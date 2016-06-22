@@ -24,6 +24,11 @@
 
         public static void DrawMenu()
         {
+            if (EditorPrefs.HasKey("PLAYFAB_CURRENT_MENU"))
+            {
+                _menuState = (MenuStates) EditorPrefs.GetInt("PLAYFAB_CURRENT_MENU");
+            }
+
             //Create a GUI Style
             var style = new GUIStyle();
             //Set the fixed height of this container
@@ -113,16 +118,19 @@
         public static void OnServicesClicked()
         {
             Debug.Log("Services Clicked");
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU",(int)MenuStates.Services);
         }
 
         public static void OnSdKsClicked()
         {
             Debug.Log("SDKS Clicked");
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Sdks);
         }
 
         public static void OnSettingsClicked()
         {
             Debug.Log("Settings Clicked");
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Settings);
         }
 
         public static void OnLogoutClicked()
@@ -130,6 +138,7 @@
             Debug.Log("Logout Clicked");
             PlayFabEditorAuthenticate.Logout();
             _menuState = MenuStates.Sdks;
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Sdks);
         }
 
     }

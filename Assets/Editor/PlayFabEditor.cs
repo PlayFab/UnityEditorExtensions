@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace PlayFab.Editor
+﻿namespace PlayFab.Editor
 {
     using UnityEngine;
     using System.Collections;
@@ -14,6 +11,7 @@ namespace PlayFab.Editor
         internal static PlayFabEditor window;
         private static GUISkin skin;
         internal static float Progress = 0f;
+        internal static bool HasEditorShown;
 
         //Create a color vector for the background;  Dark Grey
         internal static Vector3 ColorVectorDarkGrey = PlayFabEditorHelper.GetColorVector(41);
@@ -21,9 +19,10 @@ namespace PlayFab.Editor
         //Create a color vector for the background;  Light Grey
         internal static Vector3 ColorVectorLightGrey = PlayFabEditorHelper.GetColorVector(30);
 
-
         //create background texture
         internal static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVectorDarkGrey.x, ColorVectorDarkGrey.y, ColorVectorDarkGrey.z));
+
+
 
         [MenuItem("Window/PlayFab/Services")]
         static void PlayFabServices()
@@ -34,6 +33,29 @@ namespace PlayFab.Editor
             window.titleContent = new GUIContent("PlayFab");
             skin = EditorGUIUtility.Load("Assets/Editor/PlayFabSkin.GUISkin") as GUISkin;
         }
+
+        [InitializeOnLoad]
+        public class Startup
+        {
+            static Startup()
+            {
+                if (!HasEditorShown)
+                {
+                    EditorCoroutine.start(OpenPlayServices());
+                    HasEditorShown = true; 
+                }
+            }
+        }
+
+        static IEnumerator OpenPlayServices()
+        {
+            yield return new WaitForSeconds(1f);
+            if (!Application.isPlaying)
+            {
+                PlayFabServices();
+            }
+        }
+
 
         void OnGUI()
         {
@@ -46,6 +68,7 @@ namespace PlayFab.Editor
 
            //Run all updaters prior to drawing;  
             PlayFabEditorAuthenticate.Update();
+            PlayFabEditorSettings.Update();
 
             PlayFabEditorHeader.DrawHeader(Progress);
 
@@ -69,6 +92,8 @@ namespace PlayFab.Editor
                         case PlayFabEditorMenu.MenuStates.Services:
                             break;
                         case PlayFabEditorMenu.MenuStates.Settings:
+                            PlayFabEditorSettings.DrawSettingsPanel();
+                            PlayFabEditorSettings.After();
                             break;
                         default:
                             break;
