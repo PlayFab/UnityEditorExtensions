@@ -14,15 +14,30 @@
         internal static bool HasEditorShown;
 
         //Create a color vector for the background;  Dark Grey
-        internal static Vector3 ColorVectorDarkGrey = PlayFabEditorHelper.GetColorVector(41);
+        internal static Vector3 ColorVectorDarkGrey;
 
         //Create a color vector for the background;  Light Grey
-        internal static Vector3 ColorVectorLightGrey = PlayFabEditorHelper.GetColorVector(30);
+        internal static Vector3 ColorVectorLightGrey;
 
         //create background texture
-        internal static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVectorDarkGrey.x, ColorVectorDarkGrey.y, ColorVectorDarkGrey.z));
+        internal static Texture2D Background;
 
+        void OnEnable()
+        {
+            ColorVectorDarkGrey = PlayFabEditorHelper.GetColorVector(41);
+            ColorVectorLightGrey = PlayFabEditorHelper.GetColorVector(30);
+            Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVectorDarkGrey.x, ColorVectorDarkGrey.y, ColorVectorDarkGrey.z));
 
+            if (window == null)
+            {
+                window = this;
+            }
+        }
+
+        void OnFocus()
+        {
+            OnEnable();
+        }
 
         [MenuItem("Window/PlayFab/Services")]
         static void PlayFabServices()
@@ -32,6 +47,7 @@
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab");
             skin = EditorGUIUtility.Load("Assets/Editor/PlayFabSkin.GUISkin") as GUISkin;
+            EditorPrefs.SetBool("PlayFabToolsShown", true);
         }
 
         [InitializeOnLoad]
@@ -39,10 +55,9 @@
         {
             static Startup()
             {
-                if (!HasEditorShown)
+                if (!EditorPrefs.HasKey("PlayFabToolsShown") || !PlayFabEditorSDKTools.IsInstalled)
                 {
                     EditorCoroutine.start(OpenPlayServices());
-                    HasEditorShown = true; 
                 }
             }
         }

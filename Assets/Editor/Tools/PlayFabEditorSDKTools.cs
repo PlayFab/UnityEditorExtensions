@@ -9,7 +9,7 @@ namespace PlayFab.Editor
 
     public class PlayFabEditorSDKTools : Editor
     {
-        private static bool IsInstalled = IsSDKInstalled();
+        internal static bool IsInstalled = IsSDKInstalled();
         private static Vector3 ColorVector = PlayFabEditorHelper.GetColorVector(62);
         private static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVector.x, ColorVector.y, ColorVector.z));
 
@@ -59,7 +59,7 @@ namespace PlayFab.Editor
             AssetDatabase.ImportPackage(@"C:\_GitRoot\_PlayFab\sdks\UnitySDK_Experimental\PlayFabUnitySDK_Bak.unitypackage", false);
         }
 
-        public static bool IsSDKInstalled()
+        private static bool IsSDKInstalled()
         {
             var playfabVersionType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                         from type in assembly.GetTypes()
@@ -71,7 +71,7 @@ namespace PlayFab.Editor
             return playfabVersionType.ToList().Count > 0;
         }
 
-        public static void checkSdkVersion()
+        private static void checkSdkVersion()
         {
 
         }
