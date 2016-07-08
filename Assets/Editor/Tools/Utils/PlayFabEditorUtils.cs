@@ -1,4 +1,4 @@
-﻿using PlayFab.Json;
+﻿using PlayFab.Editor.Json;
 using System;
 
 using System.Globalization;

@@ -64,7 +64,7 @@ namespace PlayFab.Editor
 
             GUILayout.Space(15);
 
-            var buttonRect = EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal(); //var buttonRect = 
             var buttonWidth = 100;
 
             var linkStyle = PlayFabEditorHelper.GetTextButtonStyle();

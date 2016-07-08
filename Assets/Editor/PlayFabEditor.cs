@@ -1,4 +1,6 @@
-﻿namespace PlayFab.Editor
+﻿using System;
+
+namespace PlayFab.Editor
 {
     using UnityEngine;
     using System.Collections;
@@ -7,9 +9,9 @@
 
     public class PlayFabEditor : EditorWindow
     {
+        public static PlayFabSharedSettings PlayFabSharedSettings;
 
         internal static PlayFabEditor window;
-        private static GUISkin skin;
         internal static float Progress = 0f;
         internal static bool HasEditorShown;
 
@@ -24,6 +26,8 @@
 
         void OnEnable()
         {
+            PlayFabSharedSettings = PlayFabSettings.PlayFabShared;
+
             ColorVectorDarkGrey = PlayFabEditorHelper.GetColorVector(41);
             ColorVectorLightGrey = PlayFabEditorHelper.GetColorVector(30);
             Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVectorDarkGrey.x, ColorVectorDarkGrey.y, ColorVectorDarkGrey.z));
@@ -46,7 +50,6 @@
             var inspWndType = editorAsm.GetType("UnityEditor.SceneHierarchyWindow"); //UnityEditor.InspectorWindow
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab");
-            skin = EditorGUIUtility.Load("Assets/Editor/PlayFabSkin.GUISkin") as GUISkin;
             EditorPrefs.SetBool("PlayFabToolsShown", true);
         }
 
@@ -115,9 +118,10 @@
                     }
 
                 }
-                catch
+                catch(Exception e)
                 {
                     //Do Nothing.
+                    Debug.LogException(e);
                 }
             }
             else
