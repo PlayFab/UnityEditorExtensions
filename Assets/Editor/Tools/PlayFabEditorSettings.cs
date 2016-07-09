@@ -1,8 +1,6 @@
-﻿using System;
-using System.Text;
-
-namespace PlayFab.Editor
+﻿namespace PlayFab.Editor
 {
+    using System;
     using UnityEngine;
     using System.Collections;
     using System.Collections.Generic;
@@ -15,6 +13,12 @@ namespace PlayFab.Editor
         {
             StandardSettings,
             ApiSettings
+        }
+
+        public enum WebRequestType
+        {
+            UnityWww, // High compatability Unity api calls
+            HttpWebRequest // High performance multi-threaded api calls
         }
 
         private static readonly GUIStyle GlobalButtonStyle = PlayFabEditorHelper.GetTextButtonStyle();
@@ -41,6 +45,9 @@ namespace PlayFab.Editor
 
         //Settings properties
         private static string _TitleId;
+#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+        private static string _DeveloperSecretKey;
+#endif
         private static WebRequestType _RequestType;
         private static int _RequestTimeOut;
         private static bool _KeepAlive;
@@ -50,22 +57,6 @@ namespace PlayFab.Editor
         private static string _LoggerPort;
         private static int _LogCapLimit;
 
-
-        public static PlayFabSharedSettings GetSharedSettingsObject()
-        {
-            var settingsList = Resources.FindObjectsOfTypeAll<PlayFabSharedSettings>();
-            if (settingsList.Length != 1)
-            {
-                throw new Exception("Either Missing PlayFabSharedSettings data file or multiple data files exist.");
-            }
-            return settingsList[0];
-        }
-
-        public static void SetSettingsData()
-        {
-            _TitleId = _TitleId ?? PlayFabSettings.TitleId;
-        }
-
         public static void LoadBaseTextures()
         {
             Background = Background ?? PlayFabEditorHelper.MakeTex(1, 1, new Color(_colorVector.x, _colorVector.y, _colorVector.z));
@@ -74,8 +65,38 @@ namespace PlayFab.Editor
             CheckmarkIconOff = CheckmarkIconOff ?? EditorGUIUtility.Load("Assets/Editor/images/checkmark_off.png") as Texture2D;
         }
 
+        private static bool _isSettingsSet = false;
+        public static void SetSettingsProperties()
+        {
+            if (PlayFabEditorSDKTools.IsInstalled && !_isSettingsSet)
+            {
+                var playfabSettingsType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                    from type in assembly.GetTypes()
+                    where type.Name == "PlayFabSettings"
+                    select type);
+                if (playfabSettingsType.ToList().Count > 0)
+                {
+                    var type = playfabSettingsType.ToList().FirstOrDefault();
+                    var fields = type.GetFields();
+                    var props = type.GetProperties();
+
+                    _TitleId = (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null) ?? string.Empty; 
+                    _RequestType = (WebRequestType) props.ToList().Find(p => p.Name == "RequestType").GetValue(null, null);
+                    _RequestTimeOut = (int) props.ToList().Find(p => p.Name == "RequestTimeout").GetValue(null, null);
+                    _KeepAlive = (bool) props.ToList().Find(p => p.Name == "RequestKeepAlive").GetValue(null, null);
+                    _CompressApiData = (bool)props.ToList().Find(p => p.Name == "CompressApiData").GetValue(null, null);
+#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+                    _DeveloperSecretKey = (string) props.ToList().Find(p => p.Name == "DeveloperSecretKey").GetValue(null, null) ?? string.Empty;
+#endif
+                    _isSettingsSet = true; 
+                }
+            }
+            
+        }
+
         public static void DrawSettingsPanel()
         {
+            SetSettingsProperties();
             LoadBaseTextures();
             //SetSettingsData();
             if (EditorPrefs.HasKey("PLAYFAB_CURRENT_SETTINGSMENU"))
@@ -112,12 +133,12 @@ namespace PlayFab.Editor
 
             GUILayout.BeginHorizontal(menuStyle);
             GUILayout.Space(5);
-            if (GUILayout.Button("STANDARD SETTINGS", standardSettingsButtonStyle, GUILayout.MaxWidth(100)))
+            if (GUILayout.Button("STANDARD SETTINGS", standardSettingsButtonStyle, GUILayout.MaxWidth(110)))
             {
                 OnStandardSetttingsClicked();
             }
             GUILayout.Space(20);
-            if (GUILayout.Button("API SETTINGS", apiSettingsButtonStyle, GUILayout.MaxWidth(100)))
+            if (GUILayout.Button("API SETTINGS", apiSettingsButtonStyle, GUILayout.MaxWidth(110)))
             {
                 OnApiSettingsClicked();
             }
@@ -150,7 +171,7 @@ namespace PlayFab.Editor
         public static void DrawStandardSettingsSubPanel()
         {
             var style = PlayFabEditorHelper.GetTextButtonStyle();
-            style.fixedHeight = 185;
+            style.fixedHeight = 250;
             style.normal.background = Background;
             style.hover.background = Background;
 
@@ -163,6 +184,7 @@ namespace PlayFab.Editor
             var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
             labelStyle.font = PlayFabEditorHelper.buttonFontBold;
             labelStyle.fontSize = 14;
+            labelStyle.fixedHeight = 25f;
 
             var toggleStyle = new GUIStyle();
             toggleStyle.normal.background = CheckmarkIconOff;
@@ -192,23 +214,63 @@ namespace PlayFab.Editor
 
             GUILayout.Space(10);
 
+#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
             GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), labelStyle))
+            using (new FixedWidthLabel(new GUIContent("DEVELOPER SECRET KEY: "), labelStyle))
             {
                 GUILayout.Space(40);
-                _RequestTimeOut = EditorGUILayout.IntField(_RequestTimeOut, textFieldStyle, GUILayout.MinHeight(25));
+                _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, textFieldStyle, GUILayout.MinHeight(25));
             }
             GUILayout.Space(10);
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
+#endif
+
 
             GUILayout.BeginHorizontal();
-            var keepAliveLabel = new GUIContent("KEEP ALIVE: ");
-            using (new FixedWidthLabel(keepAliveLabel, labelStyle))
+            using (new FixedWidthLabel(new GUIContent("REQUEST TYPE: "), labelStyle))
             {
-                GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(keepAliveLabel).x - 40);
-                _KeepAlive = EditorGUILayout.Toggle(_KeepAlive, toggleStyle, GUILayout.MinHeight(25));
+                GUILayout.Space(40);
+                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, textFieldStyle, GUILayout.MinHeight(25)); //.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
+            }
+            GUILayout.Space(10);
+            GUILayout.EndHorizontal();
+
+            if (_RequestType == WebRequestType.HttpWebRequest)
+            {
+                GUILayout.Space(10);
+
+                GUILayout.BeginHorizontal();
+                using (new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), labelStyle))
+                {
+                    GUILayout.Space(40);
+                    _RequestTimeOut = EditorGUILayout.IntField(_RequestTimeOut, textFieldStyle, GUILayout.MinHeight(25));
+                }
+                GUILayout.Space(10);
+                GUILayout.EndHorizontal();
+
+                GUILayout.Space(10);
+
+                GUILayout.BeginHorizontal();
+                var keepAliveLabel = new GUIContent("KEEP ALIVE: ");
+                using (new FixedWidthLabel(keepAliveLabel, labelStyle))
+                {
+                    GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(keepAliveLabel).x - 40);
+                    _KeepAlive = EditorGUILayout.Toggle(_KeepAlive, toggleStyle, GUILayout.MinHeight(25));
+                }
+                GUILayout.Space(10);
+                GUILayout.EndHorizontal();
+            }
+
+            GUILayout.Space(10);
+
+            GUILayout.BeginHorizontal();
+            var compressDataLabel = new GUIContent("COMPRESS API DATA: ");
+            using (new FixedWidthLabel(compressDataLabel, labelStyle))
+            {
+                GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(compressDataLabel).x - 40);
+                _CompressApiData = EditorGUILayout.Toggle(_CompressApiData, toggleStyle, GUILayout.MinHeight(25));
             }
             GUILayout.Space(10);
             GUILayout.EndHorizontal();
@@ -235,8 +297,63 @@ namespace PlayFab.Editor
 
         private static void OnSaveSettings()
         {
+            //#if ENABLE_PLAYFABCLIENT_API || ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+            //#endif
 
+            Debug.Log("Save Settings Clicked");
+            if (PlayFabEditorSDKTools.IsInstalled)
+            {
+                var playfabSettingsType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                    from type in assembly.GetTypes()
+                    where type.Name == "PlayFabSettings"
+                    select type);
+                if (playfabSettingsType.ToList().Count > 0)
+                {
+                    var type = playfabSettingsType.ToList().FirstOrDefault();
+                    var fields = type.GetFields();
+                    var props = type.GetProperties();
+
+                    foreach (var property in props)
+                    {
+                        //Debug.Log(property.Name);
+                        if (property.Name.ToLower() == "titleid")
+                        {
+                            property.SetValue(null, _TitleId, null);
+                        }
+                        if (property.Name.ToLower() == "requesttype")
+                        {
+                            property.SetValue(null, (int)_RequestType, null);
+                        }
+                        if (property.Name.ToLower() == "timeout")
+                        {
+                            property.SetValue(null, _RequestTimeOut, null);
+                        }
+                        if (property.Name.ToLower() == "requestkeepalive")
+                        {
+                            property.SetValue(null, _KeepAlive, null);
+                        }
+                        if (property.Name.ToLower() == "compressapidata")
+                        {
+                            property.SetValue(null, _CompressApiData, null);
+                        }
+#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+                        if (property.Name.ToLower() == "developersecretkey")
+                        {
+                            property.SetValue(null, _DeveloperSecretKey, null);
+                        }
+#endif
+                    }
+
+                    AssetDatabase.SaveAssets();
+                }
+            }
+            else
+            {
+                Debug.Log("SDK is not installed.");
+            }
         }
+
+
 
         public static void DrawApiSubPanel()
         {

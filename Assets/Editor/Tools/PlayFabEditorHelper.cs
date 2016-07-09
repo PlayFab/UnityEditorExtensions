@@ -68,6 +68,7 @@
         {
             var buttonStyle = new GUIStyle
             {
+                clipping =TextClipping.Clip,
                 font = buttonFontBold,
                 padding =
                 {

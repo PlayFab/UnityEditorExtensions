@@ -37,6 +37,7 @@ namespace PlayFab.Editor
             var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
             labelStyle.font = PlayFabEditorHelper.buttonFontBold;
             labelStyle.fontSize = 14;
+            labelStyle.fixedHeight = 25f;
             GUILayout.Space(10);
 
             GUILayout.BeginVertical(style);

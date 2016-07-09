@@ -26,7 +26,10 @@
         {
             if (EditorPrefs.HasKey("PLAYFAB_CURRENT_MENU"))
             {
-                _menuState = (MenuStates) EditorPrefs.GetInt("PLAYFAB_CURRENT_MENU");
+                if (PlayFabEditorSDKTools.IsInstalled)
+                {
+                    _menuState = (MenuStates) EditorPrefs.GetInt("PLAYFAB_CURRENT_MENU");
+                }
             }
 
             //Create a GUI Style
@@ -90,23 +93,27 @@
 
             GUILayout.Space(15);
 
-            if (GUILayout.Button("SERVICES", servicesButtonStyle, GUILayout.MaxWidth(50)))
+            if (PlayFabEditorSDKTools.IsInstalled)
             {
-                _menuState = MenuStates.Services;
-                OnServicesClicked();
+
+                if (GUILayout.Button("SERVICES", servicesButtonStyle, GUILayout.MaxWidth(55)))
+                {
+                    _menuState = MenuStates.Services;
+                    OnServicesClicked();
+                }
+
+                GUILayout.Space(15);
+
+                if (GUILayout.Button("SETTINGS", settingsButtonStyle, GUILayout.MaxWidth(55)))
+                {
+                    _menuState = MenuStates.Settings;
+                    OnSettingsClicked();
+                }
+
+                GUILayout.Space(15);
             }
 
-            GUILayout.Space(15);
-
-            if (GUILayout.Button("SETTINGS", settingsButtonStyle, GUILayout.MaxWidth(50)))
-            {
-                _menuState = MenuStates.Settings;
-                OnSettingsClicked();
-            }
-
-            GUILayout.Space(15);
-
-            if (GUILayout.Button("LOGOUT", logoutButtonStyle, GUILayout.MaxWidth(50)))
+            if (GUILayout.Button("LOGOUT", logoutButtonStyle, GUILayout.MaxWidth(55)))
             {
                 _menuState = MenuStates.Logout;
                 OnLogoutClicked();

@@ -9,8 +9,6 @@ namespace PlayFab.Editor
 
     public class PlayFabEditor : EditorWindow
     {
-        public static PlayFabSharedSettings PlayFabSharedSettings;
-
         internal static PlayFabEditor window;
         internal static float Progress = 0f;
         internal static bool HasEditorShown;
@@ -26,8 +24,6 @@ namespace PlayFab.Editor
 
         void OnEnable()
         {
-            PlayFabSharedSettings = PlayFabSettings.PlayFabShared;
-
             ColorVectorDarkGrey = PlayFabEditorHelper.GetColorVector(41);
             ColorVectorLightGrey = PlayFabEditorHelper.GetColorVector(30);
             Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVectorDarkGrey.x, ColorVectorDarkGrey.y, ColorVectorDarkGrey.z));
@@ -47,7 +43,8 @@ namespace PlayFab.Editor
         static void PlayFabServices()
         {
             var editorAsm = typeof (Editor).Assembly;
-            var inspWndType = editorAsm.GetType("UnityEditor.SceneHierarchyWindow"); //UnityEditor.InspectorWindow
+            //var inspWndType = editorAsm.GetType("UnityEditor.SceneHierarchyWindow"); //UnityEditor.InspectorWindow
+            var inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab");
             EditorPrefs.SetBool("PlayFabToolsShown", true);
