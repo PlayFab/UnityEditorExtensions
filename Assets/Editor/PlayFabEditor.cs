@@ -1,14 +1,18 @@
-﻿using System;
+﻿
 
 namespace PlayFab.Editor
 {
+    using System;
     using UnityEngine;
     using System.Collections;
+    using System.Collections.Generic;
     using UnityEditor;
     using UnityEditor.UI;
-
+    using PlayFab.Editor.EditorModels;
     public class PlayFabEditor : EditorWindow
     {
+        public static List<Studio> Studios;
+
         internal static PlayFabEditor window;
         internal static float Progress = 0f;
         internal static bool HasEditorShown;
@@ -74,68 +78,77 @@ namespace PlayFab.Editor
 
         void OnGUI()
         {
-            //Create a GUI Style
-            var style = new GUIStyle();
-            style.stretchHeight = true;
-            style.normal.background = Background;
-            //create global container with background properties.
-            GUILayout.BeginVertical(style);
-
-           //Run all updaters prior to drawing;  
-            PlayFabEditorAuthenticate.Update();
-            PlayFabEditorSettings.Update();
-
-            PlayFabEditorHeader.DrawHeader(Progress);
-
-            if (PlayFabEditorAuthenticate.IsAuthenticated())
-            {
-                //Try catching to avoid Draw errors that do not actually impact the functionality
-                //EG. Mismatch Draw Layout errors.
-                try
-                {
-                    if (Progress >= .99f)
-                    {
-                        Progress = 0f;
-                    }
-                    PlayFabEditorMenu.DrawMenu();
-
-                    switch (PlayFabEditorMenu._menuState)
-                    {
-                        case PlayFabEditorMenu.MenuStates.Sdks:
-                            PlayFabEditorSDKTools.DrawSdkPanel();
-                            break;
-                        case PlayFabEditorMenu.MenuStates.Services:
-                            break;
-                        case PlayFabEditorMenu.MenuStates.Settings:
-                            PlayFabEditorSettings.DrawSettingsPanel();
-                            PlayFabEditorSettings.After();
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-                catch(Exception e)
-                {
-                    //Do Nothing.
-                    Debug.LogException(e);
-                }
-            }
-            else
-            {
-                PlayFabEditorAuthenticate.DrawLogin();
-            }
-
-            GUILayout.EndVertical();
-
             try
             {
-                Repaint();
+                //Create a GUI Style
+                var style = new GUIStyle();
+                style.stretchHeight = true;
+                style.normal.background = Background;
+                //create global container with background properties.
+                GUILayout.BeginVertical(style);
+
+                //Run all updaters prior to drawing;  
+                PlayFabEditorAuthenticate.Update();
+                PlayFabEditorSettings.Update();
+
+                PlayFabEditorHeader.DrawHeader(Progress);
+
+                if (PlayFabEditorAuthenticate.IsAuthenticated())
+                {
+                    //Try catching to avoid Draw errors that do not actually impact the functionality
+                    //EG. Mismatch Draw Layout errors.
+                    try
+                    {
+                        if (Progress >= .99f)
+                        {
+                            Progress = 0f;
+                        }
+                        PlayFabEditorMenu.DrawMenu();
+
+                        switch (PlayFabEditorMenu._menuState)
+                        {
+                            case PlayFabEditorMenu.MenuStates.Sdks:
+                                PlayFabEditorSDKTools.DrawSdkPanel();
+                                break;
+                            case PlayFabEditorMenu.MenuStates.Services:
+                                break;
+                            case PlayFabEditorMenu.MenuStates.Settings:
+                                PlayFabEditorSettings.DrawSettingsPanel();
+                                PlayFabEditorSettings.After();
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        //Do Nothing.
+                        Debug.LogException(e);
+                    }
+                }
+                else
+                {
+                    PlayFabEditorAuthenticate.DrawLogin();
+                }
+
+                GUILayout.EndVertical();
+
+                try
+                {
+                    Repaint();
+                }
+                catch
+                {
+                    //Do nothing.
+                }
+
             }
-            catch
+            catch (Exception e)
             {
-                //Do nothing.
+                //Do Nothing.. 
             }
+
         }
 
 

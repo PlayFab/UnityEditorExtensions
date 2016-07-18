@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Linq;
+using PlayFab.Editor.EditorModels;
 using UnityEngine.UI;
 
 namespace PlayFab.Editor
@@ -114,10 +116,38 @@ namespace PlayFab.Editor
         
         private static void OnLoginButtonClicked()
         {
-            EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
             progressMax = 100;
             progressCount = 0f;
             startProgress = true;
+            PlayFabEditorApi.Login(new LoginRequest()
+            {
+                DeveloperToolProductName = "PlayFabEditorExtension",
+                DeveloperToolProductVersion = "1.01",
+                Email = _userEmail,
+                Password = _userPass
+            }, (result) =>
+            {
+                //Debug.Log(result.DeveloperClientToken);
+                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
+                EditorPrefs.SetString("PlayFabUserPass", _userPass);
+                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
+                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
+
+                PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
+                {
+                    PlayFabEditor.Studios = getStudioResult.Studios.ToList();
+                }, (getStudiosError) =>
+                {
+                    //TODO: Error Handling
+                    Debug.Log(getStudiosError.ToString());
+                });
+
+            }, (error) =>
+            {
+                progressCount = 0f;
+                startProgress = false;
+                Debug.Log(error.ToString());
+            });
         }
 
         internal static void Update()

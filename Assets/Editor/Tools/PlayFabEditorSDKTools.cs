@@ -63,7 +63,7 @@ namespace PlayFab.Editor
         {
             var playfabVersionType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                         from type in assembly.GetTypes()
-                        where type.Name == "PlayFabVersion"
+                        where type.Name == "PlayFabSettings"
                         select type);
             
             //Debug.Log(playfabVersionType.GetType());
