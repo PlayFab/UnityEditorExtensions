@@ -35,7 +35,6 @@ namespace PlayFab.Editor
        
 
         void OnEnable()
-
         {
             ColorVectorDarkGrey = PlayFabEditorHelper.GetColorVector(41);
             ColorVectorLightGrey = PlayFabEditorHelper.GetColorVector(30);
@@ -44,6 +43,7 @@ namespace PlayFab.Editor
             if (window == null)
             {
                 window = this;
+                window.minSize = new Vector2(275, 0);
             }
 
 //            if ( listDisplay == null)
@@ -118,13 +118,13 @@ namespace PlayFab.Editor
         {
             try
             {
-                //GUI.skin = PlayFabEditorHelper.uiStyle;
+                GUI.skin = PlayFabEditorHelper.uiStyle;
 
                  //Create a GUI Style
-                var style = new GUIStyle();
-                style.stretchHeight = true;
-                style.normal.background = Background;
-                //create global container with background properties.
+//                var style = new GUIStyle();
+//                style.stretchHeight = true;
+//                style.normal.background = Background;
+//                //create global container with background properties.
 
                 if(UpdateLoopTick != null)
                 {
@@ -132,7 +132,7 @@ namespace PlayFab.Editor
                 } 
 
 
-                GUILayout.BeginVertical(style);
+                GUILayout.BeginVertical(); //style
 
 
 
@@ -140,7 +140,7 @@ namespace PlayFab.Editor
                 PlayFabEditorAuthenticate.Update();
                 PlayFabEditorSettings.Update();
 
-                PlayFabEditorHeader.DrawHeader(.55f);
+                PlayFabEditorHeader.DrawHeader(Progress);
 
                 if (PlayFabEditorAuthenticate.IsAuthenticated())
                 {
@@ -197,6 +197,10 @@ namespace PlayFab.Editor
             {
                 //Do Nothing.. 
             }
+
+
+            //GUI.Button(new Rect(0,0,EditorGUIUtility.currentViewWidth,1000), "", PlayFabEditorHelper.uiStyle.GetStyle("gpStyleBlur"));
+            //GUILayout.EndArea();
 
         }
 

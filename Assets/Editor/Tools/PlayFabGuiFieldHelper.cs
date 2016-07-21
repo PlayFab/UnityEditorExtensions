@@ -15,7 +15,7 @@
             //state changes are applied here.
 
             this.fieldWidth = style.CalcSize(label).x + 9 * EditorGUI.indentLevel;
-            EditorGUILayout.BeginHorizontal(); // create a new horizontal group
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")); // create a new horizontal group
             EditorGUILayout.LabelField(label, style, GUILayout.Width(fieldWidth));
                 //indentation from the left side. It's 9 pixels per indent level
 

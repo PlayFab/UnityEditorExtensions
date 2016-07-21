@@ -13,6 +13,7 @@ namespace PlayFab.Editor
     {
         private static string _userEmail = string.Empty;
         private static string _userPass = string.Empty;
+        private static bool _saveLogin = false;
 
         //Create Color vector for background.
         private static Vector3 ColorVector = PlayFabEditorHelper.GetColorVector(62);
@@ -47,16 +48,20 @@ namespace PlayFab.Editor
              using (FixedWidthLabel fwl = new FixedWidthLabel("EMAIL:"))
             {
                 GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _userEmail = EditorGUILayout.TextField(_userEmail, GUILayout.MinHeight(25));
+                _userEmail = EditorGUILayout.TextField(_userEmail, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
             }
 
             using (FixedWidthLabel fwl = new FixedWidthLabel("PASSWORD:"))
             {
                 GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _userPass = EditorGUILayout.TextField(_userPass, GUILayout.MinHeight(25));
+                _userPass = EditorGUILayout.PasswordField(_userPass, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
             }
 
-           // GUILayout.Space(15);
+            using (FixedWidthLabel fwl = new FixedWidthLabel("SAVE LOGIN:  "))
+            {
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                _saveLogin = EditorGUILayout.Toggle(_saveLogin, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+            }
 
             EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")); //var buttonRect = 
 
@@ -135,7 +140,7 @@ namespace PlayFab.Editor
                     PlayFabEditor.Studios = getStudioResult.Studios.ToList();
                 }, (getStudiosError) =>
                 {
-                    //TODO: Error Handling
+                    //TODO: Error Handling & have this update when the tab is opened.
                     Debug.LogError(getStudiosError.ToString());
                 });
 
