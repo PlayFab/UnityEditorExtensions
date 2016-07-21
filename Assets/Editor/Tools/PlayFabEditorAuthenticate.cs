@@ -25,66 +25,63 @@ namespace PlayFab.Editor
 
         public static void DrawLogin()
         {
-            var style = PlayFabEditorHelper.GetTextButtonStyle();
-            style.fixedHeight = 135;
-            style.normal.background = Background;
-            style.hover.background = Background;
+//            var style = PlayFabEditorHelper.GetTextButtonStyle();
+//            style.fixedHeight = 135;
+//            style.normal.background = Background;
+//            style.hover.background = Background;
 
-            var textFieldStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            textFieldStyle.font = PlayFabEditorHelper.buttonFontBold;
-            textFieldStyle.normal.background = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
-            textFieldStyle.hover.background = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
-            textFieldStyle.active.background = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
+//            var textFieldStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            textFieldStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            textFieldStyle.normal.background = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
+//            textFieldStyle.hover.background = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
+//            textFieldStyle.active.background = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
 
-            var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            labelStyle.font = PlayFabEditorHelper.buttonFontBold;
-            labelStyle.fontSize = 14;
-            labelStyle.fixedHeight = 25f;
-            GUILayout.Space(10);
+//            var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            labelStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            labelStyle.fontSize = 14;
+//            labelStyle.fixedHeight = 25f;
+            float labelWidth = 100;
 
-            GUILayout.BeginVertical(style);
-            GUILayout.Space(10);
-            GUILayout.BeginHorizontal();
-            
-            using (new FixedWidthLabel(new GUIContent("EMAIL: "), labelStyle))
+            GUILayout.BeginVertical();
+
+             using (FixedWidthLabel fwl = new FixedWidthLabel("EMAIL:"))
             {
-                GUILayout.Space(40);
-                _userEmail = EditorGUILayout.TextField(_userEmail,textFieldStyle, GUILayout.MinHeight(25));
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                _userEmail = EditorGUILayout.TextField(_userEmail, GUILayout.MinHeight(25));
             }
-            GUILayout.Space(10);
-            GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
-
-            GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("PASSWORD: "), labelStyle))
+            using (FixedWidthLabel fwl = new FixedWidthLabel("PASSWORD:"))
             {
-                GUILayout.Space(5);
-                _userPass = EditorGUILayout.PasswordField(_userPass, textFieldStyle, GUILayout.MinHeight(25));
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                _userPass = EditorGUILayout.TextField(_userPass, GUILayout.MinHeight(25));
             }
-            GUILayout.Space(10);
-            GUILayout.EndHorizontal();
 
-            GUILayout.Space(15);
+           // GUILayout.Space(15);
 
-            EditorGUILayout.BeginHorizontal(); //var buttonRect = 
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")); //var buttonRect = 
+
+
+//            var linkStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            linkStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            linkStyle.fontSize = 11;
+//            linkStyle.wordWrap = true;
+//            linkStyle.alignment = TextAnchor.MiddleCenter;
+
+            if(GUILayout.Button("CREATE AN ACCOUNT", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MaxWidth(100) ))
+            {
+                DrawRegister();
+            }
+
             var buttonWidth = 100;
-
-            var linkStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            linkStyle.font = PlayFabEditorHelper.buttonFontBold;
-            linkStyle.fontSize = 11;
-            linkStyle.wordWrap = true;
-            linkStyle.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Button("CREATE AN ACCOUNT", linkStyle, GUILayout.MaxWidth(100) );
-
             GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth * 2);
 
-            var buttonStyle = PlayFabEditorHelper.GetButtonStyle();
-            buttonStyle.font = PlayFabEditorHelper.buttonFontBold;
-            buttonStyle.fontSize = 14;
-            buttonStyle.alignment = TextAnchor.MiddleCenter;
-            buttonStyle.margin.right = 10;
-            if (GUILayout.Button("LOGIN", buttonStyle, GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+//            var buttonStyle = PlayFabEditorHelper.GetButtonStyle();
+//            buttonStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            buttonStyle.fontSize = 14;
+//            buttonStyle.alignment = TextAnchor.MiddleCenter;
+//            buttonStyle.margin.right = 10;
+
+            if (GUILayout.Button("LOGIN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
             {
                 OnLoginButtonClicked();
             }
@@ -121,8 +118,8 @@ namespace PlayFab.Editor
             startProgress = true;
             PlayFabEditorApi.Login(new LoginRequest()
             {
-                DeveloperToolProductName = "PlayFabEditorExtension",
-                DeveloperToolProductVersion = "1.01",
+                DeveloperToolProductName = "PlayFabEditorExtension",  //TODO make this statics in a helper class
+                DeveloperToolProductVersion = "1.01", //TODO make this statics in a helper class
                 Email = _userEmail,
                 Password = _userPass
             }, (result) =>
@@ -139,14 +136,14 @@ namespace PlayFab.Editor
                 }, (getStudiosError) =>
                 {
                     //TODO: Error Handling
-                    Debug.Log(getStudiosError.ToString());
+                    Debug.LogError(getStudiosError.ToString());
                 });
 
             }, (error) =>
             {
                 progressCount = 0f;
                 startProgress = false;
-                Debug.Log(error.ToString());
+                Debug.LogError(error.ToString());
             });
         }
 

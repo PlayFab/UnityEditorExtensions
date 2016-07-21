@@ -8,21 +8,22 @@
     public class FixedWidthLabel : IDisposable
     {
         private readonly ZeroIndent indentReset; //helper class to reset and restore indentation
+        public float fieldWidth = 0;
 
         public FixedWidthLabel(GUIContent label, GUIStyle style) //	constructor.
         {
             //state changes are applied here.
+
+            this.fieldWidth = style.CalcSize(label).x + 9 * EditorGUI.indentLevel;
             EditorGUILayout.BeginHorizontal(); // create a new horizontal group
-            EditorGUILayout.LabelField(label,style,
-                GUILayout.Width(style.CalcSize(label).x + // actual label width
-                                9*EditorGUI.indentLevel));
+            EditorGUILayout.LabelField(label, style, GUILayout.Width(fieldWidth));
                 //indentation from the left side. It's 9 pixels per indent level
 
             indentReset = new ZeroIndent(); //helper class to have no indentation after the label
         }
 
         public FixedWidthLabel(string label)
-            : this(new GUIContent(label), GUI.skin.label) //alternative constructor, if we don't want to deal with GUIContents
+            : this(new GUIContent(label), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")) //alternative constructor, if we don't want to deal with GUIContents
         {
         }
 

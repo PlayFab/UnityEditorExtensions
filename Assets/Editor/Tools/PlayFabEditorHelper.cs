@@ -7,6 +7,7 @@
     {
         public static Font buttonFont = EditorGUIUtility.Load("Assets/Editor/fonts/Avalon.ttf") as Font;
         public static Font buttonFontBold = EditorGUIUtility.Load("Assets/Editor/fonts/Avalon Bold.ttf") as Font;
+        public static GUISkin uiStyle = (GUISkin)(AssetDatabase.LoadAssetAtPath("Assets/Editor/ui/PlayFabStyles.guiskin", typeof(GUISkin)));
 
         public static GUIStyle GetOrangeButtonStyle()
         {
@@ -79,7 +80,7 @@
                 normal =
                 {
                     textColor = PlayFabEditorHelper.GetColor(149, 153, 149),
-                    background = GetTransparentBackground()
+                    background = GetTransparentBackground() 
                 },
                 //onNormal = {textColor = PlayFabEditorHelper.GetColor(149, 153, 149), background = GetTransparentBackground()},
                 hover =

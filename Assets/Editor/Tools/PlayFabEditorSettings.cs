@@ -105,40 +105,39 @@
             }
 
             //Create a GUI Style
-            var menuStyle = new GUIStyle();
-            //Set the fixed height of this container
-            menuStyle.fixedHeight = 25f;
-            menuStyle.margin.top = 10;
-            menuStyle.normal.background = Background;
-            var apiSettingsButtonStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            var standardSettingsButtonStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            var menuStyle = new GUIStyle();
+//            //Set the fixed height of this container
+//            menuStyle.fixedHeight = 25f;
+//            menuStyle.margin.top = 10;
+//            menuStyle.normal.background = Background;
+
+            var apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            var standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
 
             if (_subMenuState == SubMenuStates.StandardSettings)
             {
-                standardSettingsButtonStyle.normal = GlobalButtonStyle.active;
+                standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
             }
             else
             {
-                standardSettingsButtonStyle.normal = GlobalButtonStyle.normal;
+                standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             }
 
             if (_subMenuState == SubMenuStates.ApiSettings)
             {
-                apiSettingsButtonStyle.normal = GlobalButtonStyle.active;
+                apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
             }
             else
             {
-                apiSettingsButtonStyle.normal = GlobalButtonStyle.normal;
+                apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             }
 
-            GUILayout.BeginHorizontal(menuStyle);
-            GUILayout.Space(5);
-            if (GUILayout.Button("STANDARD SETTINGS", standardSettingsButtonStyle, GUILayout.MaxWidth(110)))
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("STANDARD SETTINGS", standardSettingsButtonStyle))
             {
                 OnStandardSetttingsClicked();
             }
-            GUILayout.Space(20);
-            if (GUILayout.Button("API SETTINGS", apiSettingsButtonStyle, GUILayout.MaxWidth(110)))
+            if (GUILayout.Button("API SETTINGS", apiSettingsButtonStyle))
             {
                 OnApiSettingsClicked();
             }
@@ -153,8 +152,6 @@
                     DrawApiSubPanel();
                     break;
             }
-
-
         }
 
         private static void OnApiSettingsClicked()
@@ -170,16 +167,16 @@
 
         public static void DrawStandardSettingsSubPanel()
         {
-            var style = PlayFabEditorHelper.GetTextButtonStyle();
-            style.fixedHeight = 250;
-            style.normal.background = Background;
-            style.hover.background = Background;
+//            var style = PlayFabEditorHelper.GetTextButtonStyle();
+//            style.fixedHeight = 250;
+//            style.normal.background = Background;
+//            style.hover.background = Background;
 
-            var textFieldStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            textFieldStyle.font = PlayFabEditorHelper.buttonFontBold;
-            textFieldStyle.normal.background = _textFieldBackground;
-            textFieldStyle.hover.background = _textFieldBackground;
-            textFieldStyle.active.background = _textFieldBackground;
+//            var textFieldStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            textFieldStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            textFieldStyle.normal.background = _textFieldBackground;
+//            textFieldStyle.hover.background = _textFieldBackground;
+//            textFieldStyle.active.background = _textFieldBackground;
 
             var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
             labelStyle.font = PlayFabEditorHelper.buttonFontBold;
@@ -198,44 +195,60 @@
             toggleStyle.fixedHeight = 20;
             toggleStyle.fixedWidth = 20;
 
-            GUILayout.Space(10);
-            GUILayout.BeginVertical(style);
-            GUILayout.Space(10);
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true));
+           
+
+            //GUILayout.BeginHorizontal();
+
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                    EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(100));
+                    _TitleId = EditorGUILayout.TextField(_TitleId, GUILayout.MinHeight(25));
+                GUILayout.EndHorizontal();
 
 
-            GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("TITLE ID: "), labelStyle))
-            {
-                GUILayout.Space(40);
-                _TitleId = EditorGUILayout.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
-            }
-            GUILayout.Space(10);
-            GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
+//            using (new FixedWidthLabel(new GUIContent("TITLE ID: "), labelStyle))
+//            {
+//                GUILayout.Space(40);
+//                _TitleId = EditorGUILayout.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
+//            }
+//            GUILayout.Space(10);
+//            GUILayout.EndHorizontal();
+
+//            GUILayout.Space(10);
 
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-            GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("DEVELOPER SECRET KEY: "), labelStyle))
-            {
-                GUILayout.Space(40);
-                _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, textFieldStyle, GUILayout.MinHeight(25));
-            }
-            GUILayout.Space(10);
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                    EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(100));
+                    _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, GUILayout.MinHeight(25));
+                GUILayout.EndHorizontal();
+
+//            GUILayout.BeginHorizontal();
+//            using (new FixedWidthLabel(new GUIContent("DEVELOPER SECRET KEY: "), labelStyle))
+//            {
+//                GUILayout.Space(40);
+//                _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, textFieldStyle, GUILayout.MinHeight(25));
+//            }
+//            GUILayout.Space(10);
+//            GUILayout.EndHorizontal();
+//
+//            GUILayout.Space(10);
+            #endif
+
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+            EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(100));
+                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, GUILayout.MinHeight(25), GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
-#endif
+//            GUILayout.BeginHorizontal();
 
-
-            GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("REQUEST TYPE: "), labelStyle))
-            {
-                GUILayout.Space(40);
-                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, textFieldStyle, GUILayout.MinHeight(25)); //.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
-            }
-            GUILayout.Space(10);
-            GUILayout.EndHorizontal();
+//            using (new FixedWidthLabel(new GUIContent("REQUEST TYPE: "), labelStyle))
+//            {
+//                GUILayout.Space(40);
+//                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, textFieldStyle, GUILayout.MinHeight(25)); //.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
+//            }
+//            GUILayout.Space(10);
+//            GUILayout.EndHorizontal();
 
             if (_RequestType == WebRequestType.HttpWebRequest)
             {
@@ -245,7 +258,7 @@
                 using (new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), labelStyle))
                 {
                     GUILayout.Space(40);
-                    _RequestTimeOut = EditorGUILayout.IntField(_RequestTimeOut, textFieldStyle, GUILayout.MinHeight(25));
+                    _RequestTimeOut = EditorGUILayout.IntField(_RequestTimeOut, GUILayout.MinHeight(25));
                 }
                 GUILayout.Space(10);
                 GUILayout.EndHorizontal();
