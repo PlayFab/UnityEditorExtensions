@@ -13,6 +13,11 @@ namespace PlayFab.Editor
     {
         public static List<Studio> Studios;
 
+
+        // testing alt update loop
+        public delegate void playFabEditorUpdate();
+        public static event playFabEditorUpdate UpdateLoopTick;
+
         internal static PlayFabEditor window;
         internal static float Progress = 0f;
         internal static bool HasEditorShown;
@@ -26,6 +31,9 @@ namespace PlayFab.Editor
         //create background texture
         internal static Texture2D Background;
 
+        private ListDisplay listDisplay;
+       
+
         void OnEnable()
         {
             ColorVectorDarkGrey = PlayFabEditorHelper.GetColorVector(41);
@@ -35,7 +43,37 @@ namespace PlayFab.Editor
             if (window == null)
             {
                 window = this;
+                window.minSize = new Vector2(275, 0);
             }
+
+//            if ( listDisplay == null)
+//            {
+//                listDisplay = CreateInstance<ListDisplay>();
+//                listDisplay.displayTitle = "Title Data:";
+//                listDisplay.items.Add(new KvpItem("Key1", "Value1"));
+//                listDisplay.items.Add(new KvpItem("Key2", "Value2"));
+//
+//                listDisplay.settings = (BaseUiComponent.ComponentSettings.useScrollBar | BaseUiComponent.ComponentSettings.fillHorizontal);
+//                listDisplay.Init(new Rect(20,20,450,120), PlayFabEditor.window.position, Color.gray, PlayFabEditorHelper.uiStyle.GetStyle("listDisplay"));
+//               
+//
+//            }
+//
+//
+//            if(listDisplay.postDrawCall == null)
+//            {
+////                listDisplay.postDrawCall = () => 
+////                {
+////                    GUILayout.TextArea(Event.current.mousePosition.ToString());
+////
+////                    EditorGUILayout.TextArea(listDisplay.bounds.ToString());
+////                    EditorGUILayout.TextArea(listDisplay.parentBounds.ToString());
+////                    if(GUILayout.Button("Submit"))
+////                    {
+////                        BaseUiAnimationController.StartAlphaFade(1, 0, listDisplay);
+////                    }
+////                };
+//            }
         }
 
         void OnFocus()
@@ -80,12 +118,23 @@ namespace PlayFab.Editor
         {
             try
             {
-                //Create a GUI Style
-                var style = new GUIStyle();
-                style.stretchHeight = true;
-                style.normal.background = Background;
-                //create global container with background properties.
-                GUILayout.BeginVertical(style);
+                GUI.skin = PlayFabEditorHelper.uiStyle;
+
+                 //Create a GUI Style
+//                var style = new GUIStyle();
+//                style.stretchHeight = true;
+//                style.normal.background = Background;
+//                //create global container with background properties.
+
+                if(UpdateLoopTick != null)
+                {
+                    UpdateLoopTick();
+                } 
+
+
+                GUILayout.BeginVertical(); //style
+
+
 
                 //Run all updaters prior to drawing;  
                 PlayFabEditorAuthenticate.Update();
@@ -103,6 +152,8 @@ namespace PlayFab.Editor
                         {
                             Progress = 0f;
                         }
+
+
                         PlayFabEditorMenu.DrawMenu();
 
                         switch (PlayFabEditorMenu._menuState)
@@ -114,22 +165,25 @@ namespace PlayFab.Editor
                                 break;
                             case PlayFabEditorMenu.MenuStates.Settings:
                                 PlayFabEditorSettings.DrawSettingsPanel();
-                                PlayFabEditorSettings.After();
+                                PlayFabEditorSettings.After(); //TODO why is this getting called every frame?
                                 break;
                             default:
                                 break;
                         }
 
+
+
+
                     }
                     catch (Exception e)
                     {
                         //Do Nothing.
-                        Debug.LogException(e);
+                        //Debug.LogException(e); // currently gettting a few errores: Getting control 1's position in a group with only 1 controls when doing Repaint
                     }
                 }
                 else
                 {
-                    PlayFabEditorAuthenticate.DrawLogin();
+                    PlayFabEditorAuthenticate.DrawAuthPanels();
                 }
 
                 GUILayout.EndVertical();
@@ -149,8 +203,20 @@ namespace PlayFab.Editor
                 //Do Nothing.. 
             }
 
+
+            //GUI.Button(new Rect(0,0,EditorGUIUtility.currentViewWidth,1000), "", PlayFabEditorHelper.uiStyle.GetStyle("gpStyleBlur"));
+            //GUILayout.EndArea();
+
         }
 
-
+        void OnDisable()
+        {
+            // clean up objects:
+            //Object.DestroyImmediate(testObjA);
+            //Object.DestroyImmediate(testObjB);
+            //Object.DestroyImmediate(testObjC);
+            UnityEngine.Object.DestroyImmediate(listDisplay);
+            EditorPrefs.SetBool("IsPlayFabAuthenticated", false);
+        }
     }
 }

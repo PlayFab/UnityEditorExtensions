@@ -6,76 +6,65 @@
 
     public class PlayFabEditorHeader : Editor
     {
-        private static Texture2D LogoTex = EditorGUIUtility.Load("Assets/Editor/images/playfablogo.png") as Texture2D;
+        //private static Texture2D LogoTex = EditorGUIUtility.Load("Assets/Editor/images/playfablogo.png") as Texture2D;
 
-        private static Texture2D DashboardIcon =
-            EditorGUIUtility.Load("Assets/Editor/images/dashboardIcon.png") as Texture2D;
+       // private static Texture2D DashboardIcon =
+           // EditorGUIUtility.Load("Assets/Editor/images/dashboardIcon.png") as Texture2D;
 
-        private static Texture2D DashboardIconHover =
-            EditorGUIUtility.Load("Assets/Editor/images/dashboardIconHover.png") as Texture2D;
+        //private static Texture2D DashboardIconHover =
+            //EditorGUIUtility.Load("Assets/Editor/images/dashboardIconHover.png") as Texture2D;
 
-        private static Texture2D Background = PlayFabEditorHelper.MakeTex(50, (int)EditorGUIUtility.currentViewWidth,
-                new Color(PlayFabEditor.ColorVectorDarkGrey.x, PlayFabEditor.ColorVectorDarkGrey.y, PlayFabEditor.ColorVectorDarkGrey.z));
+        //private static Texture2D Background = PlayFabEditorHelper.MakeTex(50, (int)EditorGUIUtility.currentViewWidth,
+                //new Color(PlayFabEditor.ColorVectorDarkGrey.x, PlayFabEditor.ColorVectorDarkGrey.y, PlayFabEditor.ColorVectorDarkGrey.z));
 
         public static void DrawHeader(float progress = 0f)
         {
             //Create a GUI Style
-            var style = new GUIStyle();
-            //Set the fixed height of this container
-            style.fixedHeight = 52f;
-            //draw the background
-            style.normal.background = Background;
+//            var style = new GUIStyle();
+//            //Set the fixed height of this container
+//            style.fixedHeight = 52f;
+//            //draw the background
+//            style.normal.background = Background;
 
             //using Begin Vertical as our container.
-            GUILayout.BeginHorizontal(style);
+            GUILayout.BeginHorizontal();
+
             //Set the image in the container
             if (EditorGUIUtility.currentViewWidth < 375)
             {
-                GUILayout.Label(LogoTex, GUILayout.MaxHeight(40), GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth));
+                GUILayout.Label("", PlayFabEditorHelper.uiStyle.GetStyle("pfLogo"), GUILayout.MaxHeight(40), GUILayout.Width(186));
             }
             else
             {
-                GUILayout.Label(LogoTex, GUILayout.MaxHeight(50), GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth));
+                GUILayout.Label("", PlayFabEditorHelper.uiStyle.GetStyle("pfLogo"), GUILayout.MaxHeight(50), GUILayout.Width(233));
             }
 
-            if (EditorGUIUtility.currentViewWidth > 375)
-            {
-                var dashboardStyle = PlayFabEditorHelper.GetTextButtonStyle();
-                dashboardStyle.font = PlayFabEditorHelper.buttonFont;
-                dashboardStyle.fontSize = 11;
-                dashboardStyle.margin.top = 10;
-                if (GUILayout.Button("GAME MANAGER", dashboardStyle))
+
+            float gmAnchor = EditorGUIUtility.currentViewWidth - 30;
+
+
+                if (EditorGUIUtility.currentViewWidth > 375)
                 {
-                    OnDashbaordClicked();
+                    gmAnchor = EditorGUIUtility.currentViewWidth - 140;
+                    GUILayout.BeginArea(new Rect(gmAnchor, 10, 140, 42));
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("GAME MANAGER", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MaxWidth(105)))
+                    {
+                        OnDashbaordClicked();
+                    }
+                }
+                else
+                {
+                    GUILayout.BeginArea(new Rect(gmAnchor, 10, EditorGUIUtility.currentViewWidth * .25f, 42));
+                    GUILayout.BeginHorizontal();
                 }
 
-                GUILayout.Space(5);
-
-                var dashboardIconStyle = PlayFabEditorHelper.GetTextButtonStyle();
-                dashboardIconStyle.normal.background = DashboardIcon;
-                dashboardIconStyle.hover.background = DashboardIconHover;
-                dashboardIconStyle.active.background = DashboardIconHover;
-                dashboardIconStyle.margin.top = 5;
-                dashboardIconStyle.margin.right = 5;
-                if (GUILayout.Button("      ", dashboardIconStyle, GUILayout.MaxHeight(24), GUILayout.MaxWidth(24)))
-                {
-                    OnDashbaordClicked();
-                }
-            }
-            else
-            {
-                var dashboardIconStyle = PlayFabEditorHelper.GetTextButtonStyle();
-                dashboardIconStyle.normal.background = DashboardIcon;
-                dashboardIconStyle.hover.background = DashboardIconHover;
-                dashboardIconStyle.active.background = DashboardIconHover;
-                dashboardIconStyle.margin.top = 5;
-                dashboardIconStyle.margin.right = 5;
-                if (GUILayout.Button("      ", dashboardIconStyle, GUILayout.MaxHeight(24), GUILayout.MaxWidth(24)))
-                {
-                    OnDashbaordClicked();
-                }
-            }
-
+                if (GUILayout.Button("", PlayFabEditorHelper.uiStyle.GetStyle("gmIcon")))
+                    {
+                        OnDashbaordClicked();
+                    }
+               GUILayout.EndHorizontal();
+            GUILayout.EndArea();
 
             //end the vertical container
             GUILayout.EndHorizontal();
@@ -93,16 +82,11 @@
 
         }
 
-        private static void DrawProgressBar(float progress)
+        private static void DrawProgressBar(float progress) //progress = 0 -> 1
         {
-                //create our container and get the rect back for positioning
-                var r = EditorGUILayout.BeginVertical();
-                //create a new rect that will be used as our progress bar
-                var rect = new Rect(0, r.position.y, EditorGUIUtility.currentViewWidth, 10);
-                //draw progress bar
-                EditorGUI.ProgressBar(rect, progress, "");
-                //end the container
-                GUILayout.EndVertical();
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("progressBarBg"));
+                GUILayout.Label("", PlayFabEditorHelper.uiStyle.GetStyle("progressBarFg"), GUILayout.Width(EditorGUIUtility.currentViewWidth * progress));
+            GUILayout.EndHorizontal();
         }
 
         private static void OnDashbaordClicked()

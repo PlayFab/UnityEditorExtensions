@@ -28,19 +28,19 @@
         private const string ClientAPI = "DISABLE_PLAYFABCLIENT_API";
         private const string DebugRequestTiming = "PLAYFAB_REQUEST_TIMING";
 
-        private static Texture2D CheckmarkIconOn =
-            EditorGUIUtility.Load("Assets/Editor/images/checkmark_on.png") as Texture2D;
-        private static Texture2D CheckmarkIconOff =
-            EditorGUIUtility.Load("Assets/Editor/images/checkmark_off.png") as Texture2D;
+//        private static Texture2D CheckmarkIconOn =
+//            EditorGUIUtility.Load("Assets/Editor/images/checkmark_on.png") as Texture2D;
+//        private static Texture2D CheckmarkIconOff =
+//            EditorGUIUtility.Load("Assets/Editor/images/checkmark_off.png") as Texture2D;
 
         private static bool _isAdminSdkEnabled;
         private static bool _isServerSdkEnabled;
         private static bool _isClientSdkEnabled = true;
         private static bool _IsDebugRequestTiming;
 
-        private static Vector3 _colorVector = PlayFabEditorHelper.GetColorVector(62);
-        private static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(_colorVector.x, _colorVector.y, _colorVector.z));
-        private static Texture2D _textFieldBackground = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
+//        private static Vector3 _colorVector = PlayFabEditorHelper.GetColorVector(62);
+//        private static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(_colorVector.x, _colorVector.y, _colorVector.z));
+//        private static Texture2D _textFieldBackground = PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
         private static SubMenuStates _subMenuState;
 
         //Settings properties
@@ -59,10 +59,10 @@
 
         public static void LoadBaseTextures()
         {
-            Background = Background ?? PlayFabEditorHelper.MakeTex(1, 1, new Color(_colorVector.x, _colorVector.y, _colorVector.z));
-            _textFieldBackground = _textFieldBackground ?? PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
-            CheckmarkIconOn = CheckmarkIconOn ?? EditorGUIUtility.Load("Assets/Editor/images/checkmark_on.png") as Texture2D;
-            CheckmarkIconOff = CheckmarkIconOff ?? EditorGUIUtility.Load("Assets/Editor/images/checkmark_off.png") as Texture2D;
+//            Background = Background ?? PlayFabEditorHelper.MakeTex(1, 1, new Color(_colorVector.x, _colorVector.y, _colorVector.z));
+//            _textFieldBackground = _textFieldBackground ?? PlayFabEditorHelper.MakeTex(1, 1, PlayFabEditorHelper.GetColor(255, 255, 255));
+//            CheckmarkIconOn = CheckmarkIconOn ?? EditorGUIUtility.Load("Assets/Editor/images/checkmark_on.png") as Texture2D;
+//            CheckmarkIconOff = CheckmarkIconOff ?? EditorGUIUtility.Load("Assets/Editor/images/checkmark_off.png") as Texture2D;
         }
 
         private static bool _isSettingsSet = false;
@@ -105,40 +105,39 @@
             }
 
             //Create a GUI Style
-            var menuStyle = new GUIStyle();
-            //Set the fixed height of this container
-            menuStyle.fixedHeight = 25f;
-            menuStyle.margin.top = 10;
-            menuStyle.normal.background = Background;
-            var apiSettingsButtonStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            var standardSettingsButtonStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            var menuStyle = new GUIStyle();
+//            //Set the fixed height of this container
+//            menuStyle.fixedHeight = 25f;
+//            menuStyle.margin.top = 10;
+//            menuStyle.normal.background = Background;
+
+            var apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            var standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
 
             if (_subMenuState == SubMenuStates.StandardSettings)
             {
-                standardSettingsButtonStyle.normal = GlobalButtonStyle.active;
+                standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
             }
             else
             {
-                standardSettingsButtonStyle.normal = GlobalButtonStyle.normal;
+                standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             }
 
             if (_subMenuState == SubMenuStates.ApiSettings)
             {
-                apiSettingsButtonStyle.normal = GlobalButtonStyle.active;
+                apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
             }
             else
             {
-                apiSettingsButtonStyle.normal = GlobalButtonStyle.normal;
+                apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             }
 
-            GUILayout.BeginHorizontal(menuStyle);
-            GUILayout.Space(5);
-            if (GUILayout.Button("STANDARD SETTINGS", standardSettingsButtonStyle, GUILayout.MaxWidth(110)))
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("STANDARD SETTINGS", standardSettingsButtonStyle))
             {
                 OnStandardSetttingsClicked();
             }
-            GUILayout.Space(20);
-            if (GUILayout.Button("API SETTINGS", apiSettingsButtonStyle, GUILayout.MaxWidth(110)))
+            if (GUILayout.Button("API SETTINGS", apiSettingsButtonStyle))
             {
                 OnApiSettingsClicked();
             }
@@ -153,8 +152,6 @@
                     DrawApiSubPanel();
                     break;
             }
-
-
         }
 
         private static void OnApiSettingsClicked()
@@ -170,126 +167,126 @@
 
         public static void DrawStandardSettingsSubPanel()
         {
-            var style = PlayFabEditorHelper.GetTextButtonStyle();
-            style.fixedHeight = 250;
-            style.normal.background = Background;
-            style.hover.background = Background;
+//            var style = PlayFabEditorHelper.GetTextButtonStyle();
+//            style.fixedHeight = 250;
+//            style.normal.background = Background;
+//            style.hover.background = Background;
 
-            var textFieldStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            textFieldStyle.font = PlayFabEditorHelper.buttonFontBold;
-            textFieldStyle.normal.background = _textFieldBackground;
-            textFieldStyle.hover.background = _textFieldBackground;
-            textFieldStyle.active.background = _textFieldBackground;
+//            var textFieldStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            textFieldStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            textFieldStyle.normal.background = _textFieldBackground;
+//            textFieldStyle.hover.background = _textFieldBackground;
+//            textFieldStyle.active.background = _textFieldBackground;
 
-            var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            labelStyle.font = PlayFabEditorHelper.buttonFontBold;
-            labelStyle.fontSize = 14;
-            labelStyle.fixedHeight = 25f;
+//            var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            labelStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            labelStyle.fontSize = 14;
+//            labelStyle.fixedHeight = 25f;
+//
+//            var toggleStyle = new GUIStyle();
+//            toggleStyle.normal.background = CheckmarkIconOff;
+//            toggleStyle.hover.background = CheckmarkIconOff;
+//            toggleStyle.active.background = CheckmarkIconOff;
+//
+//            toggleStyle.onNormal.background = CheckmarkIconOn;
+//            toggleStyle.onHover.background = CheckmarkIconOn;
+//            toggleStyle.onActive.background = CheckmarkIconOn;
+//
+//            toggleStyle.fixedHeight = 20;
+//            toggleStyle.fixedWidth = 20;
 
-            var toggleStyle = new GUIStyle();
-            toggleStyle.normal.background = CheckmarkIconOff;
-            toggleStyle.hover.background = CheckmarkIconOff;
-            toggleStyle.active.background = CheckmarkIconOff;
+            float labelWidth = 160;
 
-            toggleStyle.onNormal.background = CheckmarkIconOn;
-            toggleStyle.onHover.background = CheckmarkIconOn;
-            toggleStyle.onActive.background = CheckmarkIconOn;
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true));
+           
 
-            toggleStyle.fixedHeight = 20;
-            toggleStyle.fixedWidth = 20;
+            //GUILayout.BeginHorizontal();
 
-            GUILayout.Space(10);
-            GUILayout.BeginVertical(style);
-            GUILayout.Space(10);
-
-
-            GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("TITLE ID: "), labelStyle))
-            {
-                GUILayout.Space(40);
-                _TitleId = EditorGUILayout.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
-            }
-            GUILayout.Space(10);
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                _TitleId = EditorGUILayout.TextField(_TitleId, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
+
+
+//            using (new FixedWidthLabel(new GUIContent("TITLE ID: "), labelStyle))
+//            {
+//                GUILayout.Space(40);
+//                _TitleId = EditorGUILayout.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
+//            }
+//            GUILayout.Space(10);
+//            GUILayout.EndHorizontal();
+
+//            GUILayout.Space(10);
 
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-            GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("DEVELOPER SECRET KEY: "), labelStyle))
-            {
-                GUILayout.Space(40);
-                _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, textFieldStyle, GUILayout.MinHeight(25));
-            }
-            GUILayout.Space(10);
+                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                    EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+            _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                GUILayout.EndHorizontal();
+
+//            GUILayout.BeginHorizontal();
+//            using (new FixedWidthLabel(new GUIContent("DEVELOPER SECRET KEY: "), labelStyle))
+//            {
+//                GUILayout.Space(40);
+//                _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, textFieldStyle, GUILayout.MinHeight(25));
+//            }
+//            GUILayout.Space(10);
+//            GUILayout.EndHorizontal();
+//
+//            GUILayout.Space(10);
+            #endif
+
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
+                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(10);
-#endif
+//            GUILayout.BeginHorizontal();
 
-
-            GUILayout.BeginHorizontal();
-            using (new FixedWidthLabel(new GUIContent("REQUEST TYPE: "), labelStyle))
-            {
-                GUILayout.Space(40);
-                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, textFieldStyle, GUILayout.MinHeight(25)); //.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
-            }
-            GUILayout.Space(10);
-            GUILayout.EndHorizontal();
+//            using (new FixedWidthLabel(new GUIContent("REQUEST TYPE: "), labelStyle))
+//            {
+//                GUILayout.Space(40);
+//                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, textFieldStyle, GUILayout.MinHeight(25)); //.TextField(_TitleId, textFieldStyle, GUILayout.MinHeight(25));
+//            }
+//            GUILayout.Space(10);
+//            GUILayout.EndHorizontal();
 
             if (_RequestType == WebRequestType.HttpWebRequest)
             {
-                GUILayout.Space(10);
-
-                GUILayout.BeginHorizontal();
-                using (new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), labelStyle))
+                using (FixedWidthLabel fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
                 {
-                    GUILayout.Space(40);
-                    _RequestTimeOut = EditorGUILayout.IntField(_RequestTimeOut, textFieldStyle, GUILayout.MinHeight(25));
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _RequestTimeOut = EditorGUILayout.IntField(_RequestTimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
                 }
-                GUILayout.Space(10);
-                GUILayout.EndHorizontal();
 
-                GUILayout.Space(10);
-
-                GUILayout.BeginHorizontal();
-                var keepAliveLabel = new GUIContent("KEEP ALIVE: ");
-                using (new FixedWidthLabel(keepAliveLabel, labelStyle))
+                using (FixedWidthLabel fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
                 {
-                    GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(keepAliveLabel).x - 40);
-                    _KeepAlive = EditorGUILayout.Toggle(_KeepAlive, toggleStyle, GUILayout.MinHeight(25));
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _KeepAlive = EditorGUILayout.Toggle(_KeepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
                 }
-                GUILayout.Space(10);
-                GUILayout.EndHorizontal();
             }
 
-            GUILayout.Space(10);
 
-            GUILayout.BeginHorizontal();
-            var compressDataLabel = new GUIContent("COMPRESS API DATA: ");
-            using (new FixedWidthLabel(compressDataLabel, labelStyle))
-            {
-                GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(compressDataLabel).x - 40);
-                _CompressApiData = EditorGUILayout.Toggle(_CompressApiData, toggleStyle, GUILayout.MinHeight(25));
-            }
-            GUILayout.Space(10);
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                EditorGUILayout.LabelField("COMPRESS API DATA: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
+                _CompressApiData = EditorGUILayout.Toggle(_CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             GUILayout.EndHorizontal();
+           
 
-            GUILayout.Space(20);
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                var buttonWidth = 100;
+                GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth);
 
-            GUILayout.BeginHorizontal();
-            var buttonWidth = 100;
-            GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth);
-
-            var buttonStyle = PlayFabEditorHelper.GetButtonStyle();
-            buttonStyle.font = PlayFabEditorHelper.buttonFontBold;
-            buttonStyle.fontSize = 14;
-            buttonStyle.alignment = TextAnchor.MiddleCenter;
-            buttonStyle.margin.right = 10;
-            if (GUILayout.Button("SAVE", buttonStyle, GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
-            {
-                OnSaveSettings();
-            }
+//                var buttonStyle = PlayFabEditorHelper.GetButtonStyle();
+//                buttonStyle.font = PlayFabEditorHelper.buttonFontBold;
+//                buttonStyle.fontSize = 14;
+//                buttonStyle.alignment = TextAnchor.MiddleCenter;
+//                buttonStyle.margin.right = 10;
+                if (GUILayout.Button("SAVE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+                {
+                    OnSaveSettings();
+                }
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -357,66 +354,58 @@
 
         public static void DrawApiSubPanel()
         {
-            var style = PlayFabEditorHelper.GetTextButtonStyle();
-            style.fixedHeight = 165;
-            style.normal.background = Background;
-            style.hover.background = Background;
+//            var style = PlayFabEditorHelper.GetTextButtonStyle();
+//            style.fixedHeight = 165;
+//            style.normal.background = Background;
+//            style.hover.background = Background;
+//
+//            var toggleStyle = new GUIStyle();
+//            toggleStyle.normal.background = CheckmarkIconOff;
+//            toggleStyle.hover.background = CheckmarkIconOff;
+//            toggleStyle.active.background = CheckmarkIconOff;
+//
+//            toggleStyle.onNormal.background = CheckmarkIconOn;
+//            toggleStyle.onHover.background = CheckmarkIconOn;
+//            toggleStyle.onActive.background = CheckmarkIconOn;
+//
+//            toggleStyle.fixedHeight = 20;
+//            toggleStyle.fixedWidth = 20;
+//
+//            var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//            labelStyle.font = PlayFabEditorHelper.buttonFontBold;
+//            labelStyle.fontSize = 14;
+//            labelStyle.alignment = TextAnchor.MiddleLeft;
 
-            var toggleStyle = new GUIStyle();
-            toggleStyle.normal.background = CheckmarkIconOff;
-            toggleStyle.hover.background = CheckmarkIconOff;
-            toggleStyle.active.background = CheckmarkIconOff;
+//            GUILayout.Space(10);
 
-            toggleStyle.onNormal.background = CheckmarkIconOn;
-            toggleStyle.onHover.background = CheckmarkIconOn;
-            toggleStyle.onActive.background = CheckmarkIconOn;
+            float labelWidth = 160;
 
-            toggleStyle.fixedHeight = 20;
-            toggleStyle.fixedWidth = 20;
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+//            GUILayout.Space(10);
 
-            var labelStyle = PlayFabEditorHelper.GetTextButtonStyle();
-            labelStyle.font = PlayFabEditorHelper.buttonFontBold;
-            labelStyle.fontSize = 14;
-            labelStyle.alignment = TextAnchor.MiddleLeft;
-
-            GUILayout.Space(10);
-
-            GUILayout.BeginVertical(style);
-            GUILayout.Space(10);
-
-            var clientLabel = new GUIContent("Enable Client API: ");
-            using (new FixedWidthLabel(clientLabel, labelStyle))
+            //var clientLabel = new GUIContent("Enable Client API: ");
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Client API: "))
             {
-                GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(clientLabel).x - 40);
-                _isClientSdkEnabled = EditorGUILayout.Toggle(_isClientSdkEnabled, toggleStyle, GUILayout.MinHeight(25));
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                _isClientSdkEnabled = EditorGUILayout.Toggle(_isClientSdkEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             }
 
-            GUILayout.Space(10);
-
-            var adminLabel = new GUIContent("Enable Admin API: ");
-            using (new FixedWidthLabel(adminLabel, labelStyle))
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Admin API:  "))
             {
-                GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(adminLabel).x - 40);
-                _isAdminSdkEnabled = EditorGUILayout.Toggle(_isAdminSdkEnabled, toggleStyle, GUILayout.MinHeight(25));
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                _isAdminSdkEnabled = EditorGUILayout.Toggle(_isAdminSdkEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             }
 
-            GUILayout.Space(10);
-
-            var serverLabel = new GUIContent("Enable Server API: ");
-            using (new FixedWidthLabel(serverLabel, labelStyle))
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Server API: "))
             {
-                GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(serverLabel).x - 40);
-                _isServerSdkEnabled = EditorGUILayout.Toggle(_isServerSdkEnabled, toggleStyle, GUILayout.MinHeight(25));
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                _isServerSdkEnabled = EditorGUILayout.Toggle(_isServerSdkEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             }
 
-            GUILayout.Space(10);
-
-            var debugRequestLabel = new GUIContent("Debug Request Times: ");
-            using (new FixedWidthLabel(debugRequestLabel, labelStyle))
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Debug Request Times: "))
             {
-                GUILayout.Space(EditorGUIUtility.currentViewWidth - labelStyle.CalcSize(debugRequestLabel).x - 40);
-                _IsDebugRequestTiming = EditorGUILayout.Toggle(_IsDebugRequestTiming, toggleStyle, GUILayout.MinHeight(25));
-
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                _IsDebugRequestTiming = EditorGUILayout.Toggle(_IsDebugRequestTiming, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             }
 
             GUILayout.EndVertical();

@@ -24,28 +24,33 @@ namespace PlayFab.Editor
                 //NO SDK Is Installed..
 
                 //Create a GUI Style
-                var style = new GUIStyle();
-                //Set the fixed height of this container
-                style.fixedHeight = 100f;
-                style.margin.top = 10;
-                style.normal.background = Background;
+//                var style = new GUIStyle();
+//                //Set the fixed height of this container
+//                style.fixedHeight = 100f;
+//                style.margin.top = 10;
+//                style.normal.background = Background;
+//
+//                var textStyle = PlayFabEditorHelper.GetTextButtonStyle();
+//                textStyle.alignment = TextAnchor.MiddleCenter;
+//                textStyle.fontSize = 14;
+                GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
 
-                var textStyle = PlayFabEditorHelper.GetTextButtonStyle();
-                textStyle.alignment = TextAnchor.MiddleCenter;
-                textStyle.fontSize = 14;
-                GUILayout.BeginVertical(style);
+                GUIStyle labelStyle = new GUIStyle(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"));
+                labelStyle.alignment = TextAnchor.MiddleCenter;
+                labelStyle.fontSize = 18;
 
-                GUILayout.Label("No Sdk is currently installed.", textStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                GUILayout.Label("No SDK is installed.", labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
                 GUILayout.Space(20);
 
-                GUILayout.BeginHorizontal();
+                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
                 var buttonWidth = 150;
-                GUILayout.Space((EditorGUIUtility.currentViewWidth - buttonWidth)/2);
-                if (GUILayout.Button("Install PlayFab SDK", PlayFabEditorHelper.GetOrangeButtonStyle(),
-                    GUILayout.MaxWidth(buttonWidth), GUILayout.MinHeight(32)))
+
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Install PlayFab SDK", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(buttonWidth), GUILayout.MinHeight(32)))
                 {
                     ImportSDK();
                 }
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
                 GUILayout.EndVertical();
