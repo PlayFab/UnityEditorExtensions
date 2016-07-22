@@ -35,7 +35,7 @@ namespace PlayFab.Editor
 //                textStyle.fontSize = 14;
                 GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
 
-                GUIStyle labelStyle = PlayFabEditorHelper.uiStyle.GetStyle("labelStyle");
+                GUIStyle labelStyle = new GUIStyle(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"));
                 labelStyle.alignment = TextAnchor.MiddleCenter;
                 labelStyle.fontSize = 18;
 

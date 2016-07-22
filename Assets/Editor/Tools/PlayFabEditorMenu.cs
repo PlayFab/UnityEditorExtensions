@@ -32,15 +32,8 @@
                 }
             }
 
-            //Create a GUI Style
-//            var style = new GUIStyle();
-//            //Set the fixed height of this container
-//            style.fixedHeight = 25f;
-//            style.margin.top = 0;
-//            style.normal.background = Background;
-
             //using Begin Vertical as our container.
-            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.Height(25), GUILayout.ExpandWidth(true));
+
             var servicesButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var sdksButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var settingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
@@ -83,6 +76,9 @@
                 logoutButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             }
 
+
+            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.Height(25), GUILayout.ExpandWidth(true));
+   
             GUILayout.Space(5);
 
             if (GUILayout.Button("SDK", sdksButtonStyle, GUILayout.MaxWidth(35)))

@@ -152,6 +152,8 @@ namespace PlayFab.Editor
                         {
                             Progress = 0f;
                         }
+
+
                         PlayFabEditorMenu.DrawMenu();
 
                         switch (PlayFabEditorMenu._menuState)
@@ -169,16 +171,19 @@ namespace PlayFab.Editor
                                 break;
                         }
 
+
+
+
                     }
                     catch (Exception e)
                     {
                         //Do Nothing.
-                        Debug.LogException(e);
+                        //Debug.LogException(e); // currently gettting a few errores: Getting control 1's position in a group with only 1 controls when doing Repaint
                     }
                 }
                 else
                 {
-                    PlayFabEditorAuthenticate.DrawLogin();
+                    PlayFabEditorAuthenticate.DrawAuthPanels();
                 }
 
                 GUILayout.EndVertical();
@@ -211,6 +216,7 @@ namespace PlayFab.Editor
             //Object.DestroyImmediate(testObjB);
             //Object.DestroyImmediate(testObjC);
             UnityEngine.Object.DestroyImmediate(listDisplay);
+            EditorPrefs.SetBool("IsPlayFabAuthenticated", false);
         }
     }
 }

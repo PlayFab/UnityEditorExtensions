@@ -18,13 +18,87 @@ namespace PlayFab.Editor
     public class PlayFabEditorHttp : Editor
     {
 
-        internal static void MakeDownloadCall<TRequestType, TResultType>(string api, string apiEndpoint,
-            TRequestType request,
-            string authType,
-            Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
+        internal static void MakeDownloadCall<TRequestType, TResultType>(string url, TRequestType request, Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
         {
             //TODO 
         }
+
+//        public IEnumerator DownloadAndUnpackAsset(AssetBundleHelperObject asset)
+//        {
+//            Debug.Log(Caching.IsVersionCached(asset.GetUrl, asset.Version));
+//
+//            // Start a download of the given URL
+//            Debug.Log("HTTP GET:" + asset.ContentKey);
+//            var www = WWW.LoadFromCacheOrDownload (asset.GetUrl, asset.Version);
+//
+//            // wait until the download is done
+//            while(www.progress < 1)
+//            {
+//                asset.progress = www.progress;
+//                yield return www;
+//            }
+//
+//            if(string.IsNullOrEmpty(www.error))
+//            {
+//            
+//                asset.Error = "";
+//                asset.Unpacked.ContentKey = asset.ContentKey;
+//                asset.Unpacked.PromoId = asset.FileName;
+//
+//                asset.Bundle = www.assetBundle;
+//
+//                string[] names = asset.Bundle.GetAllAssetNames();
+//                //Debug.Log(names.ToString());
+//
+//                foreach (var name in names) 
+//                {
+//                    string bannerURI = string.Empty;
+//                    string splashURI = string.Empty;
+//
+//                    Debug.Log ("Unpacking:" + name);
+//                    if(name.Contains("banner.png") || name.Contains("Banner.png") || name.Contains("banner.jpg") || name.Contains("banner.jpg"))
+//                    {
+//                        bannerURI = name;
+//                    }
+//                    else if(name.Contains("splash.png") || name.Contains("Splash.png") || name.Contains("splash.jpg") || name.Contains("Splash.jpg"))
+//                    {
+//                        splashURI = name;
+//                    }
+//
+//                    if(string.IsNullOrEmpty(bannerURI) == false)
+//                    {
+//                        Texture2D banner = asset.Bundle.LoadAsset<Texture2D>(bannerURI);
+//                        asset.Unpacked.Banner = banner;
+//                    }
+//                    else if(string.IsNullOrEmpty(splashURI) == false)
+//                    {
+//                        Texture2D splash = asset.Bundle.LoadAsset<Texture2D>(splashURI);
+//                        asset.Unpacked.Splash = splash;
+//                    }
+//                    else
+//                    {
+//                        asset.Error += string.Format("[Err: Unplacking: {0} -- {1} ]", asset.FileName, name);
+//                    }
+//                }
+//
+//                asset.Bundle.Unload(false);
+//                asset.IsUnpacked = true;
+//                //this.isImageDownloaded = true;
+//                yield break;
+//            }
+//            else
+//            {
+//                asset.Error = www.error;
+//                Debug.Log("HTTP ERROR:" + asset.ContentKey);
+//            }
+//
+//            yield break;
+//        }
+//
+
+
+
+
 
         internal static void MakeApiCall<TRequestType, TResultType>(string api, string apiEndpoint, string token, TRequestType request,
             Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
