@@ -11,6 +11,7 @@
             Services,
             Sdks,
             Settings,
+            Help,
             Logout,
             None
         }
@@ -106,8 +107,14 @@
                     OnSettingsClicked();
                 }
 
-                GUILayout.Space(15);
             }
+
+            if (GUILayout.Button("HELP", settingsButtonStyle, GUILayout.MaxWidth(60)))
+                {
+                    _menuState = MenuStates.Help;
+//                    OnSettingsClicked();
+                }
+            GUILayout.FlexibleSpace();
 
             if (GUILayout.Button("LOGOUT", logoutButtonStyle, GUILayout.MaxWidth(55)))
             {
