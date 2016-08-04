@@ -230,6 +230,7 @@ namespace PlayFab.Editor
                 EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
                 EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
                 isLoggingIn = false;
+
                 PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
                 {
                     PlayFabEditor.Studios = getStudioResult.Studios.ToList();

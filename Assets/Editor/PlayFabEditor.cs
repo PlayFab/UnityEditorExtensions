@@ -11,7 +11,8 @@ namespace PlayFab.Editor
     using PlayFab.Editor.EditorModels;
     public class PlayFabEditor : EditorWindow
     {
-        public static List<Studio> Studios;
+        public static List<Studio> Studios = new List<Studio>();
+
 
 
         // testing alt update loop
@@ -43,37 +44,10 @@ namespace PlayFab.Editor
             if (window == null)
             {
                 window = this;
-                window.minSize = new Vector2(275, 0);
+                window.minSize = new Vector2(300, 0);
             }
 
-//            if ( listDisplay == null)
-//            {
-//                listDisplay = CreateInstance<ListDisplay>();
-//                listDisplay.displayTitle = "Title Data:";
-//                listDisplay.items.Add(new KvpItem("Key1", "Value1"));
-//                listDisplay.items.Add(new KvpItem("Key2", "Value2"));
-//
-//                listDisplay.settings = (BaseUiComponent.ComponentSettings.useScrollBar | BaseUiComponent.ComponentSettings.fillHorizontal);
-//                listDisplay.Init(new Rect(20,20,450,120), PlayFabEditor.window.position, Color.gray, PlayFabEditorHelper.uiStyle.GetStyle("listDisplay"));
-//               
-//
-//            }
-//
-//
-//            if(listDisplay.postDrawCall == null)
-//            {
-////                listDisplay.postDrawCall = () => 
-////                {
-////                    GUILayout.TextArea(Event.current.mousePosition.ToString());
-////
-////                    EditorGUILayout.TextArea(listDisplay.bounds.ToString());
-////                    EditorGUILayout.TextArea(listDisplay.parentBounds.ToString());
-////                    if(GUILayout.Button("Submit"))
-////                    {
-////                        BaseUiAnimationController.StartAlphaFade(1, 0, listDisplay);
-////                    }
-////                };
-//            }
+
         }
 
         void OnFocus()
@@ -118,7 +92,7 @@ namespace PlayFab.Editor
         {
             try
             {
-                GUI.skin = PlayFabEditorHelper.uiStyle;
+                //GUI.skin = PlayFabEditorHelper.uiStyle;
 
                  //Create a GUI Style
 //                var style = new GUIStyle();
@@ -126,10 +100,7 @@ namespace PlayFab.Editor
 //                style.normal.background = Background;
 //                //create global container with background properties.
 
-                if(UpdateLoopTick != null)
-                {
-                    UpdateLoopTick();
-                } 
+
 
 
                 GUILayout.BeginVertical(); //style
@@ -167,6 +138,10 @@ namespace PlayFab.Editor
                                 PlayFabEditorSettings.DrawSettingsPanel();
                                 PlayFabEditorSettings.After(); //TODO why is this getting called every frame?
                                 break;
+                            case PlayFabEditorMenu.MenuStates.Help:
+                                PlayFabEditorHelpMenu.DrawHelpPanel();
+                                break;
+                                
                             default:
                                 break;
                         }
@@ -185,6 +160,11 @@ namespace PlayFab.Editor
                 {
                     PlayFabEditorAuthenticate.DrawAuthPanels();
                 }
+
+                if(UpdateLoopTick != null)
+                {
+                    UpdateLoopTick();
+                } 
 
                 GUILayout.EndVertical();
 

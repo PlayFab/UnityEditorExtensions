@@ -6,8 +6,10 @@
 
     public class PlayFabEditorMenu : Editor
     {
+
         internal enum MenuStates
         {
+            Data,
             Services,
             Sdks,
             Settings,
@@ -15,6 +17,8 @@
             Logout,
             None
         }
+
+
 
         internal static MenuStates _menuState = MenuStates.Sdks;
         //private static readonly GUIStyle GlobalButtonStyle = PlayFabEditorHelper.GetTextButtonStyle();
@@ -38,6 +42,8 @@
             var servicesButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var sdksButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var settingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            var dataButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            var helpButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var logoutButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
 
             //TODO Move to state machine for states.
@@ -77,6 +83,23 @@
                 logoutButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             }
 
+            if (_menuState == MenuStates.Data)
+            {
+                dataButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
+            }
+            else
+            {
+                dataButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            }
+
+            if (_menuState == MenuStates.Help)
+            {
+                helpButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
+            }
+            else
+            {
+                helpButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            }
 
             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.Height(25), GUILayout.ExpandWidth(true));
    
@@ -88,18 +111,18 @@
                 OnSdKsClicked();
             }
 
-            GUILayout.Space(15);
+           // GUILayout.Space(15);
 
             if (PlayFabEditorSDKTools.IsInstalled)
             {
 
-                if (GUILayout.Button("SERVICES", servicesButtonStyle, GUILayout.MaxWidth(60)))
+                if (GUILayout.Button("DATA", dataButtonStyle, GUILayout.MaxWidth(60)))
                 {
-                    _menuState = MenuStates.Services;
-                    OnServicesClicked();
+                    _menuState = MenuStates.Data;
+                    OnDataClicked();
                 }
 
-                GUILayout.Space(15);
+                //GUILayout.Space(15);
 
                 if (GUILayout.Button("SETTINGS", settingsButtonStyle, GUILayout.MaxWidth(60)))
                 {
@@ -109,10 +132,11 @@
 
             }
 
-            if (GUILayout.Button("HELP", settingsButtonStyle, GUILayout.MaxWidth(60)))
+            if (GUILayout.Button("HELP", helpButtonStyle, GUILayout.MaxWidth(60)))
                 {
                     _menuState = MenuStates.Help;
-//                    OnSettingsClicked();
+                    OnHelpClicked();
+                   
                 }
             GUILayout.FlexibleSpace();
 
@@ -125,30 +149,70 @@
             GUILayout.EndHorizontal();
         }
 
+
+
+        public static void OnDataClicked()
+        {
+            DisableActivePanels(MenuStates.Data);
+
+            Debug.Log("Data Clicked");
+            PlayFabEditorDataMenu.OnEnable();
+
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU",(int)MenuStates.Data);
+
+        }
+
+        public static void OnHelpClicked()
+        {
+            DisableActivePanels(MenuStates.Help);
+
+            Debug.Log("Help Clicked");
+
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU",(int)MenuStates.Help);
+
+        }
+
         public static void OnServicesClicked()
         {
+            DisableActivePanels(MenuStates.Services);
+
             Debug.Log("Services Clicked");
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU",(int)MenuStates.Services);
         }
 
         public static void OnSdKsClicked()
         {
+            DisableActivePanels(MenuStates.Sdks);
+
             Debug.Log("SDKS Clicked");
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Sdks);
         }
 
         public static void OnSettingsClicked()
         {
+            DisableActivePanels(MenuStates.Settings);
+
             Debug.Log("Settings Clicked");
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Settings);
         }
 
         public static void OnLogoutClicked()
         {
+            DisableActivePanels(MenuStates.Logout);
+
             Debug.Log("Logout Clicked");
             PlayFabEditorAuthenticate.Logout();
             _menuState = MenuStates.Sdks;
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Sdks);
+        }
+
+
+        internal static void DisableActivePanels(MenuStates active)
+        {
+            if(active != MenuStates.Data)
+            {
+                PlayFabEditorDataMenu.OnDisable();
+            }
         }
 
     }

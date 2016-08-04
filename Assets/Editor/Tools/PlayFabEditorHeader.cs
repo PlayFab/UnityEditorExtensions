@@ -6,16 +6,6 @@
 
     public class PlayFabEditorHeader : Editor
     {
-        //private static Texture2D LogoTex = EditorGUIUtility.Load("Assets/Editor/images/playfablogo.png") as Texture2D;
-
-       // private static Texture2D DashboardIcon =
-           // EditorGUIUtility.Load("Assets/Editor/images/dashboardIcon.png") as Texture2D;
-
-        //private static Texture2D DashboardIconHover =
-            //EditorGUIUtility.Load("Assets/Editor/images/dashboardIconHover.png") as Texture2D;
-
-        //private static Texture2D Background = PlayFabEditorHelper.MakeTex(50, (int)EditorGUIUtility.currentViewWidth,
-                //new Color(PlayFabEditor.ColorVectorDarkGrey.x, PlayFabEditor.ColorVectorDarkGrey.y, PlayFabEditor.ColorVectorDarkGrey.z));
 
         public static void DrawHeader(float progress = 0f)
         {
@@ -93,7 +83,9 @@
         {
             Debug.Log("Dashboard Clicked");
             var url = @"https://developer.playfab.com";
-            Help.BrowseURL(url);
+
+
+            Help.BrowseURL(EditorPrefs.HasKey("PlayFabActiveTitleUrl") ? EditorPrefs.GetString("PlayFabActiveTitleUrl") : url);
             //PlayFabWebWindow.OpenWindow(url);
         }
 

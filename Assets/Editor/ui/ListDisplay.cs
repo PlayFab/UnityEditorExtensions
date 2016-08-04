@@ -40,14 +40,14 @@
                             items[z].Key = GUILayout.TextArea(items[z].Key, GUILayout.MaxWidth(inputBoxWidth));
 
                             EditorGUILayout.LabelField(":", GUILayout.MaxWidth(10));
-                            items[z].Value = GUILayout.TextField(""+items[z].Value, GUILayout.MaxWidth(inputBoxWidth));  
+                            items[z].Value = GUILayout.TextArea(""+items[z].Value, GUILayout.MaxWidth(inputBoxWidth));  
                                 
                             if(GUILayout.Button("X", GUILayout.MaxHeight(19)))
                             {
-                                if(string.IsNullOrEmpty(items[z].Key))
-                                {
-                                    items[z].Value = null;
-                                }
+//                                if(string.IsNullOrEmpty(items[z].Key))
+//                                {
+                                    items.RemoveAt(z);// items[z].Value = null;
+//                                }
                             } 
                           
                             EditorGUILayout.EndHorizontal();
@@ -85,6 +85,7 @@
         {
             
         }
+
 
 
         public ListDisplay(List<KvpItem> i = null)

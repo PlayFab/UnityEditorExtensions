@@ -58,6 +58,24 @@ namespace PlayFab.Editor
                     GUILayout.FlexibleSpace();
                 }
                 GUILayout.EndHorizontal();
+
+
+               
+
+                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button("VIEW RELEASE NOTES", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(32), GUILayout.MinWidth(200)))
+                    {
+                        Application.OpenURL("https://api.playfab.com/releaseNotes/");
+                    }
+
+                    GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+
+               
+
             }
             else
             {
@@ -94,6 +112,8 @@ namespace PlayFab.Editor
                 GUILayout.EndHorizontal();
 
                 GUILayout.EndVertical();
+
+
             }
 
             //CheckSdkVersion();

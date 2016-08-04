@@ -49,7 +49,7 @@ public class BaseUiComponent : Editor {
         }
 
         // TODO add condition here to make this optional
-        PlayFabEditor.UpdateLoopTick += Update;
+        //PlayFabEditor.UpdateLoopTick += Update;
     }
 
     public void Init(Rect b, Rect p, Color fc)
@@ -69,11 +69,11 @@ public class BaseUiComponent : Editor {
         this.Init();
     }
 
-//    public void OnEnable()
-//    {
-//            //PlayFabEditor.UpdateLoopTick += Update;
-//            PlayFabEditor.UpdateLoopTick += Update;
-//    }
+
+    public void OnEnable()
+    {
+            PlayFabEditor.UpdateLoopTick += Update;
+    }
 
     public void OnDisable()  // destructor
     {
