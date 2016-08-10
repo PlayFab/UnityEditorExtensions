@@ -10,8 +10,6 @@ namespace PlayFab.Editor
     public class PlayFabEditorSDKTools : Editor
     {
         internal static bool IsInstalled = IsSDKInstalled();
-        private static Vector3 ColorVector = PlayFabEditorHelper.GetColorVector(62);
-        private static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVector.x, ColorVector.y, ColorVector.z));
         private static string SdkVersion = string.Empty;
         private static string latestSdkVersion = string.Empty;
         private static bool isCheckingLatestVersion = false;

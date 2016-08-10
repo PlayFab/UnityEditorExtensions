@@ -2,12 +2,40 @@
 {
     using UnityEditor;
     using UnityEngine;
+    using System.Collections.Generic;
 
     public class PlayFabEditorHelper : Editor 
     {
         public static Font buttonFont = EditorGUIUtility.Load("Assets/Editor/fonts/Avalon.ttf") as Font;
         public static Font buttonFontBold = EditorGUIUtility.Load("Assets/Editor/fonts/Avalon Bold.ttf") as Font;
         public static GUISkin uiStyle = (GUISkin)(AssetDatabase.LoadAssetAtPath("Assets/Editor/ui/PlayFabStyles.guiskin", typeof(GUISkin)));
+
+
+
+
+        public static Dictionary<string, string> stringTable = new Dictionary<string, string>()
+        {
+            
+            { "ApiEndpoint", @"https://editor.playfabapi.com" },
+            { "TitleEndPoint", @".playfabapi.com" },
+
+            {"DebugRequestTiming", "PLAYFAB_REQUEST_TIMING"},
+            {"PlayFabAssembly", "PlayFabSettings"},
+            {"SdkDownloadPath", "/Editor/Tools/Resources/PlayFabUnitySdk.unitypackage" }
+        };
+
+
+
+
+
+
+
+        public static string GetEventJson()
+        {
+            return "{\"useSpinner\":true, \"blockUi\":true }";
+        }
+
+
 
         public static GUIStyle GetOrangeButtonStyle()
         {

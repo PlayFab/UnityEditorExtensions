@@ -153,10 +153,11 @@
 
         public static void OnDataClicked()
         {
-            DisableActivePanels(MenuStates.Data);
+           // DisableActivePanels(MenuStates.Data);
 
-            Debug.Log("Data Clicked");
-            PlayFabEditorDataMenu.OnEnable();
+            //Debug.Log("Data Clicked");
+            //PlayFabEditorDataMenu.OnEnable();
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Data.ToString());
 
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU",(int)MenuStates.Data);
 
@@ -164,56 +165,64 @@
 
         public static void OnHelpClicked()
         {
-            DisableActivePanels(MenuStates.Help);
+            //DisableActivePanels(MenuStates.Help);
 
-            Debug.Log("Help Clicked");
+           // Debug.Log("Help Clicked");
 
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Help.ToString());
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU",(int)MenuStates.Help);
 
         }
 
         public static void OnServicesClicked()
         {
-            DisableActivePanels(MenuStates.Services);
+           // DisableActivePanels(MenuStates.Services);
 
-            Debug.Log("Services Clicked");
+            //Debug.Log("Services Clicked");
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Services.ToString());
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU",(int)MenuStates.Services);
         }
 
         public static void OnSdKsClicked()
         {
-            DisableActivePanels(MenuStates.Sdks);
+           // DisableActivePanels(MenuStates.Sdks);
 
-            Debug.Log("SDKS Clicked");
+            //Debug.Log("SDKS Clicked");
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Sdks.ToString());
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Sdks);
         }
 
         public static void OnSettingsClicked()
         {
-            DisableActivePanels(MenuStates.Settings);
+            //DisableActivePanels(MenuStates.Settings);
 
-            Debug.Log("Settings Clicked");
+            //Debug.Log("Settings Clicked");
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Settings.ToString());
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Settings);
         }
 
         public static void OnLogoutClicked()
         {
-            DisableActivePanels(MenuStates.Logout);
+           // DisableActivePanels(MenuStates.Logout);
 
-            Debug.Log("Logout Clicked");
+            //Debug.Log("Logout Clicked");
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Logout.ToString());
+
             PlayFabEditorAuthenticate.Logout();
+
+
             _menuState = MenuStates.Sdks;
             EditorPrefs.SetInt("PLAYFAB_CURRENT_MENU", (int)MenuStates.Sdks);
         }
 
 
-        internal static void DisableActivePanels(MenuStates active)
-        {
-            if(active != MenuStates.Data)
-            {
-                PlayFabEditorDataMenu.OnDisable();
-            }
-        }
+//        internal static void DisableActivePanels(MenuStates active)
+//        {
+//            if(active != MenuStates.Data)
+//            {
+//                PlayFabEditorDataMenu.OnDisable();
+//            }
+//        }
 
     }
 }

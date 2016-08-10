@@ -23,7 +23,6 @@
             HttpWebRequest // High performance multi-threaded api calls
         }
 
-        private static readonly GUIStyle GlobalButtonStyle = PlayFabEditorHelper.GetTextButtonStyle();
         internal static List<string> buildTargets;
         private const string AdminAPI = "ENABLE_PLAYFABADMIN_API";
         private const string ServerAPI = "ENABLE_PLAYFABSERVER_API";
@@ -221,7 +220,7 @@
              }
 
             
-            TitleScrollPos = GUILayout.BeginScrollView(TitleScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true));
+            TitleScrollPos = GUILayout.BeginScrollView(TitleScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
 
             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                 EditorGUILayout.LabelField("STUDIOS:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
@@ -418,7 +417,7 @@
             #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
                 GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                     EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-            _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
                 GUILayout.EndHorizontal();
 
             #endif
@@ -472,7 +471,7 @@
             Debug.Log("Save Settings Clicked");
             if (PlayFabEditorSDKTools.IsInstalled)
             {
-                EditorPrefs.SetString("PlayFabActiveTitleUrl", PlayFabEditor.Studios[_selectedStudioIndex].Titles[_selectedTitleIdIndex].GameManagerUrl);
+                //EditorPrefs.SetString("PlayFabActiveTitleUrl", PlayFabEditor.Studios[_selectedStudioIndex].Titles[_selectedTitleIdIndex].GameManagerUrl);
 
                 var playfabSettingsType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                     from type in assembly.GetTypes()

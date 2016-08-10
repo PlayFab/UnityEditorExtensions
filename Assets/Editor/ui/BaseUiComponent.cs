@@ -103,25 +103,6 @@ public class BaseUiComponent : Editor {
             GUILayout.BeginArea(bounds, this.style);
         }
 
-
-
-       // Positioning();
-//        EditorGUILayout.BeginHorizontal();
-//            //EditorGUI.DrawRect(this.bounds, this.fillColor);
-//        EditorGUILayout.EndHorizontal();
-
-//        GUILayout.TextArea(Event.current.mousePosition.ToString());
-//
-//        EditorGUILayout.TextArea(this.bounds.ToString());
-//        EditorGUILayout.TextArea(this.parentBounds.ToString());
-//        if(GUILayout.Button("Submit"))
-//        {
-//            BaseUiAnimationController.StartAlphaFade(1, 0, this);
-//        }
-
-
-
-
         PostDraw();
     }
 
@@ -146,7 +127,6 @@ public class BaseUiComponent : Editor {
 
     public virtual void Update()
     {
-        //Debug.Log("Update()");
         Draw();
     }
 

@@ -18,9 +18,6 @@ namespace PlayFab.Editor
         private static string _studio = string.Empty;
         private static bool _autoLogin = false;
 
-        //Create Color vector for background.
-        //private static Vector3 ColorVector = PlayFabEditorHelper.GetColorVector(62);
-        //private static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVector.x, ColorVector.y, ColorVector.z));
         private static bool isLoggingIn = false;
 
         public enum PanelDisplayStates { Register, Login }
@@ -103,12 +100,6 @@ namespace PlayFab.Editor
             EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")); //var buttonRect = 
 
 
-//            var linkStyle = PlayFabEditorHelper.GetTextButtonStyle();
-//            linkStyle.font = PlayFabEditorHelper.buttonFontBold;
-//            linkStyle.fontSize = 11;
-//            linkStyle.wordWrap = true;
-//            linkStyle.alignment = TextAnchor.MiddleCenter;
-
             if(GUILayout.Button("CREATE AN ACCOUNT", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MaxWidth(100) ))
             {
                 activeState = PanelDisplayStates.Register;
@@ -116,12 +107,6 @@ namespace PlayFab.Editor
 
             var buttonWidth = 100;
             GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth * 2);
-
-//            var buttonStyle = PlayFabEditorHelper.GetButtonStyle();
-//            buttonStyle.font = PlayFabEditorHelper.buttonFontBold;
-//            buttonStyle.fontSize = 14;
-//            buttonStyle.alignment = TextAnchor.MiddleCenter;
-//            buttonStyle.margin.right = 10;
 
             if (GUILayout.Button("LOGIN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
             {
