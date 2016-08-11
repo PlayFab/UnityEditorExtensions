@@ -69,7 +69,7 @@ namespace PlayFab.Editor
 
             var www = new WWW(url, payload, headers);
 
-            //TODO make the blocking states optional -- eventually pull this out
+            //TODO make the blocking states optional -- eventually pull this out to the calling function
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnHttpReq, api, PlayFabEditorHelper.GetEventJson());
             EditorCoroutine.start(Post(www, (response) =>
             {

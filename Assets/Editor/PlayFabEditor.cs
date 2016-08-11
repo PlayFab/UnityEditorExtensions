@@ -12,7 +12,7 @@ namespace PlayFab.Editor
 
     public class PlayFabEditor : EditorWindow
     {
-        public static List<Studio> Studios = new List<Studio>();
+        //public static List<Studio> Studios = new List<Studio>();
 
         public enum EdExStates { OnEnable, OnDisable, OnLogin, OnLogout, OnMenuItemClicked, OnSubmenuItemClicked, OnHttpReq, OnHttpRes, OnError, OnWaitBegin, OnWaitEnd, OnSuccess, OnWarning  }
 
@@ -80,6 +80,7 @@ namespace PlayFab.Editor
             var inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab");
+
             EditorPrefs.SetBool("PlayFabToolsShown", true);
         }
 

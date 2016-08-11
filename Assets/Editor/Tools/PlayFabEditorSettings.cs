@@ -198,26 +198,26 @@
 
             // this probably does not need to run every update.
 
-            if(PlayFabEditor.Studios.Count != studioFoldOutStates.Count)
-            {
-                studioFoldOutStates.Clear();
-                foreach(var studio in PlayFabEditor.Studios)
-                {
-                    if(!studioFoldOutStates.ContainsKey(studio.Id))
-                    {
-                        studioFoldOutStates.Add(studio.Id, new StudioDisplaySet(){ Studio = studio });
-                    }
-
-                    foreach(var title in studio.Titles)
-                    {
-                        // studioFoldOutStates[studio.Id].titleFoldOutStates
-                        if(!studioFoldOutStates[studio.Id].titleFoldOutStates.ContainsKey(title.Id))
-                        {
-                            studioFoldOutStates[studio.Id].titleFoldOutStates.Add(title.Id, new TitleDisplaySet(){ Title = title });
-                        }
-                    }
-                }
-             }
+//            if(PlayFabEditor.Studios.Count != studioFoldOutStates.Count)
+//            {
+//                studioFoldOutStates.Clear();
+//                foreach(var studio in PlayFabEditor.Studios)
+//                {
+//                    if(!studioFoldOutStates.ContainsKey(studio.Id))
+//                    {
+//                        studioFoldOutStates.Add(studio.Id, new StudioDisplaySet(){ Studio = studio });
+//                    }
+//
+//                    foreach(var title in studio.Titles)
+//                    {
+//                        // studioFoldOutStates[studio.Id].titleFoldOutStates
+//                        if(!studioFoldOutStates[studio.Id].titleFoldOutStates.ContainsKey(title.Id))
+//                        {
+//                            studioFoldOutStates[studio.Id].titleFoldOutStates.Add(title.Id, new TitleDisplaySet(){ Title = title });
+//                        }
+//                    }
+//                }
+//             }
 
             
             TitleScrollPos = GUILayout.BeginScrollView(TitleScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
@@ -227,14 +227,14 @@
                 GUILayout.FlexibleSpace();
                 if(GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                 {
-                    PlayFabEditorApi.GetStudios(new PlayFab.Editor.EditorModels.GetStudiosRequest(), (getStudioResult) =>
-                    {
-                        PlayFabEditor.Studios = getStudioResult.Studios.ToList();
-                    }, (getStudiosError) =>
-                    {
-                        //TODO: Error Handling & have this update when the tab is opened.
-                        Debug.LogError(getStudiosError.ToString());
-                    });
+//                    PlayFabEditorApi.GetStudios(new PlayFab.Editor.EditorModels.GetStudiosRequest(), (getStudioResult) =>
+//                    {
+//                        PlayFabEditor.Studios = getStudioResult.Studios.ToList();
+//                    }, (getStudiosError) =>
+//                    {
+//                        //TODO: Error Handling & have this update when the tab is opened.
+//                        Debug.LogError(getStudiosError.ToString());
+//                    });
                 }
             GUILayout.EndHorizontal(); 
 
@@ -345,25 +345,25 @@
         {
             float labelWidth = 160;
 
-            if(studioOptions == null || studioOptions.Length == 0 && PlayFabEditor.Studios.Count > 0)
-            {
-                studioOptions = new string[PlayFabEditor.Studios.Count];
-                for(var z = 0; z < PlayFabEditor.Studios.Count; z++)
-                {
-                    studioOptions[z] = PlayFabEditor.Studios[z].Name;
-                }
-
-                // if nothing is selected, then we will want to preload the titles for 0, otherwise
-                titleOptions = new string[PlayFabEditor.Studios[0].Titles.Length];
-                for(var z = 0; z < PlayFabEditor.Studios[0].Titles.Length; z++)
-                {
-                    titleOptions[z] = PlayFabEditor.Studios[0].Titles[z].Id;
-                }
-
-                #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                _DeveloperSecretKey = PlayFabEditor.Studios[_selectedStudioIndex].Titles[_selectedTitleIdIndex].SecretKey;
-                #endif
-            }
+//            if(studioOptions == null || studioOptions.Length == 0 && PlayFabEditor.Studios.Count > 0)
+//            {
+//                studioOptions = new string[PlayFabEditor.Studios.Count];
+//                for(var z = 0; z < PlayFabEditor.Studios.Count; z++)
+//                {
+//                    studioOptions[z] = PlayFabEditor.Studios[z].Name;
+//                }
+//
+//                // if nothing is selected, then we will want to preload the titles for 0, otherwise
+//                titleOptions = new string[PlayFabEditor.Studios[0].Titles.Length];
+//                for(var z = 0; z < PlayFabEditor.Studios[0].Titles.Length; z++)
+//                {
+//                    titleOptions[z] = PlayFabEditor.Studios[0].Titles[z].Id;
+//                }
+//
+//                #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+//                _DeveloperSecretKey = PlayFabEditor.Studios[_selectedStudioIndex].Titles[_selectedTitleIdIndex].SecretKey;
+//                #endif
+//            }
 
             if(_selectedTitleIdIndex != _prevSelectedTitleIdIndex)
             {
@@ -373,9 +373,9 @@
 
 
 
-             #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                _DeveloperSecretKey = PlayFabEditor.Studios[_selectedStudioIndex].Titles[_selectedTitleIdIndex].SecretKey;
-             #endif
+//             #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+//                _DeveloperSecretKey = PlayFabEditor.Studios[_selectedStudioIndex].Titles[_selectedTitleIdIndex].SecretKey;
+//             #endif
 
             }
 
@@ -384,11 +384,11 @@
                 // this changed since the last loop
                 _selectedTitleIdIndex = 0; // reset our titles index
 
-                titleOptions = new string[PlayFabEditor.Studios[_selectedStudioIndex].Titles.Length];
-                for(var z = 0; z < PlayFabEditor.Studios[_selectedStudioIndex].Titles.Length; z++)
-                {
-                    titleOptions[z] = PlayFabEditor.Studios[_selectedStudioIndex].Titles[z].Id;
-                }
+//                titleOptions = new string[PlayFabEditor.Studios[_selectedStudioIndex].Titles.Length];
+//                for(var z = 0; z < PlayFabEditor.Studios[_selectedStudioIndex].Titles.Length; z++)
+//                {
+//                    titleOptions[z] = PlayFabEditor.Studios[_selectedStudioIndex].Titles[z].Id;
+//                }
 
                 _prevSelectedStudioIndex = _selectedStudioIndex;
             }
@@ -672,4 +672,3 @@
 
 
 }
-

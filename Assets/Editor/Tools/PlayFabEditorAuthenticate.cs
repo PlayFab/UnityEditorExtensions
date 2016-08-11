@@ -11,7 +11,6 @@ namespace PlayFab.Editor
 
     public class PlayFabEditorAuthenticate : Editor
     {
-        //TODO make const strings for the EditorPref keys
         private static string _userEmail = string.Empty;
         private static string _userPass = string.Empty;
         private static string _userPass2 = string.Empty;
@@ -26,32 +25,41 @@ namespace PlayFab.Editor
 
         public static bool IsAuthenticated()
         {
-            return EditorPrefs.HasKey("IsPlayFabAuthenticated") && EditorPrefs.GetBool("IsPlayFabAuthenticated");
+            //return EditorPrefs.HasKey("IsPlayFabAuthenticated") && EditorPrefs.GetBool("IsPlayFabAuthenticated");
+            return string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.devToken) ? false : true;
         }
 
         public static void DrawAuthPanels()
         {
-            if(EditorPrefs.HasKey("PlayFabUserEmail") && string.IsNullOrEmpty(_userEmail))
+            if(!string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.email))
             {
-                _userEmail = EditorPrefs.GetString("PlayFabUserEmail");
-                activeState = PanelDisplayStates.Login;
+                _userEmail = PlayFabEditorDataService.accountDetails.email;
             }
 
-            if(EditorPrefs.HasKey("PlayFabAutoLogin") && EditorPrefs.GetBool("PlayFabAutoLogin") == true && EditorPrefs.HasKey("PlayFabUserPass"))
+            if(PlayFabEditorDataService.accountDetails.useAutoLogin)
             {
-                if(EditorPrefs.HasKey("PlayFabDevClientToken") && !string.IsNullOrEmpty(EditorPrefs.GetString("PlayFabDevClientToken")))
+                if(!string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.devToken))
                 {
-                    EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
-                    return;
+                    _autoLogin = true;
+                    if(isLoggingIn == false)
+                    {
+                        Debug.Log("PlayFab developer credentials saved, logging in...");
+                        OnLoginButtonClicked();
+                    }
                 }
+                else
+                {
+                    // lost password and token, cannot auto login
+                    activeState = PanelDisplayStates.Login;
+                }
+//                if(EditorPrefs.HasKey("PlayFabDevClientToken") && !string.IsNullOrEmpty(EditorPrefs.GetString("PlayFabDevClientToken")))
+//                {
+//                    EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
+//                    return;
+//                }
+
                // auto login mode, first fetch cached password 
-                _autoLogin = true;
-                _userPass = EditorPrefs.GetString("PlayFabUserPass");
-                if(isLoggingIn == false)
-                {
-                    Debug.Log("PlayFab developer credentials saved, logging in...");
-                    OnLoginButtonClicked();
-                }
+
 
             }
             else if(activeState == PanelDisplayStates.Login)
@@ -126,9 +134,19 @@ namespace PlayFab.Editor
 
         public static void Logout()
         {
-            EditorPrefs.SetBool("IsPlayFabAuthenticated", false);
+            //EditorPrefs.SetBool("IsPlayFabAuthenticated", false);
             _autoLogin = false;
-            EditorPrefs.SetBool("PlayFabAutoLogin", false);
+            _userPass = string.Empty;
+            _userPass2 = string.Empty;
+
+            activeState = PanelDisplayStates.Login;
+
+            PlayFabEditorDataService.accountDetails.useAutoLogin = false;
+            PlayFabEditorDataService.accountDetails.devToken = string.Empty;
+            PlayFabEditorDataService.SaveAccountDetails();
+
+
+            //EditorPrefs.SetBool("PlayFabAutoLogin", false);
 
             //TODO make sure to clean up login tokens.
         }
@@ -209,21 +227,29 @@ namespace PlayFab.Editor
             }, (result) =>
             {
                 //Debug.Log(result.DeveloperClientToken);
-                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
-                EditorPrefs.SetString("PlayFabUserPass", _userPass);
-                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
-                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
-                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
+                PlayFabEditorDataService.accountDetails.devToken = result.DeveloperClientToken;
+                PlayFabEditorDataService.accountDetails.email = _userEmail;
+                PlayFabEditorDataService.accountDetails.useAutoLogin = _autoLogin;
+
+
+
+//                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
+//                EditorPrefs.SetString("PlayFabUserPass", _userPass);
+//                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
+//                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
+//                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
                 isLoggingIn = false;
 
                 PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
                 {
-                    PlayFabEditor.Studios = getStudioResult.Studios.ToList();
+                    PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
                 }, (getStudiosError) =>
                 {
                     //TODO: Error Handling & have this update when the tab is opened.
                     Debug.LogError(getStudiosError.ToString());
                 });
+                PlayFabEditorDataService.SaveAccountDetails();
+                PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;
 
             }, (error) =>
             {
@@ -258,20 +284,29 @@ namespace PlayFab.Editor
             }, (result) =>
             {
                 //Debug.Log(result.DeveloperClientToken);
-                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
-                EditorPrefs.SetString("PlayFabUserPass", _userPass);
-                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
-                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
-                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
+                PlayFabEditorDataService.accountDetails.devToken = result.DeveloperClientToken;
+                PlayFabEditorDataService.accountDetails.email = _userEmail;
+                PlayFabEditorDataService.accountDetails.useAutoLogin = _autoLogin;
+
+//                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
+//                EditorPrefs.SetString("PlayFabUserPass", _userPass);
+//                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
+//                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
+//                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
+
                 isLoggingIn = false;
                 PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
                 {
-                    PlayFabEditor.Studios = getStudioResult.Studios.ToList();
+                    PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
                 }, (getStudiosError) =>
                 {
                     //TODO: Error Handling & have this update when the tab is opened.
                     Debug.LogError(getStudiosError.ToString());
                 });
+                PlayFabEditorDataService.SaveAccountDetails();
+                PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;
+
+                //TODO add some help here since a new account was just created... will be added with the FTUE
 
             }, (error) =>
             {
