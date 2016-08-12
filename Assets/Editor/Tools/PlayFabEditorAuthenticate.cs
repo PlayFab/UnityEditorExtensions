@@ -36,6 +36,10 @@ namespace PlayFab.Editor
                 _userEmail = PlayFabEditorDataService.accountDetails.email;
             }
 
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                GUILayout.Label("Welcome to PlayFab!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+            GUILayout.EndHorizontal();
+
             if(PlayFabEditorDataService.accountDetails.useAutoLogin)
             {
                 if(!string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.devToken))
@@ -77,7 +81,17 @@ namespace PlayFab.Editor
             {
                 DrawRegister();
             }
+
+                
+
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+            GUILayout.Label("Our editor extension provides an easy way to manage the PlayFab SDK. \n\nExisting users may LOG IN using their developer account. \n\nNew users must CREATE AN ACCOUNT.", PlayFabEditorHelper.uiStyle.GetStyle("cGenTxt"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+
+
+
+            GUILayout.EndVertical();
         }
+
 
 
         public static void DrawLogin()
@@ -116,7 +130,7 @@ namespace PlayFab.Editor
             var buttonWidth = 100;
             GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth * 2);
 
-            if (GUILayout.Button("LOGIN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+            if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
             {
                
                 OnLoginButtonClicked();
@@ -183,7 +197,7 @@ namespace PlayFab.Editor
 
             EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")); //var buttonRect = 
 
-            if (GUILayout.Button("LOGIN", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(32)))
+            if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(32)))
             {
                 activeState = PanelDisplayStates.Login;
             }
@@ -221,7 +235,7 @@ namespace PlayFab.Editor
             PlayFabEditorApi.Login(new LoginRequest()
             {
                 DeveloperToolProductName = "PlayFabEditorExtension",  //TODO make this statics in a helper class
-                DeveloperToolProductVersion = "1.01", //TODO make this statics in a helper class
+                DeveloperToolProductVersion = PlayFabEditor.edexVersion, //TODO make this statics in a helper class
                 Email = _userEmail,
                 Password = _userPass
             }, (result) =>
@@ -246,7 +260,8 @@ namespace PlayFab.Editor
                 }, (getStudiosError) =>
                 {
                     //TODO: Error Handling & have this update when the tab is opened.
-                    Debug.LogError(getStudiosError.ToString());
+                    PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, getStudiosError.ToString());
+                    //Debug.LogError(getStudiosError.ToString());
                 });
                 PlayFabEditorDataService.SaveAccountDetails();
                 PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;
@@ -256,7 +271,8 @@ namespace PlayFab.Editor
                 progressCount = 0f;
                 startProgress = false;
                 isLoggingIn = false;
-                Debug.LogError(error.ToString());
+                //Debug.LogError(error.ToString());
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.ErrorMessage);
             });
         }
 
@@ -277,7 +293,7 @@ namespace PlayFab.Editor
             PlayFabEditorApi.RegisterAccouint(new RegisterAccountRequest()
             {
                 DeveloperToolProductName = "PlayFabEditorExtension",  //TODO make this statics in a helper class
-                DeveloperToolProductVersion = "1.01", //TODO make this statics in a helper class
+                DeveloperToolProductVersion = PlayFabEditor.edexVersion, //TODO make this statics in a helper class
                 Email = _userEmail,
                 Password = _userPass,
                 StudioName = _studio
@@ -300,20 +316,19 @@ namespace PlayFab.Editor
                     PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
                 }, (getStudiosError) =>
                 {
-                    //TODO: Error Handling & have this update when the tab is opened.
-                    Debug.LogError(getStudiosError.ToString());
+                    PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, getStudiosError.ToString());
                 });
                 PlayFabEditorDataService.SaveAccountDetails();
                 PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;
 
-                //TODO add some help here since a new account was just created... will be added with the FTUE
+ 
 
             }, (error) =>
             {
                 progressCount = 0f;
                 startProgress = false;
                 isLoggingIn = false;
-                Debug.LogError(error.ToString());
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.ErrorMessage);
             });
         }
 

@@ -1,4 +1,4 @@
-﻿using PlayFab.Internal;
+﻿//using PlayFab.Internal;
 using PlayFab.Editor.EditorModels;
 using UnityEngine;
 
@@ -49,18 +49,18 @@ namespace PlayFab.Editor
             {
                 {"Content-Type", "application/json"},
                 {"X-ReportErrorAsSuccess", "true"},
-                {"X-PlayFabSDK", "PlayFabEditorExtensionsSDK_0.1.0"}
+                {"X-PlayFabSDK", string.Format("PlayFabEditorExtensions_{0}", PlayFabEditor.edexVersion)}
             };
 
 
             //TODO update this in accordance with the no-SDK model
-            if(api.Contains("/Server/") || api.Contains("/Admin/"))
-            {
-                if(string.IsNullOrEmpty(PlayFabSettings.PlayFabShared.DeveloperSecretKey))
-                    throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
-
-                headers.Add("X-SecretKey", PlayFabSettings.PlayFabShared.DeveloperSecretKey);            
-            }
+//            if(api.Contains("/Server/") || api.Contains("/Admin/"))
+//            {
+//                if(string.IsNullOrEmpty(PlayFabSettings.PlayFabShared.DeveloperSecretKey))
+//                    throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+//
+//                headers.Add("X-SecretKey", PlayFabSettings.PlayFabShared.DeveloperSecretKey);            
+//            }
 
 
 

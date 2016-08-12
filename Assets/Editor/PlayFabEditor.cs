@@ -30,11 +30,14 @@ namespace PlayFab.Editor
 
         private ListDisplay listDisplay;
         public static bool isGuiEnabled = true;
-
+        public static string edexVersion = "v0.99 beta";
 
 
         public static Dictionary<string, float> blockingRequests = new Dictionary<string, float>(); // key and blockingRequest start time
         private static float blockingRequestTimeOut = 10f; // abandon the block after this many seconds.
+
+
+
 
         void OnEnable()
         {
@@ -120,7 +123,8 @@ namespace PlayFab.Editor
 
                 PlayFabEditorHeader.DrawHeader(Progress);
 
-                GUI.enabled = blockingRequests.Count > 0 ? false : true;
+
+                GUI.enabled = blockingRequests.Count > 0 || EditorApplication.isCompiling ? false : true;
 
                 if (PlayFabEditorAuthenticate.IsAuthenticated())
                 {
@@ -176,6 +180,26 @@ namespace PlayFab.Editor
                     GUILayout.FlexibleSpace();
                 GUILayout.EndVertical();
 
+                if(PlayFabEditorMenu._menuState == PlayFabEditorMenu.MenuStates.Help)
+                {
+                    GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                    GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                        GUILayout.FlexibleSpace();
+                           EditorGUILayout.LabelField( string.Format("PlayFab Editor Extensions: {0}", edexVersion), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
+                        GUILayout.FlexibleSpace();
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                        GUILayout.FlexibleSpace();
+                        if(GUILayout.Button("VIEW DOCUMENTATION", PlayFabEditorHelper.uiStyle.GetStyle("textButton") ))
+                        {
+                            Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions");
+                        }
+                        GUILayout.FlexibleSpace();
+                    GUILayout.EndHorizontal();
+                        GUILayout.EndVertical();
+                }
+
                 GUILayout.EndVertical();
 
                 PruneBlockingRequests();
@@ -206,7 +230,6 @@ namespace PlayFab.Editor
                 EdExStateUpdate(state, status, json);
             }
         }
-
 
         public static void PruneBlockingRequests()
         {

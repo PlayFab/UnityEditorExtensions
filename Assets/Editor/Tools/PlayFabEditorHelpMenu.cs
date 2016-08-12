@@ -10,12 +10,15 @@ namespace PlayFab.Editor
     public class PlayFabEditorHelpMenu : Editor
     {
         public static float buttonWidth = 200;
+        public static Vector2 scrollPos = Vector2.zero;
 
         public static void DrawHelpPanel()
         {
             buttonWidth = EditorGUIUtility.currentViewWidth > 400 ? EditorGUIUtility.currentViewWidth/2 : 200;
-        
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+
+            //scrollPos = GUILayout.BeginScrollView( scrollPos, GUILayout.Width(EditorGUIUtility.currentViewWidth));
+
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.Width(EditorGUIUtility.currentViewWidth - 80));
 
                 GUILayout.Label("LEARN PLAYFAB:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
 
@@ -115,7 +118,7 @@ namespace PlayFab.Editor
 
 
             GUILayout.EndVertical();
-
+           // GUILayout.EndScrollView();
 
 
         }

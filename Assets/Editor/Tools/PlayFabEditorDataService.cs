@@ -306,7 +306,7 @@
         public string selectedTitleId { get; set; }
         public string developerSecretKey { get; set; }
         public Dictionary<string, string> titleData { get; set; }
-
+        public string sdkPath { get; set; }
         public PlayFab_DeveloperEnvironmentDetails()
         {
             titleData = new Dictionary<string, string>();

@@ -29,18 +29,18 @@
 
             if (GUILayout.Button("TEST BAR", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MaxWidth(105)))
             {
-                 var at = PlayFabEditorDataService.activeTitle;
-                 Debug.Log(at);
-//               if(ProgressBar.currentProgressBarState == ProgressBar.ProgressBarStates.off)
-//               {
-//                    PlayFabEditor.AddBlockingRequest("TEST BAR");
-//                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.spin);
-//               }
-//               else
-//               {
-//                    PlayFabEditor.ClearBlockingRequest();
-//                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.off);
-//               }
+//                 var at = PlayFabEditorDataService.activeTitle;
+//                 Debug.Log(at);
+               if(ProgressBar.currentProgressBarState == ProgressBar.ProgressBarStates.off)
+               {
+                    PlayFabEditor.AddBlockingRequest("TEST BAR");
+                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.spin);
+               }
+               else
+               {
+                    PlayFabEditor.ClearBlockingRequest();
+                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.off);
+               }
             }
 
 
