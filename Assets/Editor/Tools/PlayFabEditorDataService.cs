@@ -56,6 +56,7 @@
                 EditorPrefs.SetString("PlayFab_DeveloperEnvironmentDetails", serialized);
 
                 //update scriptable object
+                UpdateScriptableObject();
             }
             catch(Exception ex)
             {
@@ -95,6 +96,8 @@
             accountDetails = new PlayFab_DeveloperAccountDetails();
         }
 
+
+
         public static void LoadEnvDetails()
         {
             if(EditorPrefs.HasKey("PlayFab_DeveloperEnvironmentDetails"))
@@ -103,6 +106,7 @@
                 try
                 {
                     envDetails = Json.JsonWrapper.DeserializeObject<PlayFab_DeveloperEnvironmentDetails>(serialized);
+
                     return;
 
                 }
@@ -112,6 +116,8 @@
                 }
             }
             envDetails = new PlayFab_DeveloperEnvironmentDetails();
+
+
         }
 
         public static void LoadEditorSettings()
@@ -122,8 +128,8 @@
                 try
                 {
                     editorSettings = Json.JsonWrapper.DeserializeObject<PlayFab_EditorSettings>(serialized);
+                    LoadFromScriptableObject();
                     return;
-
                 }
                 catch(Exception ex)
                 {
@@ -146,6 +152,46 @@
             LoadAccountDetails();
             LoadEnvDetails();
             LoadEditorSettings();
+
+            //TODO make sure this should be called here...
+            LoadFromScriptableObject();
+        }
+
+        //TODO answer the question what overrides S.O. or EditorPrefs -- currently defaulting to S.O.
+        public static void LoadFromScriptableObject()
+        {
+            if(envDetails == null)
+                return;
+
+            //this needs to load values into temp vars and if they are null, then allow the editorprefs(which are loaded first) to override the S.O. Once this runs we should sync our 2 datastores
+                var playfabSettingsType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                    from type in assembly.GetTypes()
+                    where type.Name == "PlayFabSettings"
+                    select type);
+
+                if (playfabSettingsType.ToList().Count > 0)
+                {
+                    var type = playfabSettingsType.ToList().FirstOrDefault();
+                    var fields = type.GetFields();
+                    var props = type.GetProperties();
+
+
+
+
+                    envDetails.selectedTitleId = (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null) ?? envDetails.selectedTitleId;
+                    envDetails.webRequestType = (PlayFabEditorSettings.WebRequestType)props.ToList().Find(p => p.Name == "RequestType").GetValue(null, null);
+                    envDetails.timeOut = (int) props.ToList().Find(p => p.Name == "RequestTimeout").GetValue(null, null);
+                    envDetails.keepAlive = (bool) props.ToList().Find(p => p.Name == "RequestKeepAlive").GetValue(null, null);
+                    envDetails.compressApiData = (bool)props.ToList().Find(p => p.Name == "CompressApiData").GetValue(null, null);
+
+
+
+#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+                    envDetails.developerSecretKey = (string) props.ToList().Find(p => p.Name == "DeveloperSecretKey").GetValue(null, null) ?? envDetails.developerSecretKey;
+#else
+                    envDetails.developerSecretKey = string.Empty;
+#endif
+                }
         }
 
 
@@ -162,40 +208,50 @@
                     var fields = type.GetFields();
                     var props = type.GetProperties();
 
-//                    foreach (var property in props)
-//                    {
-//                        //Debug.Log(property.Name);
-//                        if (property.Name.ToLower() == "titleid")
-//                        {
-//                            property.SetValue(null, titleOptions[_selectedTitleIdIndex], null);
-//                        }
-//                        if (property.Name.ToLower() == "requesttype")
-//                        {
-//                            property.SetValue(null, (int)_RequestType, null);
-//                        }
-//                        if (property.Name.ToLower() == "timeout")
-//                        {
-//                            property.SetValue(null, _RequestTimeOut, null);
-//                        }
-//                        if (property.Name.ToLower() == "requestkeepalive")
-//                        {
-//                            property.SetValue(null, _KeepAlive, null);
-//                        }
-//                        if (property.Name.ToLower() == "compressapidata")
-//                        {
-//                            property.SetValue(null, _CompressApiData, null);
-//                        }
-//#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-//                        if (property.Name.ToLower() == "developersecretkey")
-//                        {
-//                            property.SetValue(null, _DeveloperSecretKey, null);
-//                        }
-//#endif
-//                    }
+                    foreach (var property in props)
+                    {
+                        //Debug.Log(property.Name);
+                        if (property.Name.ToLower() == "titleid")
+                        {
+                            property.SetValue(null, envDetails.selectedTitleId, null);
+                        }
+                        if (property.Name.ToLower() == "requesttype")
+                        {
+                            property.SetValue(null, (int)envDetails.webRequestType, null);
+                        }
+                        if (property.Name.ToLower() == "timeout")
+                        {
+                            property.SetValue(null, envDetails.timeOut, null);
+                        }
+                        if (property.Name.ToLower() == "requestkeepalive")
+                        {
+                            property.SetValue(null, envDetails.keepAlive, null);
+                        }
+                        if (property.Name.ToLower() == "compressapidata")
+                        {
+                            property.SetValue(null, envDetails.compressApiData, null);
+                        }
+
+                        //this is a fix for the S.O. getting blanked repeatedly.
+                        if (property.Name.ToLower() == "productionenvironmenturl")
+                        {
+                            property.SetValue(null, PlayFabEditorApi.TitleEndPoint, null);
+                        }
+
+
+#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+                        if (property.Name.ToLower() == "developersecretkey")
+                        {
+                            property.SetValue(null, envDetails.developerSecretKey, null);
+                        }
+#endif
+                    }
 
                     AssetDatabase.SaveAssets();
                  }
         }
+
+
 
         //CTOR
         static PlayFabEditorDataService()
@@ -307,6 +363,12 @@
         public string developerSecretKey { get; set; }
         public Dictionary<string, string> titleData { get; set; }
         public string sdkPath { get; set; }
+
+        public PlayFabEditorSettings.WebRequestType webRequestType { get; set; }
+        public bool compressApiData { get; set; }
+        public bool keepAlive { get; set; }
+        public int timeOut { get; set; }
+
         public PlayFab_DeveloperEnvironmentDetails()
         {
             titleData = new Dictionary<string, string>();
@@ -315,10 +377,8 @@
 
     public class PlayFab_EditorSettings
     {
-        public int currentMainMenu { get; set; }
-        // sub menu?
-        public bool isEdExShown { get; set; }
-    
+       public int currentMainMenu { get; set; }
+       public bool isEdExShown { get; set; }
 
     }
 

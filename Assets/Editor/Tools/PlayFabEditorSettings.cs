@@ -7,8 +7,10 @@
     using UnityEditor;
     using System.Linq;
 
+    [InitializeOnLoad]
     public class PlayFabEditorSettings : Editor
     {
+        #region state variables
         public enum SubMenuStates
         {
             StandardSettings,
@@ -42,10 +44,10 @@
         private static string[] titleOptions;
         private static string[] studioOptions;
        
-        private static int _selectedTitleIdIndex = 0;
-        private static int _selectedStudioIndex = 0;
-        private static int _prevSelectedTitleIdIndex = 0;
-        private static int _prevSelectedStudioIndex = 0;
+        private static int _selectedTitleIdIndex = -1;
+        private static int _selectedStudioIndex = -1;
+        private static int _prevSelectedTitleIdIndex = -1;
+        private static int _prevSelectedStudioIndex = -1;
 
 
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
@@ -62,61 +64,44 @@
        
 
         private static bool _isSettingsSet = false;
+        private static Dictionary<string, StudioDisplaySet > studioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
+        private static Vector2 TitleScrollPos = Vector2.zero;
+        #endregion
 
+        #region draw calls
 
-        public static void SetSettingsProperties()
+        public static void DrawApiSubPanel()
         {
-            if (PlayFabEditorSDKTools.IsInstalled && !_isSettingsSet)
+
+            float labelWidth = 160;
+
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Client API: "))
             {
-                var playfabSettingsType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                    from type in assembly.GetTypes()
-                    where type.Name == "PlayFabSettings"
-                    select type);
-                if (playfabSettingsType.ToList().Count > 0)
-                {
-                    var type = playfabSettingsType.ToList().FirstOrDefault();
-                    var fields = type.GetFields();
-                    var props = type.GetProperties();
-
-                    _TitleId = (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null) ?? PlayFabEditorDataService.activeTitle.Id ?? string.Empty; 
-                    _RequestType = (WebRequestType) props.ToList().Find(p => p.Name == "RequestType").GetValue(null, null);
-                    _RequestTimeOut = (int) props.ToList().Find(p => p.Name == "RequestTimeout").GetValue(null, null);
-                    _KeepAlive = (bool) props.ToList().Find(p => p.Name == "RequestKeepAlive").GetValue(null, null);
-                    _CompressApiData = (bool)props.ToList().Find(p => p.Name == "CompressApiData").GetValue(null, null);
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                    _DeveloperSecretKey = (string) props.ToList().Find(p => p.Name == "DeveloperSecretKey").GetValue(null, null) ?? PlayFabEditorDataService.activeTitle.SecretKey ?? string.Empty;
-#endif
-                    _isSettingsSet = true; 
-                }
-
-                if(studioOptions == null || studioOptions.Length == 0 && PlayFabEditorDataService.accountDetails.studios.Count > 0)
-                {
-                    studioOptions = new string[PlayFabEditorDataService.accountDetails.studios.Count];
-                    for(var z = 0; z < PlayFabEditorDataService.accountDetails.studios.Count; z++)
-                    {
-                        studioOptions[z] = PlayFabEditorDataService.accountDetails.studios[z].Name;
-                        if(studioOptions[z] == PlayFabEditorDataService.envDetails.selectedStudio)
-                        {
-                            _selectedStudioIndex = z;
-                            _prevSelectedStudioIndex = z;
-                        }
-                    }
-
-                    // if nothing is selected, then we will want to preload the titles for 0, otherwise
-                    titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex].Titles.Length];
-                    for(var z = 0; z < PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex].Titles.Length; z++)
-                    {
-                        titleOptions[z] = PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex].Titles[z].Id;
-                        if(titleOptions[z] == _TitleId)
-                        {
-                            _selectedTitleIdIndex = z;
-                            _prevSelectedTitleIdIndex = z;
-                        }
-                    }
-                }
-
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                PlayFabEditorDataService.envDetails.isClientApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.envDetails.isClientApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             }
-            
+
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Admin API:  "))
+            {
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                PlayFabEditorDataService.envDetails.isAdminApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.envDetails.isAdminApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+            }
+
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Server API: "))
+            {
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                PlayFabEditorDataService.envDetails.isServerApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.envDetails.isServerApiEnabled , PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+            }
+
+            using (FixedWidthLabel fwl = new FixedWidthLabel("Debug Request Times: "))
+            {
+                GUILayout.Space(labelWidth - fwl.fieldWidth);
+                PlayFabEditorDataService.envDetails.isDebugRequestTimesEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.envDetails.isDebugRequestTimesEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+            }
+
+            GUILayout.EndVertical();
         }
 
         public static void DrawSettingsPanel()
@@ -165,7 +150,7 @@
             {
                 OnStandardSetttingsClicked();
             }
-            if (GUILayout.Button("TITLE", titleSettingsButtonStyle))
+            if (GUILayout.Button("STUDIOS", titleSettingsButtonStyle))
             {
                 OnTitleSettingsClicked();
             }
@@ -175,10 +160,10 @@
                 OnApiSettingsClicked();
             }
 
-            if (GUILayout.Button("PACKAGES", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
-            {
-                //OnStandardSetttingsClicked();
-            }
+//            if (GUILayout.Button("PACKAGES", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+//            {
+//                //OnStandardSetttingsClicked();
+//            }
 
             GUILayout.EndHorizontal();
 
@@ -202,25 +187,6 @@
 
         }
 
-        private static void OnApiSettingsClicked()
-        {
-            EditorPrefs.SetInt("PLAYFAB_CURRENT_SETTINGSMENU", (int)SubMenuStates.ApiSettings);
-        }
-
-        private static void OnStandardSetttingsClicked()
-        {
-            EditorPrefs.SetInt("PLAYFAB_CURRENT_SETTINGSMENU", (int)SubMenuStates.StandardSettings);
-        }
-
-        private static void OnTitleSettingsClicked()
-        {
-            EditorPrefs.SetInt("PLAYFAB_CURRENT_SETTINGSMENU", (int)SubMenuStates.TitleSettings);
-        }
-
-
-        //
-        private static Dictionary<string, StudioDisplaySet > studioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
-        private static Vector2 TitleScrollPos = Vector2.zero;
 
         public static void DrawTitleSettingsSubPanel()
         {
@@ -271,7 +237,6 @@
 
             foreach(var studio in studioFoldOutStates)
             {
-                //Foldout(EditorGUILayout.GetControlRect(), commonFoldout, "Common issues", true);
                 var style = new GUIStyle(EditorStyles.foldout);
 
                 if(studio.Value.isCollapsed)
@@ -284,7 +249,11 @@
                 if(!studio.Value.isCollapsed)
                 {
                     EditorGUI.indentLevel = 1;
-                    EditorGUILayout.LabelField("TITLES:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+
+                    GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                        EditorGUILayout.LabelField("TITLES:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                    GUILayout.EndHorizontal();
+
                     // draw title foldouts
                     foreach(var title in studio.Value.titleFoldOutStates)
                     {
@@ -300,7 +269,12 @@
 
                             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                                 EditorGUILayout.LabelField("URL:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                                EditorGUILayout.TextField(""+title.Value.Title.GameManagerUrl);
+                                GUILayout.FlexibleSpace();
+                                if(GUILayout.Button("VIEW IN GAME MANAGER", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                                {
+                                    Application.OpenURL(title.Value.Title.GameManagerUrl);
+                                }
+                                GUILayout.FlexibleSpace();
                             GUILayout.EndHorizontal();  
                             EditorGUI.indentLevel = 1;
                         }
@@ -309,65 +283,6 @@
                     EditorGUI.indentLevel = 0;
                 }
             }
-
-
-
-
-            //TODO START BACK HERE
-           // EditorGUILayout.Foldout
-
-//            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-//                EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-//                _TitleId = EditorGUILayout.TextField(_TitleId, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-//            GUILayout.EndHorizontal();
-
-
-//            #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-//                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-//                    EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-//            _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-//                GUILayout.EndHorizontal();
-//
-//            #endif
-//
-//            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-//                EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-//                _RequestType = (WebRequestType) EditorGUILayout.EnumPopup(_RequestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
-//            GUILayout.EndHorizontal();
-//
-//
-//            if (_RequestType == WebRequestType.HttpWebRequest)
-//            {
-//                using (FixedWidthLabel fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
-//                {
-//                    GUILayout.Space(labelWidth - fwl.fieldWidth);
-//                    _RequestTimeOut = EditorGUILayout.IntField(_RequestTimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-//                }
-//
-//                using (FixedWidthLabel fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
-//                {
-//                    GUILayout.Space(labelWidth - fwl.fieldWidth);
-//                    _KeepAlive = EditorGUILayout.Toggle(_KeepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-//                }
-//            }
-//
-//
-//            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-//                EditorGUILayout.LabelField("COMPRESS API DATA: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-//                _CompressApiData = EditorGUILayout.Toggle(_CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-//            GUILayout.EndHorizontal();
-//           
-//
-//            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-//                var buttonWidth = 100;
-//                GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth);
-//
-//                if (GUILayout.Button("SAVE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
-//                {
-//                    OnSaveSettings();
-//                }
-//            GUILayout.EndHorizontal();
-
             GUILayout.EndScrollView();
         }
 
@@ -474,119 +389,10 @@
             GUILayout.EndVertical();
         }
 
-        private static void OnSaveSettings()
-        {
-            //#if ENABLE_PLAYFABCLIENT_API || ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-            //#endif
-
-            Debug.Log("Save Settings Clicked");
-            if (PlayFabEditorSDKTools.IsInstalled)
-            {
-                
-                //PlayFabEditorDataService.envDetails.
-
-                //TODO move this logic to the data service
-                var playfabSettingsType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                    from type in assembly.GetTypes()
-                    where type.Name == "PlayFabSettings"
-                    select type);
-                if (playfabSettingsType.ToList().Count > 0)
-                {
-                    var type = playfabSettingsType.ToList().FirstOrDefault();
-                    var fields = type.GetFields();
-                    var props = type.GetProperties();
-
-                    foreach (var property in props)
-                    {
-                        //Debug.Log(property.Name);
-                        if (property.Name.ToLower() == "titleid")
-                        {
-                            property.SetValue(null, titleOptions[_selectedTitleIdIndex], null);
-                        }
-                        if (property.Name.ToLower() == "requesttype")
-                        {
-                            property.SetValue(null, (int)_RequestType, null);
-                        }
-                        if (property.Name.ToLower() == "timeout")
-                        {
-                            property.SetValue(null, _RequestTimeOut, null);
-                        }
-                        if (property.Name.ToLower() == "requestkeepalive")
-                        {
-                            property.SetValue(null, _KeepAlive, null);
-                        }
-                        if (property.Name.ToLower() == "compressapidata")
-                        {
-                            property.SetValue(null, _CompressApiData, null);
-                        }
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                        if (property.Name.ToLower() == "developersecretkey")
-                        {
-                            property.SetValue(null, _DeveloperSecretKey, null);
-                        }
-#endif
-                    }
-
-                    AssetDatabase.SaveAssets();
-
-                    PlayFabEditorDataService.envDetails.selectedTitleId = titleOptions[_selectedTitleIdIndex];
-
-                    #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                    PlayFabEditorDataService.envDetails.developerSecretKey = _DeveloperSecretKey;
-                    #endif
-         
-
-                    //TODO work out the issue here where there could be a mismatch here when using an ID not in one of your studios
-           
-                    PlayFabEditorDataService.envDetails.selectedStudio = studioOptions[_selectedStudioIndex];   
-                    PlayFabEditorDataService.SaveEnvDetails();
-
-                }
-            }
-            else
-            {
-                Debug.Log("SDK is not installed.");
-            }
-        }
+        #endregion
 
 
-
-
-        public static void DrawApiSubPanel()
-        {
-
-            float labelWidth = 160;
-
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Client API: "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _isClientSdkEnabled = EditorGUILayout.Toggle(_isClientSdkEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            }
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Admin API:  "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _isAdminSdkEnabled = EditorGUILayout.Toggle(_isAdminSdkEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            }
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("Enable Server API: "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _isServerSdkEnabled = EditorGUILayout.Toggle(_isServerSdkEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            }
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("Debug Request Times: "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _IsDebugRequestTiming = EditorGUILayout.Toggle(_IsDebugRequestTiming, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            }
-
-            GUILayout.EndVertical();
-        }
-
-
+        #region unity-like loops
 
         public static void Update()
         {
@@ -611,69 +417,199 @@
 
         public static void After()
         {
-            if (_isAdminSdkEnabled && !buildTargets.Contains(AdminAPI))
+            if (PlayFabEditorDataService.envDetails.isAdminApiEnabled && !buildTargets.Contains(AdminAPI))
             {
                 var str = AddToBuildTarget(buildTargets, AdminAPI);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.SetString(AdminAPI, "1");
+                //EditorPrefs.SetString(AdminAPI, "1");
                 //PlayFabEditorDataService.envDetails.isAdminApiEnabled = true;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
-            else if (!_isAdminSdkEnabled && buildTargets.Contains(AdminAPI))
+            else if (!PlayFabEditorDataService.envDetails.isAdminApiEnabled && buildTargets.Contains(AdminAPI))
             {
                 var str = RemoveToBuildTarget(buildTargets, AdminAPI);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.DeleteKey(AdminAPI);
+                //EditorPrefs.DeleteKey(AdminAPI);
                 //PlayFabEditorDataService.envDetails.isAdminApiEnabled = false;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
 
-            if (_isServerSdkEnabled && !buildTargets.Contains(ServerAPI))
+            if (PlayFabEditorDataService.envDetails.isServerApiEnabled  && !buildTargets.Contains(ServerAPI))
             {
                 var str = AddToBuildTarget(buildTargets, ServerAPI);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.SetString(ServerAPI, "1");
-                //PlayFabEditorDataService.envDetails.isServerApiEnabled = true;
+                //EditorPrefs.SetString(ServerAPI, "1");
+               // PlayFabEditorDataService.envDetails.isServerApiEnabled = true;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
-            else if (!_isServerSdkEnabled && buildTargets.Contains(ServerAPI))
+            else if (!PlayFabEditorDataService.envDetails.isServerApiEnabled  && buildTargets.Contains(ServerAPI))
             {
                 var str = RemoveToBuildTarget(buildTargets, ServerAPI);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.DeleteKey(ServerAPI);
+                //EditorPrefs.DeleteKey(ServerAPI);
                 //PlayFabEditorDataService.envDetails.isServerApiEnabled = false;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
 
-            if (_IsDebugRequestTiming && !buildTargets.Contains(DebugRequestTiming))
+            if (PlayFabEditorDataService.envDetails.isDebugRequestTimesEnabled && !buildTargets.Contains(DebugRequestTiming))
             {
                 var str = AddToBuildTarget(buildTargets, DebugRequestTiming);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.SetString(DebugRequestTiming, "1");
+                //EditorPrefs.SetString(DebugRequestTiming, "1");
                 //PlayFabEditorDataService.envDetails.isDebugRequestTimesEnabled = true;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
-            else if (!_IsDebugRequestTiming && buildTargets.Contains(DebugRequestTiming))
+            else if (!PlayFabEditorDataService.envDetails.isDebugRequestTimesEnabled && buildTargets.Contains(DebugRequestTiming))
             {
                 var str = RemoveToBuildTarget(buildTargets, DebugRequestTiming);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.DeleteKey(DebugRequestTiming);
+                //EditorPrefs.DeleteKey(DebugRequestTiming);
                 //PlayFabEditorDataService.envDetails.isDebugRequestTimesEnabled = false;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
 
-            if (!_isClientSdkEnabled && !buildTargets.Contains(ClientAPI))
+            if (!PlayFabEditorDataService.envDetails.isClientApiEnabled && !buildTargets.Contains(ClientAPI))
             {
                 Debug.Log(ClientAPI + ":" + buildTargets.Contains(ClientAPI));
                 var str = AddToBuildTarget(buildTargets, ClientAPI);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.SetString(ClientAPI, "1");
+                //EditorPrefs.SetString(ClientAPI, "1");
                 //PlayFabEditorDataService.envDetails.isClientApiEnabled = true;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
-            else if (_isClientSdkEnabled && buildTargets.Contains(ClientAPI))
+            else if (PlayFabEditorDataService.envDetails.isClientApiEnabled && buildTargets.Contains(ClientAPI))
             {
                 Debug.Log(ClientAPI + "- Removed");
                 var str = RemoveToBuildTarget(buildTargets, ClientAPI);
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, str);
-                EditorPrefs.DeleteKey(ClientAPI);
+                //EditorPrefs.DeleteKey(ClientAPI);
                 //PlayFabEditorDataService.envDetails.isClientApiEnabled = false;
+                PlayFabEditorDataService.SaveEnvDetails();
             }
 
         }
+
+        #endregion
+
+
+        #region menu and helper methods
+        public static void SetSettingsProperties()
+        {
+            if (PlayFabEditorSDKTools.IsInstalled && !_isSettingsSet)
+            {
+                if(studioOptions == null || studioOptions.Length == 0 && PlayFabEditorDataService.accountDetails.studios.Count > 0)
+                {
+                    studioOptions = new string[PlayFabEditorDataService.accountDetails.studios.Count];
+                    //studioOptions[0] = string.Empty;
+
+                   
+                    for(var z = 0; z < PlayFabEditorDataService.accountDetails.studios.Count; z++)
+                    {
+                        //note the 1 index
+                        studioOptions[z] = PlayFabEditorDataService.accountDetails.studios[z].Name;
+
+                        if(PlayFabEditorDataService.accountDetails.studios[z].Name == PlayFabEditorDataService.envDetails.selectedStudio)
+                        {
+                            _prevSelectedStudioIndex = z;
+                            _selectedStudioIndex = z;
+                        }
+
+                        bool foundTitle = false;
+                        for(var x = 0; x < PlayFabEditorDataService.accountDetails.studios[z].Titles.Length; x++)
+                        {   
+                            if(foundTitle) 
+                            {
+                                // then we know this is the correct studio
+                                titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[z].Titles[x].Id;
+                            }
+
+                            
+                            if(PlayFabEditorDataService.accountDetails.studios[z].Titles[x].Id == PlayFabEditorDataService.envDetails.selectedTitleId && foundTitle == false)
+                            {   
+                                foundTitle = true;
+                                titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[z].Titles.Length];
+
+                                #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+                                    _DeveloperSecretKey =  PlayFabEditorDataService.accountDetails.studios[z].Titles[x].SecretKey;
+                                #endif
+
+                                _selectedTitleIdIndex = x;
+                                _prevSelectedTitleIdIndex = x;
+
+                                _selectedStudioIndex = z;
+                                _prevSelectedStudioIndex = z;
+
+                                // restart this inner loop to add titles to dropdown
+                                x = 0;
+                            }
+                        }
+
+                    }
+
+                    //TODO build a fallback for this case. Currently this may cause unexpected behaviors on the settings screen
+                    // in these cases, we did not find the title or studio that we were looking for
+                    //if editorprefs studio is null & SO.titleId &| devKey is set, then we are likly using a title that we are not a member of.
+                    if(_selectedStudioIndex == -1)
+                    {
+                        
+                    }
+
+                    if(_selectedTitleIdIndex == -1)
+                    {
+
+                    }
+                }
+
+                _RequestTimeOut = PlayFabEditorDataService.envDetails.timeOut;
+                _KeepAlive = PlayFabEditorDataService.envDetails.keepAlive;
+
+                _isSettingsSet = true;
+
+            }
+            
+        }
+
+        private static void OnApiSettingsClicked()
+        {
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_SETTINGSMENU", (int)SubMenuStates.ApiSettings);
+        }
+
+        private static void OnStandardSetttingsClicked()
+        {
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_SETTINGSMENU", (int)SubMenuStates.StandardSettings);
+        }
+
+        private static void OnTitleSettingsClicked()
+        {
+            EditorPrefs.SetInt("PLAYFAB_CURRENT_SETTINGSMENU", (int)SubMenuStates.TitleSettings);
+        }
+
+
+        private static void OnSaveSettings()
+        {
+            if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
+            {
+                PlayFabEditorDataService.envDetails.selectedStudio = studioOptions[_selectedStudioIndex];  
+                PlayFabEditorDataService.envDetails.selectedTitleId = titleOptions[_selectedTitleIdIndex];
+
+                #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+                    PlayFabEditorDataService.envDetails.developerSecretKey = _DeveloperSecretKey;
+                #endif
+     
+                PlayFabEditorDataService.envDetails.compressApiData = _CompressApiData;
+                PlayFabEditorDataService.envDetails.keepAlive = _KeepAlive;
+                PlayFabEditorDataService.envDetails.webRequestType = _RequestType;
+                PlayFabEditorDataService.envDetails.timeOut = _RequestTimeOut;
+
+                PlayFabEditorDataService.SaveEnvDetails();
+
+            }
+            else
+            {
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, "SDK is unsupported or not installed");
+            }
+        }
+
 
         public static string AddToBuildTarget(List<string> targets, string define)
         {
@@ -687,7 +623,56 @@
             return string.Join(";", targets.ToArray());
         }
 
+        //CTOR
+        static PlayFabEditorSettings()
+        {
+            if(!PlayFabEditor.IsEventHandlerRegistered(StateUpdateHandler))
+            {
+                PlayFabEditor.EdExStateUpdate += StateUpdateHandler;
+            }
+        }
 
+        /// <summary>
+        /// Handles state updates within the editor extension.
+        /// </summary>
+        /// <param name="state">the state that triggered this event.</param>
+        /// <param name="status">a generic message about the status.</param>
+        /// <param name="json">a generic container for additional JSON encoded info.</param>
+        public static void StateUpdateHandler(PlayFabEditor.EdExStates state, string status, string json)
+        {
+            //Debug.Log(string.Format("PFE: Handled EdExStatusUpdate:{0}, Status:{1}, Misc:{2}", state, status, json)); 
+
+
+
+            switch(state)
+            {
+//                case EdExStates.OnEnable:
+//                   
+//                break;
+//                case EdExStates.OnDisable:
+//                   
+//                break;
+//                case EdExStates.OnLogin:
+//                   
+//                break;
+//                case EdExStates.OnLogout:
+//                   
+//                break;
+                case PlayFabEditor.EdExStates.OnMenuItemClicked:
+                    if(status == "Settings")
+                    {
+                        EditorPrefs.SetInt("PLAYFAB_CURRENT_SETTINGSMENU", (int)SubMenuStates.StandardSettings);
+                        _subMenuState = SubMenuStates.StandardSettings;
+                    }
+                break;
+//
+//                case EdExStates.OnSubmenuItemClicked:
+//                   
+//                break;
+//
+            }
+        }
+        #endregion
     }
 
 

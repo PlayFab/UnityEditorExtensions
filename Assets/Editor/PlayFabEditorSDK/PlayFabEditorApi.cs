@@ -11,8 +11,8 @@
 
     public class PlayFabEditorApi
     {
-        const string ApiEndpoint = @"https://editor.playfabapi.com"; //@"https://p-mns-unity-editor-api.us-west-2.elasticbeanstalk.com";
-        const string TitleEndPoint = @".playfabapi.com";
+        public const string ApiEndpoint = @"https://editor.playfabapi.com"; //@"https://p-mns-unity-editor-api.us-west-2.elasticbeanstalk.com";
+        public const string TitleEndPoint = @".playfabapi.com";
 
         public static void DownloadSDK(DownloadSDKRequest request, Action<DownloadSDKResponse> resultCallback,
             Action<EditorModels.PlayFabError> errorCallback)

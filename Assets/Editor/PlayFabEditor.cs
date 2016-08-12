@@ -30,7 +30,7 @@ namespace PlayFab.Editor
 
         private ListDisplay listDisplay;
         public static bool isGuiEnabled = true;
-        public static string edexVersion = "v0.99 beta";
+        public static string edexVersion = "0.99 beta";
 
 
         public static Dictionary<string, float> blockingRequests = new Dictionary<string, float>(); // key and blockingRequest start time
@@ -154,7 +154,9 @@ namespace PlayFab.Editor
                             case PlayFabEditorMenu.MenuStates.Help:
                                 PlayFabEditorHelpMenu.DrawHelpPanel();
                                 break;
-                     
+                            case PlayFabEditorMenu.MenuStates.Data:
+                                PlayFabEditorDataMenu.DrawDataPanel();
+                                break;
                             default:
                                 break;
                         }
