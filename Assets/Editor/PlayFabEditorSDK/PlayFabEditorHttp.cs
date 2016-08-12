@@ -1,4 +1,5 @@
-﻿using PlayFab.Editor.EditorModels;
+﻿//using PlayFab.Internal;
+using PlayFab.Editor.EditorModels;
 using UnityEngine;
 
 namespace PlayFab.Editor
@@ -7,6 +8,7 @@ namespace PlayFab.Editor
     using System.Collections;
     using System.Collections.Generic;
     using UnityEditor;
+
 #if UNITY_5_4
     using UnityEngine.Networking;
 #else
@@ -38,7 +40,7 @@ namespace PlayFab.Editor
 
 
         internal static void MakeApiCall<TRequestType, TResultType>(string api, string apiEndpoint, string token, TRequestType request,
-            Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
+        Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
         {
             var url = apiEndpoint + api;
             var req = JsonWrapper.SerializeObject(request, PlayFabEditorUtil.ApiSerializerStrategy);
@@ -47,14 +49,28 @@ namespace PlayFab.Editor
             {
                 {"Content-Type", "application/json"},
                 {"X-ReportErrorAsSuccess", "true"},
-                {"X-PlayFabSDK", "PlayFabEditorExtensionsSDK_0.1.0"}
+                {"X-PlayFabSDK", string.Format("PlayFabEditorExtensions_{0}", PlayFabEditor.edexVersion)}
             };
+
+
+            //TODO update this in accordance with the no-SDK model
+//            if(api.Contains("/Server/") || api.Contains("/Admin/"))
+//            {
+//                if(string.IsNullOrEmpty(PlayFabSettings.PlayFabShared.DeveloperSecretKey))
+//                    throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+//
+//                headers.Add("X-SecretKey", PlayFabSettings.PlayFabShared.DeveloperSecretKey);            
+//            }
+
+
 
             //Encode Payload
             var payload = System.Text.Encoding.UTF8.GetBytes(req.Trim());
 
             var www = new WWW(url, payload, headers);
 
+            //TODO make the blocking states optional -- eventually pull this out to the calling function
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnHttpReq, api, PlayFabEditorHelper.GetEventJson());
             EditorCoroutine.start(Post(www, (response) =>
             {
                 var httpResult = JsonWrapper.DeserializeObject<HttpResponseObject>(response,
@@ -64,6 +80,8 @@ namespace PlayFab.Editor
                 {
                     try
                     {
+                        PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnHttpRes, api);
+
                         var dataJson = JsonWrapper.SerializeObject(httpResult.data,
                             PlayFabEditorUtil.ApiSerializerStrategy);
                         var result = JsonWrapper.DeserializeObject<TResultType>(dataJson,
@@ -76,7 +94,8 @@ namespace PlayFab.Editor
                     }
                     catch (Exception e)
                     {
-                        UnityEngine.Debug.LogException(e);
+                        //UnityEngine.Debug.LogException(e);
+                        PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, e.Message);
                     }
 
                 }
@@ -86,6 +105,10 @@ namespace PlayFab.Editor
                     {
                         var playFabError = GeneratePlayFabError(response);
                         errorCallback(playFabError);
+                    }
+                    else
+                    {
+                        PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, string.Format("ErrorCode:{0} -- {1}", httpResult.code, httpResult.status));
                     }
                 }
 
@@ -97,9 +120,16 @@ namespace PlayFab.Editor
                     var playFabError = GeneratePlayFabError(error);
                     errorCallback(playFabError);
                 }
+                else
+                {
+                    PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error);
+                }
             }),www);
 
         }
+
+
+
 
 
         internal static void MakeGitHubApiCall(string url, Action<string> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
@@ -136,36 +166,6 @@ namespace PlayFab.Editor
                 }
 
 
-//                if (httpResult.code == 200)
-//                {
-//                    try
-//                    {
-//                        var dataJson = JsonWrapper.SerializeObject(httpResult.data,
-//                            PlayFabEditorUtil.ApiSerializerStrategy);
-//                        var result = JsonWrapper.DeserializeObject<TResultType>(dataJson,
-//                            PlayFabEditorUtil.ApiSerializerStrategy);
-//
-//                        if (resultCallback != null)
-//                        {
-//                            resultCallback(result);
-//                        }
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        UnityEngine.Debug.LogException(e);
-//                    }
-//
-//                }
-//                else
-//                {
-//                    if (errorCallback != null)
-//                    {
-//                        var playFabError = GeneratePlayFabError(response);
-//                        errorCallback(playFabError);
-//                    }
-//                }
-
-
             }, (error) =>
             {
                 if (errorCallback != null)
@@ -177,8 +177,19 @@ namespace PlayFab.Editor
 
         }
 
+
+
+
+
+
+
+
+
+
+
         private static IEnumerator Post(WWW www, Action<string> callBack, Action<string> errorCallback)
         {
+          
             yield return www;
             
             if (!string.IsNullOrEmpty(www.error))
@@ -191,12 +202,10 @@ namespace PlayFab.Editor
             }
         }
 
-       //private static IEnumerator PostDownload(UnityWebRequest www, Action<byte[]> callBack, Action<string> errorCallback)
+
         private static IEnumerator PostDownload(WWW www, Action<byte[]> callBack, Action<string> errorCallback)
         {
-            //www.downloadHandler = new UnityEngine.Experimental.Networking.DownloadHandlerBuffer();
-           
-            yield return www;//www.Send();
+            yield return www;
 
             if (!string.IsNullOrEmpty(www.error))
             {

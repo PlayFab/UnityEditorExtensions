@@ -5,10 +5,14 @@
     using System.Collections;
     using UnityEditor;
     using PlayFab.Editor.EditorModels;
+
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class PlayFabEditorApi
     {
-        const string ApiEndpoint = @"https://peek.playfabapi.com"; //@"https://p-mns-unity-editor-api.us-west-2.elasticbeanstalk.com";
-
+        const string ApiEndpoint = @"https://editor.playfabapi.com"; //@"https://p-mns-unity-editor-api.us-west-2.elasticbeanstalk.com";
+        const string TitleEndPoint = @".playfabapi.com";
 
         public static void DownloadSDK(DownloadSDKRequest request, Action<DownloadSDKResponse> resultCallback,
             Action<EditorModels.PlayFabError> errorCallback)
@@ -50,6 +54,19 @@
             request.DeveloperClientToken = token;
             PlayFabEditorHttp.MakeApiCall("/DeveloperTools/User/CreateTitle", ApiEndpoint, token, request, resultCallback, errorCallback);
         }
+
+
+
+
+
+        public static void GetTitleData( Action<GetTitleDataResult> resultCb, Action<EditorModels.PlayFabError> errorCallback)
+        {
+            //TODO this will break without the SDK installed...
+//            var titleId = PlayFabSettings.TitleId;
+//            var apiEndpoint = String.Format("https://{0}{1}", titleId, TitleEndPoint);
+//            PlayFabEditorHttp.MakeApiCall<GetTitleDataRequest, GetTitleDataResult>("/Server/GetTitleData", apiEndpoint, null, new GetTitleDataRequest(), resultCb, errorCallback);
+        }
+
 
     }
 }

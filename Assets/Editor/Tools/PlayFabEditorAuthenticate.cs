@@ -11,16 +11,12 @@ namespace PlayFab.Editor
 
     public class PlayFabEditorAuthenticate : Editor
     {
-        //TODO make const strings for the EditorPref keys
         private static string _userEmail = string.Empty;
         private static string _userPass = string.Empty;
         private static string _userPass2 = string.Empty;
         private static string _studio = string.Empty;
         private static bool _autoLogin = false;
 
-        //Create Color vector for background.
-        //private static Vector3 ColorVector = PlayFabEditorHelper.GetColorVector(62);
-        //private static Texture2D Background = PlayFabEditorHelper.MakeTex(1, 1, new Color(ColorVector.x, ColorVector.y, ColorVector.z));
         private static bool isLoggingIn = false;
 
         public enum PanelDisplayStates { Register, Login }
@@ -29,32 +25,45 @@ namespace PlayFab.Editor
 
         public static bool IsAuthenticated()
         {
-            return EditorPrefs.HasKey("IsPlayFabAuthenticated") && EditorPrefs.GetBool("IsPlayFabAuthenticated");
+            //return EditorPrefs.HasKey("IsPlayFabAuthenticated") && EditorPrefs.GetBool("IsPlayFabAuthenticated");
+            return string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.devToken) ? false : true;
         }
 
         public static void DrawAuthPanels()
         {
-            if(EditorPrefs.HasKey("PlayFabUserEmail") && string.IsNullOrEmpty(_userEmail))
+            if(!string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.email))
             {
-                _userEmail = EditorPrefs.GetString("PlayFabUserEmail");
-                activeState = PanelDisplayStates.Login;
+                _userEmail = PlayFabEditorDataService.accountDetails.email;
             }
 
-            if(EditorPrefs.HasKey("PlayFabAutoLogin") && EditorPrefs.GetBool("PlayFabAutoLogin") == true && EditorPrefs.HasKey("PlayFabUserPass"))
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                GUILayout.Label("Welcome to PlayFab!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+            GUILayout.EndHorizontal();
+
+            if(PlayFabEditorDataService.accountDetails.useAutoLogin)
             {
-                if(EditorPrefs.HasKey("PlayFabDevClientToken") && !string.IsNullOrEmpty(EditorPrefs.GetString("PlayFabDevClientToken")))
+                if(!string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.devToken))
                 {
-                    EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
-                    return;
+                    _autoLogin = true;
+                    if(isLoggingIn == false)
+                    {
+                        Debug.Log("PlayFab developer credentials saved, logging in...");
+                        OnLoginButtonClicked();
+                    }
                 }
+                else
+                {
+                    // lost password and token, cannot auto login
+                    activeState = PanelDisplayStates.Login;
+                }
+//                if(EditorPrefs.HasKey("PlayFabDevClientToken") && !string.IsNullOrEmpty(EditorPrefs.GetString("PlayFabDevClientToken")))
+//                {
+//                    EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
+//                    return;
+//                }
+
                // auto login mode, first fetch cached password 
-                _autoLogin = true;
-                _userPass = EditorPrefs.GetString("PlayFabUserPass");
-                if(isLoggingIn == false)
-                {
-                    Debug.Log("PlayFab developer credentials saved, logging in...");
-                    OnLoginButtonClicked();
-                }
+
 
             }
             else if(activeState == PanelDisplayStates.Login)
@@ -72,7 +81,17 @@ namespace PlayFab.Editor
             {
                 DrawRegister();
             }
+
+                
+
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+            GUILayout.Label("Our editor extension provides an easy way to manage the PlayFab SDK. \n\nExisting users may LOG IN using their developer account. \n\nNew users must CREATE AN ACCOUNT.", PlayFabEditorHelper.uiStyle.GetStyle("cGenTxt"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+
+
+
+            GUILayout.EndVertical();
         }
+
 
 
         public static void DrawLogin()
@@ -103,12 +122,6 @@ namespace PlayFab.Editor
             EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")); //var buttonRect = 
 
 
-//            var linkStyle = PlayFabEditorHelper.GetTextButtonStyle();
-//            linkStyle.font = PlayFabEditorHelper.buttonFontBold;
-//            linkStyle.fontSize = 11;
-//            linkStyle.wordWrap = true;
-//            linkStyle.alignment = TextAnchor.MiddleCenter;
-
             if(GUILayout.Button("CREATE AN ACCOUNT", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MaxWidth(100) ))
             {
                 activeState = PanelDisplayStates.Register;
@@ -117,13 +130,7 @@ namespace PlayFab.Editor
             var buttonWidth = 100;
             GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth * 2);
 
-//            var buttonStyle = PlayFabEditorHelper.GetButtonStyle();
-//            buttonStyle.font = PlayFabEditorHelper.buttonFontBold;
-//            buttonStyle.fontSize = 14;
-//            buttonStyle.alignment = TextAnchor.MiddleCenter;
-//            buttonStyle.margin.right = 10;
-
-            if (GUILayout.Button("LOGIN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+            if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
             {
                
                 OnLoginButtonClicked();
@@ -141,9 +148,19 @@ namespace PlayFab.Editor
 
         public static void Logout()
         {
-            EditorPrefs.SetBool("IsPlayFabAuthenticated", false);
+            //EditorPrefs.SetBool("IsPlayFabAuthenticated", false);
             _autoLogin = false;
-            EditorPrefs.SetBool("PlayFabAutoLogin", false);
+            _userPass = string.Empty;
+            _userPass2 = string.Empty;
+
+            activeState = PanelDisplayStates.Login;
+
+            PlayFabEditorDataService.accountDetails.useAutoLogin = false;
+            PlayFabEditorDataService.accountDetails.devToken = string.Empty;
+            PlayFabEditorDataService.SaveAccountDetails();
+
+
+            //EditorPrefs.SetBool("PlayFabAutoLogin", false);
 
             //TODO make sure to clean up login tokens.
         }
@@ -180,7 +197,7 @@ namespace PlayFab.Editor
 
             EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")); //var buttonRect = 
 
-            if (GUILayout.Button("LOGIN", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(32)))
+            if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(32)))
             {
                 activeState = PanelDisplayStates.Login;
             }
@@ -218,33 +235,44 @@ namespace PlayFab.Editor
             PlayFabEditorApi.Login(new LoginRequest()
             {
                 DeveloperToolProductName = "PlayFabEditorExtension",  //TODO make this statics in a helper class
-                DeveloperToolProductVersion = "1.01", //TODO make this statics in a helper class
+                DeveloperToolProductVersion = PlayFabEditor.edexVersion, //TODO make this statics in a helper class
                 Email = _userEmail,
                 Password = _userPass
             }, (result) =>
             {
                 //Debug.Log(result.DeveloperClientToken);
-                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
-                EditorPrefs.SetString("PlayFabUserPass", _userPass);
-                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
-                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
-                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
+                PlayFabEditorDataService.accountDetails.devToken = result.DeveloperClientToken;
+                PlayFabEditorDataService.accountDetails.email = _userEmail;
+                PlayFabEditorDataService.accountDetails.useAutoLogin = _autoLogin;
+
+
+
+//                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
+//                EditorPrefs.SetString("PlayFabUserPass", _userPass);
+//                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
+//                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
+//                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
                 isLoggingIn = false;
+
                 PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
                 {
-                    PlayFabEditor.Studios = getStudioResult.Studios.ToList();
+                    PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
                 }, (getStudiosError) =>
                 {
                     //TODO: Error Handling & have this update when the tab is opened.
-                    Debug.LogError(getStudiosError.ToString());
+                    PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, getStudiosError.ToString());
+                    //Debug.LogError(getStudiosError.ToString());
                 });
+                PlayFabEditorDataService.SaveAccountDetails();
+                PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;
 
             }, (error) =>
             {
                 progressCount = 0f;
                 startProgress = false;
                 isLoggingIn = false;
-                Debug.LogError(error.ToString());
+                //Debug.LogError(error.ToString());
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.ErrorMessage);
             });
         }
 
@@ -265,34 +293,42 @@ namespace PlayFab.Editor
             PlayFabEditorApi.RegisterAccouint(new RegisterAccountRequest()
             {
                 DeveloperToolProductName = "PlayFabEditorExtension",  //TODO make this statics in a helper class
-                DeveloperToolProductVersion = "1.01", //TODO make this statics in a helper class
+                DeveloperToolProductVersion = PlayFabEditor.edexVersion, //TODO make this statics in a helper class
                 Email = _userEmail,
                 Password = _userPass,
                 StudioName = _studio
             }, (result) =>
             {
                 //Debug.Log(result.DeveloperClientToken);
-                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
-                EditorPrefs.SetString("PlayFabUserPass", _userPass);
-                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
-                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
-                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
+                PlayFabEditorDataService.accountDetails.devToken = result.DeveloperClientToken;
+                PlayFabEditorDataService.accountDetails.email = _userEmail;
+                PlayFabEditorDataService.accountDetails.useAutoLogin = _autoLogin;
+
+//                EditorPrefs.SetString("PlayFabUserEmail",_userEmail);
+//                EditorPrefs.SetString("PlayFabUserPass", _userPass);
+//                EditorPrefs.SetString("PlayFabDevClientToken",result.DeveloperClientToken);
+//                EditorPrefs.SetBool("IsPlayFabAuthenticated", true);
+//                EditorPrefs.SetBool("PlayFabAutoLogin", _autoLogin);
+
                 isLoggingIn = false;
                 PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
                 {
-                    PlayFabEditor.Studios = getStudioResult.Studios.ToList();
+                    PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
                 }, (getStudiosError) =>
                 {
-                    //TODO: Error Handling & have this update when the tab is opened.
-                    Debug.LogError(getStudiosError.ToString());
+                    PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, getStudiosError.ToString());
                 });
+                PlayFabEditorDataService.SaveAccountDetails();
+                PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;
+
+ 
 
             }, (error) =>
             {
                 progressCount = 0f;
                 startProgress = false;
                 isLoggingIn = false;
-                Debug.LogError(error.ToString());
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.ErrorMessage);
             });
         }
 

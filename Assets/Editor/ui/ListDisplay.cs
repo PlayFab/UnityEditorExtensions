@@ -1,5 +1,6 @@
 ﻿namespace PlayFab.Editor
 {
+    using System;
     using UnityEngine;
     using UnityEditor;
     using System.Collections.Generic;
@@ -16,7 +17,25 @@
                 EditorGUILayout.LabelField(this.displayTitle);
                 if(GUILayout.Button("Refresh"))
                 {
+
                     //BaseUiAnimationController.StartAlphaFade(1, 0, listDisplay);
+                    Action<PlayFab.Editor.EditorModels.GetTitleDataResult> cb = (result) => {
+                        items.Clear();
+                        foreach(var kvp in result.Data)
+                        {
+                            items.Add(new KvpItem(kvp.Key, kvp.Value));
+                        }
+                    };
+
+                    Action<PlayFab.Editor.EditorModels.PlayFabError> onError = (err) => 
+                    {
+                        Debug.LogError(err.ErrorMessage);
+                    };
+
+
+
+                    PlayFabEditorApi.GetTitleData(cb, onError); 
+
                 }
 
                 if(GUILayout.Button("+"))
@@ -29,25 +48,41 @@
 
             if(items.Count > 0)
             {
-                EditorGUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("listDisplayBox"));
-                float inputBoxWidth = EditorGUIUtility.currentViewWidth - 100 > 0 ? (EditorGUIUtility.currentViewWidth - 100) / 2 : 50;
-                        
-                    for(var z = 0; z < this.items.Count; z++)
+                EditorGUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("listDisplayBox"), GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth));
+                    float keyInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? 150 : (EditorGUIUtility.currentViewWidth - 100) / 2;
+                    float valueInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? EditorGUIUtility.currentViewWidth - 270 : (EditorGUIUtility.currentViewWidth - 100) / 2; 
+
+                      for(var z = 0; z < this.items.Count; z++)
                     {
                         if(items[z].Value != null)
                         {
-                            EditorGUILayout.BeginHorizontal();
-                            items[z].Key = GUILayout.TextArea(items[z].Key, GUILayout.MaxWidth(inputBoxWidth));
+
+                            GUIContent c1 = new GUIContent(items[z].Value);
+                            //Rect r1 = GUILayoutUtility.GetRect(c1, EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).GetStyle("TextArea"));
+
+                            var style = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).GetStyle("TextArea");
+                            var h = style.CalcHeight(c1, valueInputBoxWidth);
+
+
+                            EditorGUILayout.BeginHorizontal(GUILayout.MaxHeight(200));
+
+
+
+                            items[z].Key = GUILayout.TextField(items[z].Key, GUILayout.Width(keyInputBoxWidth));
 
                             EditorGUILayout.LabelField(":", GUILayout.MaxWidth(10));
-                            items[z].Value = GUILayout.TextField(""+items[z].Value, GUILayout.MaxWidth(inputBoxWidth));  
-                                
-                            if(GUILayout.Button("X", GUILayout.MaxHeight(19)))
+                            GUILayout.Label(""+items[z].Value, GUILayout.MaxWidth(valueInputBoxWidth), GUILayout.MaxHeight(15));  
+
+                            if(GUILayout.Button("E", GUILayout.MaxHeight(19), GUILayout.MaxWidth(20)))
                             {
-                                if(string.IsNullOrEmpty(items[z].Key))
-                                {
-                                    items[z].Value = null;
-                                }
+
+                            } 
+                            if(GUILayout.Button("X", GUILayout.MaxHeight(19), GUILayout.MaxWidth(20)))
+                            {
+//                                if(string.IsNullOrEmpty(items[z].Key))
+//                                {
+                                    items.RemoveAt(z);// items[z].Value = null;
+//                                }
                             } 
                           
                             EditorGUILayout.EndHorizontal();
@@ -58,7 +93,7 @@
                 EditorGUILayout.EndVertical();
 
                 EditorGUILayout.BeginHorizontal();
-                    if(GUILayout.Button("Save"))
+                if(GUILayout.Button("Save", GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth - 30)))
                     {
                         //BaseUiAnimationController.StartAlphaFade(1, 0, listDisplay);
                     }
@@ -87,6 +122,7 @@
         }
 
 
+
         public ListDisplay(List<KvpItem> i = null)
         {
             this.items = i ?? new List<KvpItem>();
@@ -96,6 +132,11 @@
         {
             this.items = new List<KvpItem>();
         }
+
+
+
+
+
     }
 
 

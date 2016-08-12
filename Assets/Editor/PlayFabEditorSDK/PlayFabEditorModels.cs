@@ -97,6 +97,25 @@
         public Title[] Titles { get; set; }
     }
 
+
+    //[Serializable]
+    public class GetTitleDataRequest //: PlayFabResultCommon
+    {
+        /// <summary>
+        /// Specific keys to search for in the title data (leave null to get all keys)
+        /// </summary>
+        public List<string> Keys { get; set;}
+    }
+
+    //[Serializable]
+    public class GetTitleDataResult //: PlayFabResultCommon
+    {
+        /// <summary>
+        /// a dictionary object of key / value pairs
+        /// </summary>
+        public Dictionary<string,string> Data { get; set;}
+    }
+
     public class PlayFabError
     {
         public int HttpCode;
