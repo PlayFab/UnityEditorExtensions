@@ -25,7 +25,7 @@ namespace PlayFab.Editor
         private static Object _previoussSdkFolderPath;
         private static bool isObjectFieldActive;
         private static bool isInitialized; //used to check once, gets reset after each compile;
-        private static bool isSdkSupported = true;
+        public static bool isSdkSupported = true;
 
         public static void DrawSdkPanel()
         {

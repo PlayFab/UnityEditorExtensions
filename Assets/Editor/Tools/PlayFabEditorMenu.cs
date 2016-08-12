@@ -113,7 +113,7 @@
 
            // GUILayout.Space(15);
 
-            if (PlayFabEditorSDKTools.IsInstalled)
+            if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
             {
 
                 if (GUILayout.Button("DATA", dataButtonStyle, GUILayout.MaxWidth(60)))

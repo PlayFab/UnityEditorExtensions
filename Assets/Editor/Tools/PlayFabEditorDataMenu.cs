@@ -52,6 +52,13 @@
 
 
 
+        public static void DrawDataPanel()
+        {
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                GUILayout.Label("Coming Soon!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+            GUILayout.EndHorizontal();
+        }
+
 
         public static void OnDisable()
         {
