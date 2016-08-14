@@ -5,7 +5,7 @@ We will continuing to add onto this platform as PlayFab's features grow.
 
 the best interface to our latest Unity SDK ( > 2.0)
 
-![UB Login](https://github.com/PlayFab/UnicornBattle/wiki/Assets/Images/Login.png "Unicorn Battle Login")
+![UB Login](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_CreateAccount.png "Unicorn Battle Login")
 
 
 [[https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_CreateAccount.png | width = 250px]]
