@@ -1,14 +1,10 @@
-# UnityEditorExtensions
-The home for PlayFab's Unity Editor plugin. This plugin houses a custom inspector for viewing and configuring the PlayFab SDK.
+# PlayFab Unity Editor Extensions
+The home for PlayFab's official Unity plugin, the best interface to our latest Unity SDK. This plugin (currently in beta) houses a custom inspector for viewing and configuring the PlayFab SDK all from within the IDE.
 
 We will continuing to add onto this platform as PlayFab's features grow.
 
-the best interface to our latest Unity SDK ( > 2.0)
+![PlayFab Developer Login](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_CreateAccount.png "Users new to PlayFab can create an account.")
 
-![UB Login](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_CreateAccount.png "Unicorn Battle Login")
-
-
-[[https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_CreateAccount.png | width = 250px]]
 
 ##Feature List:
 
@@ -23,19 +19,21 @@ the best interface to our latest Unity SDK ( > 2.0)
   * 
 
 
-###Proposed Features (to be added later):
+###Proposed Features (to be added in upcoming releases):
 
-  * Download and install samples and examples
+  * Download and install recipes and examples
   * Enable and disable additional add-on modules
   * View usage & modify the limits for a title
   * Configure additional title settings
-  * Automated plugin upgrades
-  * 
+  * Automatic plugin upgrades
 
+##Setup
+Download this
 
+![EditorExtensions_SKDs](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_SDKs.png "View the current SDK and upgrade to the latest SDK.")
 
 ## How it works:
-The editor extensions works independently from the SDK. All of the Editor Extensions code lives in editor folders within your Unity Project. This prevents any of the editor code from being compiled into the game build. 
+PlayFab Editor Extensions is a stand-alone Unity plug-in that streamlines getting started with PlayFab.  All of the Editor Extensions code lives in editor folders within your Unity Project. This prevents any of the editor code from being compiled into the game build. 
 
 
 ## Troubleshooting and support:
