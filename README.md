@@ -8,7 +8,7 @@ the best interface to our latest Unity SDK ( > 2.0)
 ![UB Login](https://github.com/PlayFab/UnicornBattle/wiki/Assets/Images/Login.png "Unicorn Battle Login")
 
 
-[[_repoAssets/img/EdEx_SDKs.png | width = 250px]]
+[[https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_CreateAccount.png | width = 250px]]
 
 ##Feature List:
 
