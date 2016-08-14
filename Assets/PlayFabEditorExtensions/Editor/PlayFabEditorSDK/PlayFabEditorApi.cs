@@ -62,9 +62,9 @@
         public static void GetTitleData( Action<GetTitleDataResult> resultCb, Action<EditorModels.PlayFabError> errorCallback)
         {
             //TODO this will break without the SDK installed...
-//            var titleId = PlayFabSettings.TitleId;
-//            var apiEndpoint = String.Format("https://{0}{1}", titleId, TitleEndPoint);
-//            PlayFabEditorHttp.MakeApiCall<GetTitleDataRequest, GetTitleDataResult>("/Server/GetTitleData", apiEndpoint, null, new GetTitleDataRequest(), resultCb, errorCallback);
+            var titleId = PlayFabSettings.TitleId;
+            var apiEndpoint = String.Format("https://{0}{1}", titleId, TitleEndPoint);
+            PlayFabEditorHttp.MakeApiCall<GetTitleDataRequest, GetTitleDataResult>("/Server/GetTitleData", apiEndpoint, null, new GetTitleDataRequest(), resultCb, errorCallback);
         }
 
 

@@ -5,13 +5,13 @@
     using UnityEditor;
     using System.Collections.Generic;
 
-    public class ListDisplay : BaseUiComponent {
+    public class TitleDataViewer : Editor {
         public List<KvpItem> items;
 
-        public string displayTitle = "New List Display";
-
+        public string displayTitle = "";
+        public Vector2 scrollPos = Vector2.zero;
         // this gets called after the Base draw loop
-        public override void PostDraw()
+        public void Draw()
         {
             EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(this.displayTitle);
@@ -25,6 +25,10 @@
                         {
                             items.Add(new KvpItem(kvp.Key, kvp.Value));
                         }
+
+                        PlayFabEditorDataService.envDetails.titleData = result.Data;
+                        PlayFabEditorDataService.SaveEnvDetails();
+
                     };
 
                     Action<PlayFab.Editor.EditorModels.PlayFabError> onError = (err) => 
@@ -48,9 +52,9 @@
 
             if(items.Count > 0)
             {
-                EditorGUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("listDisplayBox"), GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth));
+                    scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
                     float keyInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? 150 : (EditorGUIUtility.currentViewWidth - 100) / 2;
-                    float valueInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? EditorGUIUtility.currentViewWidth - 270 : (EditorGUIUtility.currentViewWidth - 100) / 2; 
+                    float valueInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? EditorGUIUtility.currentViewWidth - 260 : (EditorGUIUtility.currentViewWidth - 100) / 2; 
 
                       for(var z = 0; z < this.items.Count; z++)
                     {
@@ -64,7 +68,7 @@
                             var h = style.CalcHeight(c1, valueInputBoxWidth);
 
 
-                            EditorGUILayout.BeginHorizontal(GUILayout.MaxHeight(200));
+                            EditorGUILayout.BeginHorizontal();
 
 
 
@@ -90,19 +94,22 @@
                     }
 
 
-                EditorGUILayout.EndVertical();
+                GUILayout.EndScrollView();//EditorGUILayout.EndVertical();
+
 
                 EditorGUILayout.BeginHorizontal();
-                if(GUILayout.Button("Save", GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth - 30)))
+                GUILayout.FlexibleSpace();
+                if(GUILayout.Button("Save", GUILayout.MaxWidth(200)))
                     {
                         //BaseUiAnimationController.StartAlphaFade(1, 0, listDisplay);
                     }
+                GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
             }
 
 
             // draw code here.
-            base.PostDraw();
+           // base.PostDraw();
         }
 
 
@@ -123,19 +130,15 @@
 
 
 
-        public ListDisplay(List<KvpItem> i = null)
+        public TitleDataViewer(List<KvpItem> i = null)
         {
             this.items = i ?? new List<KvpItem>();
         }
 
-        public ListDisplay()
+        public TitleDataViewer()
         {
             this.items = new List<KvpItem>();
         }
-
-
-
-
 
     }
 
@@ -144,6 +147,7 @@
     {
         public string Key;
         public string Value;
+        public bool isDirty;
 
         public KvpItem(string k, string v)
         {

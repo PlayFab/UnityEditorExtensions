@@ -28,7 +28,7 @@ namespace PlayFab.Editor
 
             EditorCoroutine.start(PostDownload(www, (response) =>
             {
-                string fileSaveLocation = string.Format(Application.dataPath + "/Editor/Tools/Resources/PlayFabUnitySdk.unitypackage");
+                string fileSaveLocation = string.Format(PlayFabEditorHelper.editorRoot + "/Tools/Resources/PlayFabUnitySdk.unitypackage");
                 System.IO.File.WriteAllBytes(fileSaveLocation, response);
                 resultCallback(fileSaveLocation);
 
@@ -54,13 +54,13 @@ namespace PlayFab.Editor
 
 
             //TODO update this in accordance with the no-SDK model
-//            if(api.Contains("/Server/") || api.Contains("/Admin/"))
-//            {
-//                if(string.IsNullOrEmpty(PlayFabSettings.PlayFabShared.DeveloperSecretKey))
-//                    throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
-//
-//                headers.Add("X-SecretKey", PlayFabSettings.PlayFabShared.DeveloperSecretKey);            
-//            }
+            if(api.Contains("/Server/") || api.Contains("/Admin/"))
+            {
+                if(string.IsNullOrEmpty(PlayFabEditorDataService.activeTitle.SecretKey))
+                    throw new Exception("Must have PlayFabSettings.DeveloperSecretKey set to call this method");
+
+                headers.Add("X-SecretKey", PlayFabEditorDataService.activeTitle.SecretKey);            
+            }
 
 
 

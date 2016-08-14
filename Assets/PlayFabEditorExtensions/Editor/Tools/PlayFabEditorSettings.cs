@@ -589,6 +589,8 @@
         {
             if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
             {
+                PlayFabEditorDataService.envDetails.titleData.Clear();
+
                 PlayFabEditorDataService.envDetails.selectedStudio = studioOptions[_selectedStudioIndex];  
                 PlayFabEditorDataService.envDetails.selectedTitleId = titleOptions[_selectedTitleIdIndex];
 

@@ -28,7 +28,7 @@ namespace PlayFab.Editor
         internal static float Progress = 0f;
         internal static bool HasEditorShown; 
 
-        private ListDisplay listDisplay;
+        //private ListDisplay listDisplay;
         public static bool isGuiEnabled = true;
         public static string edexVersion = "0.99 beta";
 
@@ -58,7 +58,7 @@ namespace PlayFab.Editor
         void OnDisable()
         {
             // clean up objects:
-            UnityEngine.Object.DestroyImmediate(listDisplay);
+            //UnityEngine.Object.DestroyImmediate(listDisplay);
 
             EditorPrefs.DeleteKey("PlayFabToolsShown");
 
@@ -90,6 +90,8 @@ namespace PlayFab.Editor
         [InitializeOnLoad]
         public class Startup
         {
+
+
             static Startup()
             {
                 if (EditorPrefs.HasKey("PlayFabToolsShown") || !PlayFabEditorSDKTools.IsInstalled)
