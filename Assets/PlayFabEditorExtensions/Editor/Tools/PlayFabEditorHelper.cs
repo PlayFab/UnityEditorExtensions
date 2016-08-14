@@ -3,15 +3,17 @@
     using UnityEditor;
     using UnityEngine;
     using System.Collections.Generic;
+    using System.IO;
 
+    [InitializeOnLoad]
     public class PlayFabEditorHelper : Editor 
     {
-        public static Font buttonFont = EditorGUIUtility.Load("Assets/Editor/fonts/Avalon.ttf") as Font;
-        public static Font buttonFontBold = EditorGUIUtility.Load("Assets/Editor/fonts/Avalon Bold.ttf") as Font;
-        public static GUISkin uiStyle = (GUISkin)(AssetDatabase.LoadAssetAtPath("Assets/Editor/ui/PlayFabStyles.guiskin", typeof(GUISkin)));
+        public static Font buttonFont = EditorGUIUtility.Load("Assets/PlayFabEditorExtensions/Editor/fonts/Avalon.ttf") as Font;
+        public static Font buttonFontBold = EditorGUIUtility.Load("Assets/PlayFabEditorExtensions/Editor/fonts/Avalon Bold.ttf") as Font;
+        public static GUISkin uiStyle = (GUISkin)(AssetDatabase.LoadAssetAtPath("Assets/PlayFabEditorExtensions/Editor/ui/PlayFabStyles.guiskin", typeof(GUISkin)));
 
 
-
+        public static string editorRoot = Application.dataPath + "/PlayFabEditorExtensions/Editor";
 
         public static Dictionary<string, string> stringTable = new Dictionary<string, string>()
         {
@@ -26,6 +28,57 @@
 
 
 
+
+
+        static PlayFabEditorHelper()
+        {
+            
+            if(buttonFont == null || buttonFontBold == null || uiStyle == null)
+            {
+                string[] rootFiles = new string[0];
+                bool relocatedEdEx = false;
+
+                try
+                {
+                    rootFiles = Directory.GetDirectories(editorRoot);
+                }
+                catch
+                {
+
+                    if(rootFiles.Length == 0)
+                    {
+                        // this probably means the editor folder was moved.
+                        //see if we can locate the moved root
+                        // and reload the assets
+
+                        var movedRootFiles = Directory.GetFiles(Application.dataPath, "PlayFabEditor.cs", SearchOption.AllDirectories);
+                        if(movedRootFiles.Length > 0)
+                        {
+                            relocatedEdEx = true;
+                            editorRoot = movedRootFiles[0].Substring(0, movedRootFiles[0].IndexOf("PlayFabEditor.cs")-1);
+
+                            var relRoot = editorRoot.Substring(editorRoot.IndexOf("Assets/"));
+                            buttonFont = EditorGUIUtility.Load(relRoot+ "/fonts/Avalon.ttf") as Font;
+                            buttonFontBold = EditorGUIUtility.Load(relRoot+ "/fonts/Avalon Bold.ttf") as Font;
+                            uiStyle = (GUISkin)AssetDatabase.LoadAssetAtPath(relRoot+ "/ui/PlayFabStyles.guiskin", typeof(GUISkin));
+                           // Debug.Log();
+                        }
+
+                    }
+                }
+                finally
+                {
+                    if(relocatedEdEx)
+                    {
+                        Debug.Log(string.Format("Found new EdEx root: {0}", editorRoot));
+                    }
+                    else
+                    {
+                        Debug.Log("Could not relocate the PlayFab Editor Extension");
+                    }
+                }
+            }
+        }
 
 
 

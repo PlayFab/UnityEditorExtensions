@@ -10,73 +10,78 @@
     [InitializeOnLoad]
     public class PlayFabEditorDataMenu : Editor
     {
-        public static ListDisplay listDisplay;
+        public static TitleDataViewer tdViewer;
         public static bool isEnabled = false;
+        public static MenuComponent menu = null;
 
+        public enum DataMenuStates { TitleData }
+        public static DataMenuStates currentState = DataMenuStates.TitleData;
 
-        public static void OnEnable()
-        {
-            
-            if ( listDisplay == null)
-            {
-                listDisplay = CreateInstance<ListDisplay>();
-                listDisplay.displayTitle = "Title Data:";
-                listDisplay.items.Add(new KvpItem("Key1", "Value1"));
-                listDisplay.items.Add(new KvpItem("Key2", "Nullam id augue nibh. Proin commodo neque non sem fermentum finibus. Fusce tincidunt felis risus, semper feugiat diam aliquam a. Aliquam erat volutpat. Nunc euismod, turpis eu fringilla fermentum, ligula arcu elementum ipsum, eu interdum nibh sapien placerat nisi. Ut ipsum nisl, elementum eget nisl eget, lobortis lacinia tortor. Sed rhoncus velit fermentum sem varius, in accumsan mauris dignissim. Quisque id tempor ante. Nullam id augue nibh. Proin commodo neque non sem fermentum finibus. Fusce tincidunt felis risus, semper feugiat diam aliquam a. Aliquam erat volutpat. Nunc euismod, turpis eu fringilla fermentum, ligula arcu elementum ipsum, eu interdum nibh sapien placerat nisi. Ut ipsum nisl, elementum eget nisl eget, lobortis lacinia tortor. Sed rhoncus velit fermentum sem varius, in accumsan mauris dignissim. Quisque id tempor ante. "));
-
-                listDisplay.settings = (BaseUiComponent.ComponentSettings.useScrollBar | BaseUiComponent.ComponentSettings.fillHorizontal);
-                listDisplay.Init(new Rect(20,20,450,120), PlayFabEditor.window.position, Color.gray, PlayFabEditorHelper.uiStyle.GetStyle("listDisplay"));
-                isEnabled = true;
-            }
-            else if(!isEnabled)
-            {
-                isEnabled = true;
-                //listDisplay.OnEnable();
-            }
-
-//            if(listDisplay.postDrawCall == null)
-//            {
-//                listDisplay.postDrawCall = () => 
-//                {
-//                    GUILayout.TextArea(Event.current.mousePosition.ToString());
-//
-//                    EditorGUILayout.TextArea(listDisplay.bounds.ToString());
-//                    EditorGUILayout.TextArea(listDisplay.parentBounds.ToString());
-//                    if(GUILayout.Button("Submit"))
-//                    {
-//                        //BaseUiAnimationController.StartAlphaFade(1, 0, listDisplay);
-//                    }
-//                };
-//            }
-        }
-
-
-
-        public static void DrawDataPanel()
-        {
-            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                GUILayout.Label("Coming Soon!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
-            GUILayout.EndHorizontal();
-        }
-
-
-        public static void OnDisable()
-        {
-            isEnabled = false;
-            //listDisplay.OnDisable();
-            //listDisplay = null;
-        }
-
+        private static Vector2 scrollPos = Vector2.zero;
 
         static PlayFabEditorDataMenu()
         {
-            Debug.LogWarning("INIT FIRED!");
             if(!PlayFabEditor.IsEventHandlerRegistered(StateUpdateHandler))
             {
                 PlayFabEditor.EdExStateUpdate += StateUpdateHandler;
             }
 
+            RegisterMenu();
         }
+
+        public static void OnTitleDataClicked()
+        {
+            currentState = DataMenuStates.TitleData;
+        }
+
+
+        public static void DrawDataPanel()
+        {
+            if(menu != null)
+            {
+                menu.DrawMenu();
+
+                switch(currentState)
+                {
+                    case DataMenuStates.TitleData:
+                        if(tdViewer == null)
+                        {
+                            tdViewer = ScriptableObject.CreateInstance<TitleDataViewer>();
+                            foreach(var item in PlayFabEditorDataService.envDetails.titleData)
+                            {
+                                tdViewer.items.Add(new KvpItem(item.Key, item.Value));
+                            }
+                        }
+                        else
+                        {
+                            scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                            tdViewer.Draw();
+                            GUILayout.EndScrollView();
+                        }
+                       
+                    break;
+
+                    default:
+                        EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                            GUILayout.Label("Coming Soon!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                        GUILayout.EndHorizontal();
+                    break;
+                   
+                }
+            }
+            else
+            {
+                RegisterMenu();
+            }
+
+        }
+
+
+        public static void OnDisable()
+        {
+
+        }
+     
 
         public void OnDestroy()
         {
@@ -86,6 +91,15 @@
             }
         }
 
+
+        public static void RegisterMenu()
+        {
+            if ( menu == null)
+            {
+                menu = ScriptableObject.CreateInstance<MenuComponent>();
+                menu.RegisterMenuItem("TITLE DATA", OnTitleDataClicked);
+            }
+        }
 
 
         public static void StateUpdateHandler(PlayFabEditor.EdExStates state, string status, string json)
