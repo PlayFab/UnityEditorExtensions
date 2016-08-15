@@ -116,6 +116,30 @@
         public Dictionary<string,string> Data { get; set;}
     }
 
+
+    //[Serializable]
+    public class SetTitleDataRequest //: PlayFabRequestCommon
+    {
+        /// <summary>
+        /// key we want to set a value on (note, this is additive - will only replace an existing key's value if they are the same name.) Keys are trimmed of whitespace. Keys may not begin with the '!' character.
+        /// </summary>
+        public string Key { get; set;}
+        /// <summary>
+        /// new value to set. Set to null to remove a value
+        /// </summary>
+        public string Value { get; set;}
+    }
+
+    //[Serializable]
+    public class SetTitleDataResult //: PlayFabResultCommon
+    {
+    }
+
+
+
+
+
+
     public class PlayFabError
     {
         public int HttpCode;
