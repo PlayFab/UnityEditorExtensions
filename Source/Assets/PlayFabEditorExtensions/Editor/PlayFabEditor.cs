@@ -1,6 +1,4 @@
-﻿
-
-namespace PlayFab.Editor
+﻿namespace PlayFab.Editor
 {
     using System;
     using UnityEngine;
@@ -12,29 +10,23 @@ namespace PlayFab.Editor
 
     public class PlayFabEditor : EditorWindow
     {
-        //public static List<Studio> Studios = new List<Studio>();
 
+        // vars for the plugin-wide event system
         public enum EdExStates { OnEnable, OnDisable, OnLogin, OnLogout, OnMenuItemClicked, OnSubmenuItemClicked, OnHttpReq, OnHttpRes, OnError, OnWaitBegin, OnWaitEnd, OnSuccess, OnWarning  }
-
 
         public delegate void PlayFabEdExStateHandler(EdExStates state, string status, string misc);
         public static event PlayFabEdExStateHandler EdExStateUpdate;
 
-        // testing alt update loop
-        public delegate void playFabEditorUpdate();
-        public static event playFabEditorUpdate UpdateLoopTick;
+        public static Dictionary<string, float> blockingRequests = new Dictionary<string, float>(); // key and blockingRequest start time
+        private static float blockingRequestTimeOut = 10f; // abandon the block after this many seconds.
 
+
+        //plugin  details
         internal static PlayFabEditor window;
-        internal static float Progress = 0f;
-        internal static bool HasEditorShown; 
-
-        //private ListDisplay listDisplay;
+      
         public static bool isGuiEnabled = true;
         public static string edexVersion = "0.99 beta";
 
-
-        public static Dictionary<string, float> blockingRequests = new Dictionary<string, float>(); // key and blockingRequest start time
-        private static float blockingRequestTimeOut = 10f; // abandon the block after this many seconds.
 
 
 
@@ -58,16 +50,14 @@ namespace PlayFab.Editor
         void OnDisable()
         {
             // clean up objects:
-            //UnityEngine.Object.DestroyImmediate(listDisplay);
-
+          
             EditorPrefs.DeleteKey("PlayFabToolsShown");
 
-
-
-//            if(IsEventHandlerRegistered(StateUpdateResponse))
-//            {
-//                EdExStateUpdate -= StateUpdateResponse;
-//            }
+          
+            if(IsEventHandlerRegistered(StateUpdateHandler))
+            {
+                EdExStateUpdate -= StateUpdateHandler;
+            }
         }
 
         void OnFocus()
@@ -79,12 +69,12 @@ namespace PlayFab.Editor
         static void PlayFabServices()
         {
             var editorAsm = typeof (Editor).Assembly;
-            //var inspWndType = editorAsm.GetType("UnityEditor.SceneHierarchyWindow"); //UnityEditor.InspectorWindow
             var inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab");
 
-            EditorPrefs.SetBool("PlayFabToolsShown", true);
+            //TODO remove editor prefs & make sure states are preserved.
+            //EditorPrefs.SetBool("PlayFabToolsShown", true);
         }
 
         [InitializeOnLoad]
@@ -123,7 +113,7 @@ namespace PlayFab.Editor
                 PlayFabEditorAuthenticate.Update();
                 PlayFabEditorSettings.Update();
 
-                PlayFabEditorHeader.DrawHeader(Progress);
+                PlayFabEditorHeader.DrawHeader();
 
 
                 GUI.enabled = blockingRequests.Count > 0 || EditorApplication.isCompiling ? false : true;
@@ -134,11 +124,6 @@ namespace PlayFab.Editor
                     //EG. Mismatch Draw Layout errors.
                     try
                     {
-                        if (Progress >= .99f)
-                        {
-                            Progress = 0f;
-                        }
-
 
                         PlayFabEditorMenu.DrawMenu();
 
@@ -164,21 +149,16 @@ namespace PlayFab.Editor
                         }
 
                     }
-                    catch (Exception e)
+                    catch 
                     {
                         //Do Nothing.
-                        //Debug.LogException(e); // currently gettting a few errores: Getting control 1's position in a group with only 1 controls when doing Repaint
+                        // currently gettting a few errores: Getting control 1's position in a group with only 1 controls when doing Repaint
                     }
                 }
                 else
                 {
                     PlayFabEditorAuthenticate.DrawAuthPanels();
                 }
-
-                if(UpdateLoopTick != null)
-                {
-                    UpdateLoopTick();
-                } 
 
                 GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
                     GUILayout.FlexibleSpace();
@@ -218,7 +198,7 @@ namespace PlayFab.Editor
                 }
 
             }
-            catch (Exception e)
+            catch
             {
                 //Do Nothing.. 
             }
@@ -309,7 +289,7 @@ namespace PlayFab.Editor
 //                   
 //                break;
                 case EdExStates.OnMenuItemClicked:
-                    Debug.Log(string.Format("MenuItem: {0} Clicked", status));
+                    //Debug.Log(string.Format("MenuItem: {0} Clicked", status));
                 break;
 //
 //                case EdExStates.OnSubmenuItemClicked:
@@ -384,11 +364,3 @@ namespace PlayFab.Editor
         }
     }
 }
-
-
-public class PlayFabEdExSavedSettings
-{
-    
-}
-
-//public class PlayFab

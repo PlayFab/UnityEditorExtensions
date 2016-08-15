@@ -22,13 +22,11 @@ namespace PlayFab.Editor
 
         internal static void MakeDownloadCall(string url, Action<string> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
         {
-            
-            //var www = new UnityWebRequest(url);
             var www = new WWW(url);
 
             EditorCoroutine.start(PostDownload(www, (response) =>
             {
-                string fileSaveLocation = string.Format(PlayFabEditorHelper.editorRoot + "/Tools/Resources/PlayFabUnitySdk.unitypackage");
+                string fileSaveLocation = string.Format(PlayFabEditorHelper.editorRoot + "/Resources/PlayFabUnitySdk.unitypackage");
                 System.IO.File.WriteAllBytes(fileSaveLocation, response);
                 resultCallback(fileSaveLocation);
 
@@ -241,7 +239,7 @@ namespace PlayFab.Editor
             {
                 return new PlayFabError()
                 {
-                    ErrorMessage = json
+                    ErrorMessage = e.Message
                 };
             }
             //create new error object
