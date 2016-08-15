@@ -417,7 +417,7 @@ namespace PlayFab.Editor
 
         private static void UpgradeSdk()
         {
-            if( EditorUtility.DisplayDialog("Confirm SDK Upgrade", "This action will remove the current PlayFab SDK and install the lastet version.", "Confirm", "Cancel"))
+            if( EditorUtility.DisplayDialog("Confirm SDK Upgrade", "This action will remove the current PlayFab SDK and install the lastet version. Related plug-ins will need to be manually upgraded.", "Confirm", "Cancel"))
             {
                 RemoveSDK(false);
                 ImportLatestSDK();
@@ -429,7 +429,7 @@ namespace PlayFab.Editor
         {
             if(prompt)
             {
-                if(!EditorUtility.DisplayDialog("Confirm SDK Removal", "This action will remove the current PlayFab SDK.", "Confirm", "Cancel"))
+                if(!EditorUtility.DisplayDialog("Confirm SDK Removal", "This action will remove the current PlayFab SDK. Related plug-ins will need to be manually removed.", "Confirm", "Cancel"))
                 {
                     return;
                 }
