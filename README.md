@@ -34,13 +34,17 @@ PlayFab Editor Extensions is a stand-alone Unity plug-in that streamlines gettin
 
 When a supported SDK is installed, additional service menus are available. These menus provide access to SDK configurations. These configurations settings are saved in a combination of places to ensure that the data persists throughout Unity compilations and deployments. 
  
+Now that Admin & Server APIs and Models are all included in one single SDK, we require *#IFDEF*'s to [selectively ignore sets](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html "Unity Scripting Define Symbols") that are not needed. In doing so, we also include and omit the **DeveloperSecretKey** to match the selected settings.  As always, never publish your developer secret key in any client facing code.
+
+### Additional Systems & Features within the Editor Extension
   * Editor HTTP Service & Coroutine Manager
   * Isolated API set (independent from the PlayFab SDK)
-  * Configured to fetch our latest SDKs
+  * Configured to fetch our [latest SDK](https://github.com/PlayFab/UnitySDK/blob/versioned/Packages/UnitySDK.unitypackage "GitHub Versioned Repo")
   * Saves Account and Environment settings via Unity's [EditorPrefs](https://docs.unity3d.com/ScriptReference/EditorPrefs.html "Unity3d Docs") and [ScripableObjects](https://docs.unity3d.com/ScriptReference/ScriptableObject.html "Unity3d Docs")
   * Saves configuration data to the SDK via reflecting on the installed assemblies. 
  
-You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder.
+#####A word of caution:
+You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
 
 ## Troubleshooting and Support:
 
