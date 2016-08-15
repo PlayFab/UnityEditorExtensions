@@ -11,6 +11,8 @@
     public class PlayFabEditorDataMenu : Editor
     {
         public static TitleDataViewer tdViewer;
+       
+
         public static bool isEnabled = false;
         public static MenuComponent menu = null;
 
