@@ -1,44 +1,33 @@
-﻿
+﻿using System;
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.UI;
+using PlayFab.Editor.EditorModels;
 
 namespace PlayFab.Editor
 {
-    using System;
-    using UnityEngine;
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEditor;
-    using UnityEditor.UI;
-    using PlayFab.Editor.EditorModels;
-
     public class PlayFabEditor : EditorWindow
     {
-        //public static List<Studio> Studios = new List<Studio>();
 
+#region EdEx Variables
+        // vars for the plugin-wide event system
         public enum EdExStates { OnEnable, OnDisable, OnLogin, OnLogout, OnMenuItemClicked, OnSubmenuItemClicked, OnHttpReq, OnHttpRes, OnError, OnWaitBegin, OnWaitEnd, OnSuccess, OnWarning  }
-
 
         public delegate void PlayFabEdExStateHandler(EdExStates state, string status, string misc);
         public static event PlayFabEdExStateHandler EdExStateUpdate;
 
-        // testing alt update loop
-        public delegate void playFabEditorUpdate();
-        public static event playFabEditorUpdate UpdateLoopTick;
-
-        internal static PlayFabEditor window;
-        internal static float Progress = 0f;
-        internal static bool HasEditorShown; 
-
-        //private ListDisplay listDisplay;
-        public static bool isGuiEnabled = true;
-        public static string edexVersion = "0.99 beta";
-
-
         public static Dictionary<string, float> blockingRequests = new Dictionary<string, float>(); // key and blockingRequest start time
         private static float blockingRequestTimeOut = 10f; // abandon the block after this many seconds.
 
+        //plugin  details
+        internal static PlayFabEditor window;
+      
+        public static bool isGuiEnabled = true;
+ #endregion
 
-
-
+ #region unity lopps & methods
         void OnEnable()
         {
             if (window == null)
@@ -58,16 +47,13 @@ namespace PlayFab.Editor
         void OnDisable()
         {
             // clean up objects:
-            //UnityEngine.Object.DestroyImmediate(listDisplay);
+            PlayFabEditorDataService.editorSettings.isEdExShown = false;
+            PlayFabEditorDataService.SaveEditorSettings();
 
-            EditorPrefs.DeleteKey("PlayFabToolsShown");
-
-
-
-//            if(IsEventHandlerRegistered(StateUpdateResponse))
-//            {
-//                EdExStateUpdate -= StateUpdateResponse;
-//            }
+            if(IsEventHandlerRegistered(StateUpdateHandler))
+            {
+                EdExStateUpdate -= StateUpdateHandler;
+            }
         }
 
         void OnFocus()
@@ -78,25 +64,20 @@ namespace PlayFab.Editor
         [MenuItem("Window/PlayFab/Editor Extensions")]
         static void PlayFabServices()
         {
-            var editorAsm = typeof (Editor).Assembly;
-            //var inspWndType = editorAsm.GetType("UnityEditor.SceneHierarchyWindow"); //UnityEditor.InspectorWindow
+            var editorAsm = typeof (UnityEditor.Editor).Assembly;
             var inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
-            window.titleContent = new GUIContent("PlayFab");
+            window.titleContent = new GUIContent("PlayFab EdEx");
 
-            EditorPrefs.SetBool("PlayFabToolsShown", true);
         }
 
         [InitializeOnLoad]
         public class Startup
         {
-
-
             static Startup()
             {
-                if (EditorPrefs.HasKey("PlayFabToolsShown") || !PlayFabEditorSDKTools.IsInstalled)
+                if (PlayFabEditorDataService.editorSettings.isEdExShown || !PlayFabEditorSDKTools.IsInstalled)
                 {
-                   
                     EditorCoroutine.start(OpenPlayServices());
                 }
                
@@ -110,6 +91,9 @@ namespace PlayFab.Editor
             {
                 PlayFabServices();
             }
+
+            PlayFabEditorDataService.editorSettings.isEdExShown = true;
+            PlayFabEditorDataService.SaveEditorSettings();
         }
 
 
@@ -120,10 +104,9 @@ namespace PlayFab.Editor
                 GUILayout.BeginVertical();
 
                 //Run all updaters prior to drawing;  
-                PlayFabEditorAuthenticate.Update();
                 PlayFabEditorSettings.Update();
 
-                PlayFabEditorHeader.DrawHeader(Progress);
+                PlayFabEditorHeader.DrawHeader();
 
 
                 GUI.enabled = blockingRequests.Count > 0 || EditorApplication.isCompiling ? false : true;
@@ -131,14 +114,8 @@ namespace PlayFab.Editor
                 if (PlayFabEditorAuthenticate.IsAuthenticated())
                 {
                     //Try catching to avoid Draw errors that do not actually impact the functionality
-                    //EG. Mismatch Draw Layout errors.
                     try
                     {
-                        if (Progress >= .99f)
-                        {
-                            Progress = 0f;
-                        }
-
 
                         PlayFabEditorMenu.DrawMenu();
 
@@ -151,7 +128,7 @@ namespace PlayFab.Editor
                                 break;
                             case PlayFabEditorMenu.MenuStates.Settings:
                                 PlayFabEditorSettings.DrawSettingsPanel();
-                                PlayFabEditorSettings.After(); //TODO why is this getting called every frame?
+                                PlayFabEditorSettings.After();
                                 break;
                             case PlayFabEditorMenu.MenuStates.Help:
                                 PlayFabEditorHelpMenu.DrawHelpPanel();
@@ -164,21 +141,16 @@ namespace PlayFab.Editor
                         }
 
                     }
-                    catch (Exception e)
+                    catch 
                     {
                         //Do Nothing.
-                        //Debug.LogException(e); // currently gettting a few errores: Getting control 1's position in a group with only 1 controls when doing Repaint
+                        // currently gettting a few errores: Getting control 1's position in a group with only 1 controls when doing Repaint
                     }
                 }
                 else
                 {
                     PlayFabEditorAuthenticate.DrawAuthPanels();
                 }
-
-                if(UpdateLoopTick != null)
-                {
-                    UpdateLoopTick();
-                } 
 
                 GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
                     GUILayout.FlexibleSpace();
@@ -189,7 +161,7 @@ namespace PlayFab.Editor
                     GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
                     GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                         GUILayout.FlexibleSpace();
-                           EditorGUILayout.LabelField( string.Format("PlayFab Editor Extensions: {0}", edexVersion), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
+                    EditorGUILayout.LabelField( string.Format("PlayFab Editor Extensions: {0}", PlayFabEditorHelper.EDEX_VERSION), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
                         GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
 
@@ -218,15 +190,15 @@ namespace PlayFab.Editor
                 }
 
             }
-            catch (Exception e)
+            catch
             {
                 //Do Nothing.. 
             }
-
         }
 
+#endregion
 
-
+#region menu and helper methods
         public static void RaiseStateUpdate(EdExStates state, string status = null, string json = null)
         {
             if(EdExStateUpdate != null)
@@ -292,32 +264,14 @@ namespace PlayFab.Editor
         /// <param name="json">a generic container for additional JSON encoded info.</param>
         public void StateUpdateHandler(EdExStates state, string status, string json)
         {
-            //Debug.Log(string.Format("PFE: Handled EdExStatusUpdate:{0}, Status:{1}, Misc:{2}", state, status, json)); 
 
             switch(state)
             {
-//                case EdExStates.OnEnable:
-//                   
-//                break;
-//                case EdExStates.OnDisable:
-//                   
-//                break;
-//                case EdExStates.OnLogin:
-//                   
-//                break;
-//                case EdExStates.OnLogout:
-//                   
-//                break;
                 case EdExStates.OnMenuItemClicked:
-                    Debug.Log(string.Format("MenuItem: {0} Clicked", status));
+                    //Debug.Log(string.Format("MenuItem: {0} Clicked", status));
                 break;
-//
-//                case EdExStates.OnSubmenuItemClicked:
-//                   
-//                break;
-//
+
                 case EdExStates.OnHttpReq:
-                    //JsonWrapper.SerializeObject(request, PlayFabEditorUtil.ApiSerializerStrategy);
                     object temp;
                     if(!string.IsNullOrEmpty(json) && Json.PlayFabSimpleJson.TryDeserializeObject(json, out temp))  // Json.JsonWrapper.DeserializeObject(json);)
                     {
@@ -338,12 +292,11 @@ namespace PlayFab.Editor
                 break;
 
                 case EdExStates.OnHttpRes:
-                    //var httpResult = JsonWrapper.DeserializeObject<HttpResponseObject>(response, PlayFabEditorUtil.ApiSerializerStrategy);
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.off);
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.success);
                     ClearBlockingRequest(status);
                 break;
-//
+
                 case EdExStates.OnError:
 
                     // deserialize and add json details
@@ -352,14 +305,7 @@ namespace PlayFab.Editor
                     ClearBlockingRequest();
                     Debug.LogError(string.Format("PlayFab EditorExtensions: Caught an error:{0}", status)); 
                 break;
-//
-//                case EdExStates.OnWaitBegin:
-//                   
-//                break;
-//
-//                case EdExStates.OnWaitEnd:
-//                    Debug.LogError(string.Format("PlayFab EditorExtensions: Caught an error:{0}", status)); 
-//                break;
+
                 case EdExStates.OnWarning:
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.warning);
                     ClearBlockingRequest();
@@ -382,13 +328,6 @@ namespace PlayFab.Editor
             }
             return false;
         }
+#endregion
     }
 }
-
-
-public class PlayFabEdExSavedSettings
-{
-    
-}
-
-//public class PlayFab

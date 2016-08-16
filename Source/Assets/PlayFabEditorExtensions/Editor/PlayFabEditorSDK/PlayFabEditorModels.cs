@@ -1,9 +1,11 @@
-﻿namespace PlayFab.Editor.EditorModels
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+
+namespace PlayFab.Editor.EditorModels
 {
-    using UnityEngine;
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEditor;
+
 
     public class DownloadSDKRequest
     {
@@ -42,6 +44,7 @@
     {
         public string Email { get; set; }
         public string Password { get; set; }
+        public string TwoFactorAuth { get; set; }
         public string DeveloperToolProductName { get; set; }
         public string DeveloperToolProductVersion { get; set; }
     }
@@ -52,6 +55,15 @@
         public string DeveloperClientToken { get; set; }
     }
 
+    public class LogoutRequest
+    {
+
+        public string DeveloperClientToken { get; set; }
+    }
+
+    public class LogoutResult
+    {
+    }
 
     public class GetStudiosRequest
     {
@@ -144,7 +156,7 @@
     {
         public int HttpCode;
         public string HttpStatus;
-        public PlayFabErrorCode Error;
+        public PlayFab.Editor.EditorModels.PlayFabErrorCode Error;
         public string ErrorMessage;
         public Dictionary<string, List<string>> ErrorDetails;
         public object CustomData;
@@ -402,7 +414,68 @@
         TitleNewsItemCountLimitExceeded = 1231,
         InvalidTwitchToken = 1232,
         TwitchResponseError = 1233,
-        ProfaneDisplayName = 1234
+        ProfaneDisplayName = 1234,
+        TwoFactorAuthenticationTokenRequired = 1246
     }
+
+
+    #region Misc UI Models
+    public class PlayFab_DeveloperAccountDetails
+    {
+        public string email { get; set; }
+        public string devToken { get; set; }
+        public List<EditorModels.Studio> studios { get; set; }
+        public bool useAutoLogin { get; set; }
+
+        public PlayFab_DeveloperAccountDetails()
+        {
+            studios = new List<EditorModels.Studio>();
+        }
+    }
+
+    public class PlayFab_DeveloperEnvironmentDetails
+    {
+        public bool isAdminApiEnabled { get; set; }
+        public bool isClientApiEnabled { get; set; }
+        public bool isServerApiEnabled { get; set; }
+        public bool isDebugRequestTimesEnabled { get; set; }
+        public string selectedStudio { get; set; }
+        public string selectedTitleId { get; set; }
+        public string developerSecretKey { get; set; }
+        public Dictionary<string, string> titleData { get; set; }
+        public string sdkPath { get; set; }
+
+        public PlayFabEditorSettings.WebRequestType webRequestType { get; set; }
+        public bool compressApiData { get; set; }
+        public bool keepAlive { get; set; }
+        public int timeOut { get; set; }
+
+        public PlayFab_DeveloperEnvironmentDetails()
+        {
+            titleData = new Dictionary<string, string>();
+        }
+    }
+
+    public class PlayFab_EditorSettings
+    {
+       public int currentMainMenu { get; set; }
+       public bool isEdExShown { get; set; }
+
+    }
+
+    public class StudioDisplaySet
+    {
+        public PlayFab.Editor.EditorModels.Studio Studio;
+        public bool isCollapsed = true;
+        public Dictionary<string, TitleDisplaySet> titleFoldOutStates = new Dictionary<string, TitleDisplaySet>();
+    }
+
+    public class TitleDisplaySet
+    {
+        public PlayFab.Editor.EditorModels.Title Title;
+        public bool isCollapsed = true;
+    }
+    #endregion
+
 
 }

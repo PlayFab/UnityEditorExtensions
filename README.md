@@ -25,7 +25,8 @@ We will be adding to this platform as PlayFab's features grow.
     * If your SDK is a supported version(2.0+), you may use this plugin stay up-to-date with the latest SDK
     * If you have an older SDK, we recommend reading [this upgrade guide](https://github.com/PlayFab/UnitySDK/blob/master/UPGRADE.md) prior to upgrading.
     * If no SDK was detected, this plugin can download and install the latest SDK version from gitHub.
-  5. After a supported SDK is installed, you may use the Editor Extensions to configure the SDK settings from within the IDE.   
+  5. After a supported SDK is installed, you will need to select a studio and title id.
+  6. After a studio and title id are selected, you may use the Editor Extensions to configure the SDK settings from within the IDE.   
 
 ![EditorExtensions_SKDs](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_SDKs.png "View the current SDK and upgrade to the latest SDK.")
 
