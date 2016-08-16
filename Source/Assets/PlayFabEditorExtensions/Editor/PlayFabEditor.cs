@@ -1,16 +1,17 @@
-﻿namespace PlayFab.Editor
-{
-    using System;
-    using UnityEngine;
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEditor;
-    using UnityEditor.UI;
-    using PlayFab.Editor.EditorModels;
+﻿using System;
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.UI;
+using PlayFab.Editor.EditorModels;
 
+namespace PlayFab.Editor
+{
     public class PlayFabEditor : EditorWindow
     {
 
+#region EdEx Variables
         // vars for the plugin-wide event system
         public enum EdExStates { OnEnable, OnDisable, OnLogin, OnLogout, OnMenuItemClicked, OnSubmenuItemClicked, OnHttpReq, OnHttpRes, OnError, OnWaitBegin, OnWaitEnd, OnSuccess, OnWarning  }
 
@@ -20,17 +21,13 @@
         public static Dictionary<string, float> blockingRequests = new Dictionary<string, float>(); // key and blockingRequest start time
         private static float blockingRequestTimeOut = 10f; // abandon the block after this many seconds.
 
-
         //plugin  details
         internal static PlayFabEditor window;
       
         public static bool isGuiEnabled = true;
-        public static string edexVersion = "0.99 beta";
+ #endregion
 
-
-
-
-
+ #region unity lopps & methods
         void OnEnable()
         {
             if (window == null)
@@ -50,10 +47,9 @@
         void OnDisable()
         {
             // clean up objects:
-          
-            EditorPrefs.DeleteKey("PlayFabToolsShown");
+            PlayFabEditorDataService.editorSettings.isEdExShown = false;
+            PlayFabEditorDataService.SaveEditorSettings();
 
-          
             if(IsEventHandlerRegistered(StateUpdateHandler))
             {
                 EdExStateUpdate -= StateUpdateHandler;
@@ -68,25 +64,20 @@
         [MenuItem("Window/PlayFab/Editor Extensions")]
         static void PlayFabServices()
         {
-            var editorAsm = typeof (Editor).Assembly;
+            var editorAsm = typeof (UnityEditor.Editor).Assembly;
             var inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
-            window.titleContent = new GUIContent("PlayFab");
+            window.titleContent = new GUIContent("PlayFab EdEx");
 
-            //TODO remove editor prefs & make sure states are preserved.
-            //EditorPrefs.SetBool("PlayFabToolsShown", true);
         }
 
         [InitializeOnLoad]
         public class Startup
         {
-
-
             static Startup()
             {
-                if (EditorPrefs.HasKey("PlayFabToolsShown") || !PlayFabEditorSDKTools.IsInstalled)
+                if (PlayFabEditorDataService.editorSettings.isEdExShown || !PlayFabEditorSDKTools.IsInstalled)
                 {
-                   
                     EditorCoroutine.start(OpenPlayServices());
                 }
                
@@ -100,6 +91,9 @@
             {
                 PlayFabServices();
             }
+
+            PlayFabEditorDataService.editorSettings.isEdExShown = true;
+            PlayFabEditorDataService.SaveEditorSettings();
         }
 
 
@@ -110,7 +104,6 @@
                 GUILayout.BeginVertical();
 
                 //Run all updaters prior to drawing;  
-                PlayFabEditorAuthenticate.Update();
                 PlayFabEditorSettings.Update();
 
                 PlayFabEditorHeader.DrawHeader();
@@ -121,7 +114,6 @@
                 if (PlayFabEditorAuthenticate.IsAuthenticated())
                 {
                     //Try catching to avoid Draw errors that do not actually impact the functionality
-                    //EG. Mismatch Draw Layout errors.
                     try
                     {
 
@@ -136,7 +128,7 @@
                                 break;
                             case PlayFabEditorMenu.MenuStates.Settings:
                                 PlayFabEditorSettings.DrawSettingsPanel();
-                                PlayFabEditorSettings.After(); //TODO why is this getting called every frame?
+                                PlayFabEditorSettings.After();
                                 break;
                             case PlayFabEditorMenu.MenuStates.Help:
                                 PlayFabEditorHelpMenu.DrawHelpPanel();
@@ -169,7 +161,7 @@
                     GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
                     GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                         GUILayout.FlexibleSpace();
-                           EditorGUILayout.LabelField( string.Format("PlayFab Editor Extensions: {0}", edexVersion), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
+                    EditorGUILayout.LabelField( string.Format("PlayFab Editor Extensions: {0}", PlayFabEditorHelper.EDEX_VERSION), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
                         GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
 
@@ -202,11 +194,11 @@
             {
                 //Do Nothing.. 
             }
-
         }
 
+#endregion
 
-
+#region menu and helper methods
         public static void RaiseStateUpdate(EdExStates state, string status = null, string json = null)
         {
             if(EdExStateUpdate != null)
@@ -272,32 +264,14 @@
         /// <param name="json">a generic container for additional JSON encoded info.</param>
         public void StateUpdateHandler(EdExStates state, string status, string json)
         {
-            //Debug.Log(string.Format("PFE: Handled EdExStatusUpdate:{0}, Status:{1}, Misc:{2}", state, status, json)); 
 
             switch(state)
             {
-//                case EdExStates.OnEnable:
-//                   
-//                break;
-//                case EdExStates.OnDisable:
-//                   
-//                break;
-//                case EdExStates.OnLogin:
-//                   
-//                break;
-//                case EdExStates.OnLogout:
-//                   
-//                break;
                 case EdExStates.OnMenuItemClicked:
                     //Debug.Log(string.Format("MenuItem: {0} Clicked", status));
                 break;
-//
-//                case EdExStates.OnSubmenuItemClicked:
-//                   
-//                break;
-//
+
                 case EdExStates.OnHttpReq:
-                    //JsonWrapper.SerializeObject(request, PlayFabEditorUtil.ApiSerializerStrategy);
                     object temp;
                     if(!string.IsNullOrEmpty(json) && Json.PlayFabSimpleJson.TryDeserializeObject(json, out temp))  // Json.JsonWrapper.DeserializeObject(json);)
                     {
@@ -318,12 +292,11 @@
                 break;
 
                 case EdExStates.OnHttpRes:
-                    //var httpResult = JsonWrapper.DeserializeObject<HttpResponseObject>(response, PlayFabEditorUtil.ApiSerializerStrategy);
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.off);
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.success);
                     ClearBlockingRequest(status);
                 break;
-//
+
                 case EdExStates.OnError:
 
                     // deserialize and add json details
@@ -332,14 +305,7 @@
                     ClearBlockingRequest();
                     Debug.LogError(string.Format("PlayFab EditorExtensions: Caught an error:{0}", status)); 
                 break;
-//
-//                case EdExStates.OnWaitBegin:
-//                   
-//                break;
-//
-//                case EdExStates.OnWaitEnd:
-//                    Debug.LogError(string.Format("PlayFab EditorExtensions: Caught an error:{0}", status)); 
-//                break;
+
                 case EdExStates.OnWarning:
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.warning);
                     ClearBlockingRequest();
@@ -362,5 +328,6 @@
             }
             return false;
         }
+#endregion
     }
 }

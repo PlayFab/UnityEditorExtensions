@@ -1,19 +1,20 @@
-﻿namespace PlayFab.Editor
-{
-    using System;
-    using UnityEngine;
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEditor;
-    using System.Linq;
+﻿using System;
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using System.Linq;
+using PlayFab.Editor.EditorModels;
 
+namespace PlayFab.Editor
+{
     [InitializeOnLoad]
-    public class PlayFabEditorDataService : Editor {
+    public class PlayFabEditorDataService : UnityEditor.Editor {
         public static PlayFab_DeveloperAccountDetails accountDetails;
         public static PlayFab_DeveloperEnvironmentDetails envDetails;
         public static PlayFab_EditorSettings editorSettings;
 
-       public static EditorModels.Title activeTitle 
+        public static EditorModels.Title activeTitle 
        { 
             get {
                 if(accountDetails != null && accountDetails.studios.Count > 0)
@@ -96,8 +97,6 @@
             accountDetails = new PlayFab_DeveloperAccountDetails();
         }
 
-
-
         public static void LoadEnvDetails()
         {
             if(EditorPrefs.HasKey("PlayFab_DeveloperEnvironmentDetails"))
@@ -139,7 +138,6 @@
             editorSettings = new PlayFab_EditorSettings();
         }
 
-
         public static void SaveAllData()
         {
             SaveAccountDetails();
@@ -157,13 +155,11 @@
             LoadFromScriptableObject();
         }
 
-        //TODO answer the question what overrides S.O. or EditorPrefs -- currently defaulting to S.O.
         public static void LoadFromScriptableObject()
         {
             if(envDetails == null)
                 return;
-
-            //this needs to load values into temp vars and if they are null, then allow the editorprefs(which are loaded first) to override the S.O. Once this runs we should sync our 2 datastores
+               
                 var playfabSettingsType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                     from type in assembly.GetTypes()
                     where type.Name == "PlayFabSettings"
@@ -172,11 +168,7 @@
                 if (playfabSettingsType.ToList().Count > 0)
                 {
                     var type = playfabSettingsType.ToList().FirstOrDefault();
-                    //var fields = type.GetFields();
                     var props = type.GetProperties();
-
-
-
 
                     envDetails.selectedTitleId = (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null) ?? envDetails.selectedTitleId;
                     envDetails.webRequestType = (PlayFabEditorSettings.WebRequestType)props.ToList().Find(p => p.Name == "RequestType").GetValue(null, null);
@@ -193,8 +185,7 @@
 #endif
                 }
         }
-
-
+      
         public static void UpdateScriptableObject()
         {
                 //TODO move this logic to the data service
@@ -235,7 +226,7 @@
                         //this is a fix for the S.O. getting blanked repeatedly.
                         if (property.Name.ToLower() == "productionenvironmenturl")
                         {
-                            property.SetValue(null, PlayFabEditorApi.TitleEndPoint, null);
+                            property.SetValue(null, PlayFabEditorHelper.TITLE_ENDPOINT, null);
                         }
 
 
@@ -252,136 +243,11 @@
         }
 
 
-
         //CTOR
         static PlayFabEditorDataService()
         {
-            if(!PlayFabEditor.IsEventHandlerRegistered(StateUpdateHandler))
-            {
-                PlayFabEditor.EdExStateUpdate += StateUpdateHandler;
-            }
             LoadAllData();
         }
 
-
-        public void OnDestroy()
-        {
-            if(PlayFabEditor.IsEventHandlerRegistered(StateUpdateHandler))
-            {
-                PlayFabEditor.EdExStateUpdate -= StateUpdateHandler;
-            }
-        }
-
-
-        public static void StateUpdateHandler(PlayFabEditor.EdExStates state, string status, string json)
-        {
-          
-
-            switch(state)
-            {
-//                case EdExStates.OnEnable:
-//                   
-//                break;
-//                case EdExStates.OnDisable:
-//                   
-//                break;
-//                case EdExStates.OnLogin:
-//                   
-//                break;
-//                case EdExStates.OnLogout:
-//                   
-//                break;
-                case PlayFabEditor.EdExStates.OnMenuItemClicked:
-                    
-                    //Debug.Log(string.Format("MenuItem: {0} Clicked", status));
-                break;
-//
-//                case EdExStates.OnSubmenuItemClicked:
-//                   
-//                break;
-//
-//                case EdExStates.OnHttpReq:
-//                    //JsonWrapper.SerializeObject(request, PlayFabEditorUtil.ApiSerializerStrategy);
-//                    object temp;
-//                    if(!string.IsNullOrEmpty(json) && Json.PlayFabSimpleJson.TryDeserializeObject(json, out temp))  // Json.JsonWrapper.DeserializeObject(json);)
-//                    {
-//                       Json.JsonObject deserialized = temp as Json.JsonObject;
-//                       object useSpinner = false;
-//                       object blockUi = false;
-//
-//                        if(deserialized.TryGetValue("useSpinner", out useSpinner) && bool.Parse(useSpinner.ToString()))
-//                        {
-//                            ProgressBar.UpdateState(ProgressBar.ProgressBarStates.spin);
-//                        }
-//
-//                        if(deserialized.TryGetValue("blockUi", out blockUi) && bool.Parse(blockUi.ToString()))
-//                        {
-//                            AddBlockingRequest(status);
-//                        }
-//
-//                    }
-//                break;
-//
-//                case EdExStates.OnHttpRes:
-//                    //var httpResult = JsonWrapper.DeserializeObject<HttpResponseObject>(response, PlayFabEditorUtil.ApiSerializerStrategy);
-//                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.off);
-//                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.success);
-//                    ClearBlockingRequest(status);
-//                break;
-            }
-        }
-
     }
-
-
-
-  
-
-    //TODO move these classes to editor models
-
-    public class PlayFab_DeveloperAccountDetails
-    {
-        public string email { get; set; }
-        public string devToken { get; set; }
-        public List<EditorModels.Studio> studios { get; set; }
-        public bool useAutoLogin { get; set; }
-
-        public PlayFab_DeveloperAccountDetails()
-        {
-            studios = new List<EditorModels.Studio>();
-        }
-    }
-
-    public class PlayFab_DeveloperEnvironmentDetails
-    {
-        public bool isAdminApiEnabled { get; set; }
-        public bool isClientApiEnabled { get; set; }
-        public bool isServerApiEnabled { get; set; }
-        public bool isDebugRequestTimesEnabled { get; set; }
-        public string selectedStudio { get; set; }
-        public string selectedTitleId { get; set; }
-        public string developerSecretKey { get; set; }
-        public Dictionary<string, string> titleData { get; set; }
-        public string sdkPath { get; set; }
-
-        public PlayFabEditorSettings.WebRequestType webRequestType { get; set; }
-        public bool compressApiData { get; set; }
-        public bool keepAlive { get; set; }
-        public int timeOut { get; set; }
-
-        public PlayFab_DeveloperEnvironmentDetails()
-        {
-            titleData = new Dictionary<string, string>();
-        }
-    }
-
-    public class PlayFab_EditorSettings
-    {
-       public int currentMainMenu { get; set; }
-       public bool isEdExShown { get; set; }
-
-    }
-
-
-
 }

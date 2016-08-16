@@ -1,32 +1,29 @@
-﻿//using PlayFab.Internal;
+﻿using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using PlayFab.Editor.Json;
 using PlayFab.Editor.EditorModels;
-using UnityEngine;
-
-namespace PlayFab.Editor
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEditor;
 
 #if UNITY_5_4
     using UnityEngine.Networking;
 #else
     using UnityEngine.Experimental.Networking;
 #endif
-    using PlayFab.Editor.Json;
-    using PlayFab.Editor.EditorModels;
 
-    public class PlayFabEditorHttp : Editor
+
+namespace PlayFab.Editor
+{
+    public class PlayFabEditorHttp : UnityEditor.Editor
     {
-
         internal static void MakeDownloadCall(string url, Action<string> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
         {
             var www = new WWW(url);
 
             EditorCoroutine.start(PostDownload(www, (response) =>
             {
-                string fileSaveLocation = string.Format(PlayFabEditorHelper.editorRoot + "/Resources/PlayFabUnitySdk.unitypackage");
+                string fileSaveLocation = string.Format(PlayFabEditorHelper.EDITOR_ROOT + PlayFabEditorHelper.SDK_DOWNLOAD_PATH);
                 System.IO.File.WriteAllBytes(fileSaveLocation, response);
                 resultCallback(fileSaveLocation);
 
@@ -37,7 +34,7 @@ namespace PlayFab.Editor
         }
 
 
-        internal static void MakeApiCall<TRequestType, TResultType>(string api, string apiEndpoint, string token, TRequestType request,
+        internal static void MakeApiCall<TRequestType, TResultType>(string api, string apiEndpoint, TRequestType request,
         Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
         {
             var url = apiEndpoint + api;
@@ -47,11 +44,10 @@ namespace PlayFab.Editor
             {
                 {"Content-Type", "application/json"},
                 {"X-ReportErrorAsSuccess", "true"},
-                {"X-PlayFabSDK", string.Format("PlayFabEditorExtensions_{0}", PlayFabEditor.edexVersion)}
+                {"X-PlayFabSDK", string.Format("{0}_{1}", PlayFabEditorHelper.EDEX_NAME, PlayFabEditorHelper.EDEX_VERSION)}
             };
 
 
-            //TODO update this in accordance with the no-SDK model
             if(api.Contains("/Server/") || api.Contains("/Admin/"))
             {
                 if(string.IsNullOrEmpty(PlayFabEditorDataService.activeTitle.SecretKey))
@@ -92,7 +88,6 @@ namespace PlayFab.Editor
                     }
                     catch (Exception e)
                     {
-                        //UnityEngine.Debug.LogException(e);
                         PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, e.Message);
                     }
 
@@ -101,7 +96,7 @@ namespace PlayFab.Editor
                 {
                     if (errorCallback != null)
                     {
-                        var playFabError = GeneratePlayFabError(response);
+                        PlayFab.Editor.EditorModels.PlayFabError playFabError = GeneratePlayFabError(response);
                         errorCallback(playFabError);
                     }
                     else
@@ -126,17 +121,14 @@ namespace PlayFab.Editor
 
         }
 
-
-
-
-
+       
         internal static void MakeGitHubApiCall(string url, Action<string> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
         {
             var www = new WWW(url);
 
             EditorCoroutine.start(Post(www, (response) =>
             {
-                List<Object> jsonResponse = JsonWrapper.DeserializeObject<List<Object>>(response);
+                List<System.Object> jsonResponse = JsonWrapper.DeserializeObject<List<System.Object>>(response);
 
                 // list seems to come back in ascending order (oldest -> newest)
                 if(jsonResponse != null && jsonResponse.Count > 0)
@@ -175,16 +167,6 @@ namespace PlayFab.Editor
 
         }
 
-
-
-
-
-
-
-
-
-
-
         private static IEnumerator Post(WWW www, Action<string> callBack, Action<string> errorCallback)
         {
           
@@ -217,7 +199,7 @@ namespace PlayFab.Editor
         }
 
 
-        protected internal static PlayFabError GeneratePlayFabError(string json, object customData = null)
+        protected internal static PlayFab.Editor.EditorModels.PlayFabError GeneratePlayFabError(string json, object customData = null)
         {
             JsonObject errorDict = null;
             Dictionary<string, List<string>> errorDetails = null;
@@ -237,21 +219,22 @@ namespace PlayFab.Editor
             }
             catch (Exception e)
             {
-                return new PlayFabError()
+                return new PlayFab.Editor.EditorModels.PlayFabError()
                 {
                     ErrorMessage = e.Message
                 };
             }
+
             //create new error object
-            return new PlayFabError
+            return new PlayFab.Editor.EditorModels.PlayFabError
             {
                 HttpCode = errorDict.ContainsKey("code") ? Convert.ToInt32(errorDict["code"]) : 400,
                 HttpStatus = errorDict.ContainsKey("status")
                     ? (string)errorDict["status"]
                     : "BadRequest",
                 Error = errorDict.ContainsKey("errorCode")
-                    ? (PlayFabErrorCode)Convert.ToInt32(errorDict["errorCode"])
-                    : PlayFabErrorCode.ServiceUnavailable,
+                    ? (PlayFab.Editor.EditorModels.PlayFabErrorCode)Convert.ToInt32(errorDict["errorCode"])
+                    : PlayFab.Editor.EditorModels.PlayFabErrorCode.ServiceUnavailable,
                 ErrorMessage = errorDict.ContainsKey("errorMessage")
                     ? (string)errorDict["errorMessage"]
                     : string.Empty,
@@ -260,6 +243,6 @@ namespace PlayFab.Editor
             };
         }
 
-
+ 
     }
 }
