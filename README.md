@@ -48,6 +48,7 @@ Now that Admin & Server APIs and Models are all included in one single SDK, we r
 You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
 
 ## Troubleshooting and Support:
+This project is designed to work with Unity 5.4+. Using this plugin on earlier versions should work; however, 
 
 Did you find an issue or is Editor Extensions giving you a bad experience? 
 
@@ -71,13 +72,21 @@ Editor Extensions is our attempt to make a first class PlayFab development exper
 Let us know what we are missing and we will do our best to accommodate.
 
 ### Known Issues:
-  * Occasional Error thrown when logging in. 
+
+  1. Occasional Error thrown when making web requests. 
     * Currently under investigation, this does not seem to be impacting functionality.
-  * The EditorExtensions Tab is open and nothing is being drawn. 
+  2. The EditorExtensions Tab is open and nothing is being drawn. 
     * This typically is caused when renaming the PlayFabEditorExtensions directory.
-  * The EditorExtensions may rarely crash the Unity Window Layouts. 
+  3. The EditorExtensions may rarely crash the Unity Window Layouts. 
     * This may cause the inspector to stop drawing the PlayFab inspector until a [Reset Layouts](http://answers.unity3d.com/questions/613376/how-do-i-reset-the-layout-of-the-editor.html "Unity Answers") has been performed. 
-  * Plugins and other packages must be installed / removed and upgraded separately  
+  4. Plugins and other packages must be installed / removed / upgraded separately 
+  5. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
+    *  This can be manually set via under  **Build Settings > Player Settings**. More information can be found [here](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
+   
+#####Unsupported Build-Targets:
+  * **Unity Web Player** - The editor Extensions will not work properly when Unity is set to output Web Player builds. Web player was removed in Unity 5.4, and is no longer a supported build target. 
+
+ 
 
 ##Copyright and Licensing Information:
 

@@ -64,3 +64,8 @@
 /sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/Unity.CecilTools.dll
 /sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/Mono.Cecil.Pdb.dll
 /sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/Mono.Cecil.Mdb.dll
+/sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/AssetStoreTools.dll
+/sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/AssetStoreToolsExtra.dll
+/sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/UnityEditor.WebGL.Extensions.dll
+/sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/UnityEditor.iOS.Extensions.Common.dll.mdb
+/sourceTree/UnityEditorExtensions/Source/Temp/bin/Debug/UnityEditor.iOS.Extensions.Xcode.dll.mdb
