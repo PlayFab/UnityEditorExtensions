@@ -97,7 +97,7 @@
                     OnSettingsClicked();
                 }
 
-                if (GUILayout.Button("DATA", dataButtonStyle, GUILayout.MaxWidth(60)))
+                if (GUILayout.Button("DATA", dataButtonStyle, GUILayout.MaxWidth(45)))
                 {
                     
                     OnDataClicked();
@@ -105,7 +105,7 @@
 
             }
 
-            if (GUILayout.Button("HELP", helpButtonStyle, GUILayout.MaxWidth(60)))
+            if (GUILayout.Button("HELP", helpButtonStyle, GUILayout.MaxWidth(45)))
                 {
                  
                     OnHelpClicked();

@@ -126,7 +126,7 @@ namespace PlayFab.Editor
                             {
                                   //older version of the SDK
                                 GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));    
-                                GUILayout.Label("Most of the Editor Extensions depend on SDK versions >2.0. Consider upgrading to the get most features.", PlayFabEditorHelper.uiStyle.GetStyle("cGenTxt"), GUILayout.MinHeight(32));
+                                GUILayout.Label("Most of the Editor Extensions depend on SDK versions >2.0. Consider upgrading to the get most features.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
                                 GUILayout.EndHorizontal();
 
                                 GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));

@@ -14,6 +14,34 @@ namespace PlayFab.Editor
         public static PlayFab_DeveloperEnvironmentDetails envDetails;
         public static PlayFab_EditorSettings editorSettings;
 
+        public static bool isNewlyInstalled { get {
+
+            if(EditorPrefs.HasKey(keyPrefix + PlayFabEditorHelper.EDPREF_INSTALLED))
+            {
+                return false;
+            }
+            else
+            {
+                //TODO find a way to unset this after uninstall.
+                EditorPrefs.SetBool(keyPrefix + PlayFabEditorHelper.EDPREF_INSTALLED, false);
+
+                envDetails.isClientApiEnabled = true;
+                envDetails.isAdminApiEnabled = false;
+                envDetails.isServerApiEnabled = false;
+                return true;
+            }
+
+        }}
+
+        public static string keyPrefix { get { 
+       
+            string dataPath = Application.dataPath;
+            int lastIndex = dataPath.LastIndexOf('/');
+            int secondToLastIndex = dataPath.LastIndexOf('/', lastIndex-1);
+
+            return dataPath.Substring(secondToLastIndex, (lastIndex-secondToLastIndex));
+
+            }}
 
         public static bool isDataLoaded = false;
 
@@ -54,7 +82,7 @@ namespace PlayFab.Editor
             try
             {
                 var serialized = Json.JsonWrapper.SerializeObject(accountDetails);
-                EditorPrefs.SetString("PlayFab_DeveloperAccountDetails", serialized);
+                EditorPrefs.SetString(keyPrefix+"PlayFab_DeveloperAccountDetails", serialized);
             }
             catch(Exception ex)
             {
@@ -67,7 +95,7 @@ namespace PlayFab.Editor
             try
             {
                 var serialized = Json.JsonWrapper.SerializeObject(envDetails);
-                EditorPrefs.SetString("PlayFab_DeveloperEnvironmentDetails", serialized);
+                EditorPrefs.SetString(keyPrefix+"PlayFab_DeveloperEnvironmentDetails", serialized);
 
                 //update scriptable object
                 UpdateScriptableObject();
@@ -83,7 +111,7 @@ namespace PlayFab.Editor
             try
             {
                 var serialized = Json.JsonWrapper.SerializeObject(editorSettings);
-                EditorPrefs.SetString("PlayFab_EditorSettings", serialized);
+                EditorPrefs.SetString(keyPrefix+"PlayFab_EditorSettings", serialized);
             }
             catch(Exception ex)
             {
@@ -93,9 +121,9 @@ namespace PlayFab.Editor
 
         public static void LoadAccountDetails()
         {
-            if(EditorPrefs.HasKey("PlayFab_DeveloperAccountDetails"))
+            if(EditorPrefs.HasKey(keyPrefix+"PlayFab_DeveloperAccountDetails"))
             {
-                var serialized = EditorPrefs.GetString("PlayFab_DeveloperAccountDetails");
+                var serialized = EditorPrefs.GetString(keyPrefix+"PlayFab_DeveloperAccountDetails");
                 try
                 {
                     accountDetails = Json.JsonWrapper.DeserializeObject<PlayFab_DeveloperAccountDetails>(serialized);
@@ -112,9 +140,9 @@ namespace PlayFab.Editor
 
         public static void LoadEnvDetails()
         {
-            if(EditorPrefs.HasKey("PlayFab_DeveloperEnvironmentDetails"))
+            if(EditorPrefs.HasKey(keyPrefix+"PlayFab_DeveloperEnvironmentDetails"))
             {
-                var serialized = EditorPrefs.GetString("PlayFab_DeveloperEnvironmentDetails");
+                var serialized = EditorPrefs.GetString(keyPrefix+"PlayFab_DeveloperEnvironmentDetails");
                 try
                 {
                     envDetails = Json.JsonWrapper.DeserializeObject<PlayFab_DeveloperEnvironmentDetails>(serialized);
@@ -134,9 +162,9 @@ namespace PlayFab.Editor
 
         public static void LoadEditorSettings()
         {
-            if(EditorPrefs.HasKey("PlayFab_EditorSettings"))
+            if(EditorPrefs.HasKey(keyPrefix+"PlayFab_EditorSettings"))
             {
-                var serialized = EditorPrefs.GetString("PlayFab_EditorSettings");
+                var serialized = EditorPrefs.GetString(keyPrefix+"PlayFab_EditorSettings");
                 try
                 {
                     editorSettings = Json.JsonWrapper.DeserializeObject<PlayFab_EditorSettings>(serialized);
@@ -258,6 +286,13 @@ namespace PlayFab.Editor
                  }
         }
 
+        public static void RemoveEditorPrefs()
+        {
+            EditorPrefs.DeleteKey(keyPrefix + PlayFabEditorHelper.EDPREF_INSTALLED);
+            EditorPrefs.DeleteKey(keyPrefix + "PlayFab_EditorSettings");
+            EditorPrefs.DeleteKey(keyPrefix + "PlayFab_DeveloperEnvironmentDetails");
+            EditorPrefs.DeleteKey(keyPrefix + "PlayFab_DeveloperAccountDetails");
+        }
 
         public static bool DoesTitleExistInStudios(string searchFor) //out Studio studio
         {
@@ -301,7 +336,6 @@ namespace PlayFab.Editor
         static PlayFabEditorDataService()
         {
             LoadAllData();
-
         }
 
     }
