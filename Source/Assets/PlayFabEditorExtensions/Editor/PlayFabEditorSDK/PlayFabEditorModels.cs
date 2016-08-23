@@ -459,7 +459,7 @@ namespace PlayFab.Editor.EditorModels
     {
        public int currentMainMenu { get; set; }
        public bool isEdExShown { get; set; }
-
+      
     }
 
     public class StudioDisplaySet

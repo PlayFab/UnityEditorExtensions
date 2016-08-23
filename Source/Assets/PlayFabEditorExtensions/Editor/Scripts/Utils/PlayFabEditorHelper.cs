@@ -31,6 +31,9 @@ namespace PlayFab.Editor
         public static string STUDIO_OVERRIDE = "_OVERRIDE_";
 
         public static string MSG_SPIN_BLOCK = "{\"useSpinner\":true, \"blockUi\":true }";
+
+        public static string EDPREF_INSTALLED = "NewlyInstalled";
+
         //public static string MSG_SPIN = "{\"useSpinner\":true}";
         //public static string MSG_BLOCK = "{\"blockUi\":true }";
         #endregion
@@ -85,6 +88,7 @@ namespace PlayFab.Editor
                     else if(rootFiles.Length == 0)
                     {
                         Debug.Log("Could not relocate the PlayFab Editor Extension");
+                        EDITOR_ROOT = string.Empty;
                     }
                 }
             }

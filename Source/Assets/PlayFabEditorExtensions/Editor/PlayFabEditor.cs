@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -63,7 +64,13 @@ namespace PlayFab.Editor
         static void PlayFabServices()
         {
             var editorAsm = typeof (UnityEditor.Editor).Assembly;
-            var inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
+            var inspWndType = editorAsm.GetType("UnityEditor.SceneHierarchyWindow");
+
+            if(inspWndType == null)
+            {
+                inspWndType = editorAsm.GetType("UnityEditor.InspectorWindow");
+            }
+
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab EdEx");
 
@@ -74,7 +81,7 @@ namespace PlayFab.Editor
         {
             static Startup()
             {
-                if (PlayFabEditorDataService.editorSettings.isEdExShown || !PlayFabEditorSDKTools.IsInstalled)
+                if (PlayFabEditorDataService.editorSettings.isEdExShown || !PlayFabEditorSDKTools.IsInstalled || PlayFabEditorDataService.isNewlyInstalled)
                 {
                     EditorCoroutine.start(OpenPlayServices());
                 }
@@ -116,7 +123,6 @@ namespace PlayFab.Editor
                         //Try catching to avoid Draw errors that do not actually impact the functionality
                         try
                         {
-
                             PlayFabEditorMenu.DrawMenu();
 
                             switch (PlayFabEditorMenu._menuState)
@@ -186,7 +192,38 @@ namespace PlayFab.Editor
                             }
                             GUILayout.FlexibleSpace();
                         GUILayout.EndHorizontal();
-                            GUILayout.EndVertical();
+
+                        if(!string.IsNullOrEmpty(PlayFabEditorHelper.EDITOR_ROOT))
+                        {
+                            GUILayout.BeginHorizontal();
+                                GUILayout.FlexibleSpace();
+                                if(GUILayout.Button("UNINSTALL ", PlayFabEditorHelper.uiStyle.GetStyle("textButton") ))
+                                {
+                                    if(EditorUtility.DisplayDialog("Confirm Editor Extensions Removal", "This action will remove PlayFab Editor Extensions from the current project.", "Confirm", "Cancel"))
+                                    {
+                                        try
+                                        {
+                                            PlayFabEditor.window.Close();
+                                            var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDITOR_ROOT);
+
+                                            FileUtil.DeleteFileOrDirectory(edExRoot.Parent.FullName);
+                                            PlayFabEditorDataService.RemoveEditorPrefs();
+
+
+                                            AssetDatabase.Refresh();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            RaiseStateUpdate(EdExStates.OnError, ex.Message);
+                                            PlayFabServices();
+                                        }   
+                                    }
+           
+                                }
+                                GUILayout.FlexibleSpace();
+                            GUILayout.EndHorizontal();
+                                GUILayout.EndVertical();
+                        }
                     }
 
                     GUILayout.EndVertical();
