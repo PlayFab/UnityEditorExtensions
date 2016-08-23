@@ -43,12 +43,19 @@ Now that Admin & Server APIs and Models are all included in one single SDK, we r
   * Configured to fetch our [latest SDK](https://github.com/PlayFab/UnitySDK/blob/versioned/Packages/UnitySDK.unitypackage "GitHub Versioned Repo")
   * Saves Account and Environment settings via Unity's [EditorPrefs](https://docs.unity3d.com/ScriptReference/EditorPrefs.html "Unity3d Docs") and [ScripableObjects](https://docs.unity3d.com/ScriptReference/ScriptableObject.html "Unity3d Docs")
   * Saves configuration data to the SDK via reflecting on the installed assemblies. 
+  * Setting the *STUDIO* to **_OVERRIDE_** will blank the *TITLE ID* and *DEVELOPER SECRET KEY* for manual input. Use this option when you need to connect to a studio to which you do not belong. Generally speaking, it is a good practice to only connect to titles to which you are a member; however, this mode can be useful when getting familiar with PlayFab. 
+ 
+ 
+ ![EditorExtensions_Override](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_Override.png "Select _OVERRIDE_ to manually input your Title Id")
+ 
  
 #####A word of caution:
 You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
 
 ## Troubleshooting and Support:
 This project is designed to work with Unity 5.4+. Using this plugin on earlier versions should work; however, 
+
+If you choose to remove Editor Extensions make sure to close the Inspector window prior to deleting the files. 
 
 Did you find an issue or is Editor Extensions giving you a bad experience? 
 
