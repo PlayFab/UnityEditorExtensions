@@ -26,7 +26,7 @@ We will be adding to this platform as PlayFab's features grow.
     * If you have an older SDK, we recommend reading [this upgrade guide](https://github.com/PlayFab/UnitySDK/blob/master/UPGRADE.md) prior to upgrading.
     * If no SDK was detected, this plugin can download and install the latest SDK version from gitHub.
   5. After a supported SDK is installed, you will need to select a studio and title id.
-  6. After a studio and title id are selected, you may use the Editor Extensions to configure the SDK settings from within the IDE.   
+  6. After a studio and title id are selected, you may now call APIs and use the Editor Extensions to configure the SDK settings from within the IDE.   
 
 ![EditorExtensions_SKDs](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_SDKs.png "View the current SDK and upgrade to the latest SDK.")
 
@@ -53,9 +53,7 @@ Now that Admin & Server APIs and Models are all included in one single SDK, we r
 You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
 
 ## Troubleshooting and Support:
-This project is designed to work with Unity 5.4+. Using this plugin on earlier versions should work; however, 
-
-If you choose to remove Editor Extensions make sure to close the Inspector window prior to deleting the files. 
+This project is designed to work with Unity 5.4+. Using this plugin on earlier versions should work; however, If you choose to remove Editor Extensions make sure to close the Inspector window prior to deleting the files. 
 
 Did you find an issue or is Editor Extensions giving you a bad experience? 
 
@@ -80,20 +78,16 @@ Let us know what we are missing and we will do our best to accommodate.
 
 ### Known Issues:
 
-  1. Occasional Error thrown when making web requests. 
-    * Currently under investigation, this does not seem to be impacting functionality.
-  2. The EditorExtensions Tab is open and nothing is being drawn. 
-    * This typically is caused when renaming the PlayFabEditorExtensions directory.
-  3. The EditorExtensions may rarely crash the Unity Window Layouts. 
-    * This may cause the inspector to stop drawing the PlayFab inspector until a [Reset Layouts](http://answers.unity3d.com/questions/613376/how-do-i-reset-the-layout-of-the-editor.html "Unity Answers") has been performed. 
-  4. Plugins and other packages must be installed / removed / upgraded separately 
-  5. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
+  1. The EditorExtensions Tab is open and nothing is being drawn. 
+    * This typically is caused when the PlayFabEditorExtensions directory has been renamed.
+  2. Plugins and other packages must be installed / removed / upgraded separately 
+  3. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
     *  This can be manually set via under  **Build Settings > Player Settings**. More information can be found [here](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
+
+A complete list of issues can be found [here](https://github.com/PlayFab/UnityEditorExtensions/issues)
    
 #####Unsupported Build-Targets:
   * **Unity Web Player** - The editor Extensions will not work properly when Unity is set to output Web Player builds. Web player was removed in Unity 5.4, and is no longer a supported build target. 
-
- 
 
 ##Copyright and Licensing Information:
 
