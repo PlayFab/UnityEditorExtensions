@@ -18,7 +18,7 @@ We will be adding to this platform as PlayFab's features grow.
 
 ##Setup:
   
-  1. Download [this Asset Package](/Packages/ "PlayFabEditorExtensions.unitypackage") and import into a new or existing project.
+  1. Download [this Asset Package](https://api.playfab.com/sdks/download/unity-edex "PlayFabEditorExtensions.unitypackage") and import into a new or existing project.
   2. Open the Editor Extensions via the Unity menu: **Window > PlayFab > Editor Extensions** 
   3. Log in using an existing PlayFab developer account (or create a new account) to continue.
   4. Editor Extensions will automatically detect if you have a PlayFab SDK installed. 
@@ -82,7 +82,7 @@ Let us know what we are missing and we will do our best to accommodate.
     * This typically is caused when the PlayFabEditorExtensions directory has been renamed.
   2. Plugins and other packages must be installed / removed / upgraded separately 
   3. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
-    *  This can be manually set via under  **Build Settings > Player Settings**. More information can be found [here](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
+    *  This can be manually set via under  **Build Settings > Player Settings**. [More Information](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
 
 A complete list of issues can be found [here](https://github.com/PlayFab/UnityEditorExtensions/issues)
    

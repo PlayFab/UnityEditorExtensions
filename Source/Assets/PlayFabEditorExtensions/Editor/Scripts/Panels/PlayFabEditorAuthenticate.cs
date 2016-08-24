@@ -54,6 +54,17 @@ namespace PlayFab.Editor
                         GUILayout.FlexibleSpace();
                     EditorGUILayout.EndHorizontal();
 
+                    EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"));
+
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("CANCEL", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                        {
+                            activeState = PanelDisplayStates.Login;
+
+                        }
+                        GUILayout.FlexibleSpace();
+                    EditorGUILayout.EndHorizontal();
+
                 EditorGUILayout.EndVertical();
                 return;
             }
