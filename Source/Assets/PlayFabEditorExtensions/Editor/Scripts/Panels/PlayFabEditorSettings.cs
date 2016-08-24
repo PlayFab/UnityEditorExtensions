@@ -658,6 +658,7 @@ namespace PlayFab.Editor
 
                 PlayFabEditorDataService.SaveEnvDetails();
 
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSuccess);
 
             }
             else

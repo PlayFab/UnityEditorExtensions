@@ -106,6 +106,8 @@ namespace PlayFab.Editor
         {
             try
             {
+                GUI.skin = PlayFabEditorHelper.uiStyle;
+
                 GUILayout.BeginVertical();
 
                 //Run all updaters prior to drawing;  
@@ -363,6 +365,11 @@ namespace PlayFab.Editor
                     ClearBlockingRequest();
                     Debug.LogWarning(string.Format("PlayFab EditorExtensions: {0}", status)); 
                 break;
+
+                case EdExStates.OnSuccess:
+                    ClearBlockingRequest();
+                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.success);
+                    break;
             }
         }
 
