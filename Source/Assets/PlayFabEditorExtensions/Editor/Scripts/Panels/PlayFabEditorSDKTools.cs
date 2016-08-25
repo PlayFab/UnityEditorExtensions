@@ -231,7 +231,7 @@ namespace PlayFab.Editor
 
         public static void ImportLatestSDK()
         {
-            PlayFabEditorHttp.MakeDownloadCall("https://github.com/PlayFab/UnitySDK/raw/versioned/Packages/UnitySDK.unitypackage", (fileName) => 
+            PlayFabEditorHttp.MakeDownloadCall("https://api.playfab.com/sdks/download/unity-via-edex", (fileName) => 
             {
                 Debug.Log("PlayFab SDK Complete");
                 AssetDatabase.ImportPackage(fileName, false); 
