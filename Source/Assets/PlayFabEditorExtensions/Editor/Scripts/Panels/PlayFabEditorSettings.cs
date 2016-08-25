@@ -33,9 +33,9 @@ namespace PlayFab.Editor
         private static string[] titleOptions;
         private static string[] studioOptions;
        
-        private static int _selectedTitleIdIndex = -1;
+        private static int _selectedTitleIdIndex = 0;
         private static int _selectedStudioIndex = -1;
-        private static int _prevSelectedTitleIdIndex = -1;
+        private static int _prevSelectedTitleIdIndex = 0;
         private static int _prevSelectedStudioIndex = -1;
 
         private static string _TitleId;
@@ -57,10 +57,11 @@ namespace PlayFab.Editor
        
 
         private static bool _isSettingsSet = false;
-        private static bool _foundUnknownTitleId = true;
+        private static bool _foundUnknownTitleId = false;
 
         private static Dictionary<string, StudioDisplaySet > studioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
         private static Vector2 TitleScrollPos = Vector2.zero;
+        private static GUIStyle foldOutStyle;
         #endregion
 
         #region draw calls
@@ -171,8 +172,7 @@ namespace PlayFab.Editor
         public static void DrawTitleSettingsSubPanel()
         {
             float labelWidth = 100;
-
-            // this probably does not need to run every update.
+           
 
             if(PlayFabEditorDataService.accountDetails.studios.Count != studioFoldOutStates.Count)
             {
@@ -219,24 +219,25 @@ namespace PlayFab.Editor
                     style.fontStyle = FontStyle.Normal;
                 }
 
-                studio.Value.isCollapsed = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), studio.Value.isCollapsed, string.Format("{0} ({1})", studio.Value.Studio.Name, studio.Value.Studio.Titles.Length), true, style);
+                studio.Value.isCollapsed = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), studio.Value.isCollapsed, string.Format("{0} ({1})", studio.Value.Studio.Name, studio.Value.Studio.Titles.Length), true, PlayFabEditorHelper.uiStyle.GetStyle("foldOut_std"));
 
                 if(!studio.Value.isCollapsed)
                 {
-                    EditorGUI.indentLevel = 1;
+                    EditorGUI.indentLevel = 2;
 
                     GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                         EditorGUILayout.LabelField("TITLES:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
                     GUILayout.EndHorizontal();
+                    GUILayout.Space(5);
 
                     // draw title foldouts
                     foreach(var title in studio.Value.titleFoldOutStates)
                     {
-                        title.Value.isCollapsed = EditorGUILayout.Foldout(title.Value.isCollapsed, string.Format("{0} [{1}]", title.Value.Title.Name, title.Value.Title.Id));
+                        title.Value.isCollapsed = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), title.Value.isCollapsed, string.Format("{0} [{1}]", title.Value.Title.Name, title.Value.Title.Id), true, PlayFabEditorHelper.uiStyle.GetStyle("foldOut_std"));
                        
                         if(! title.Value.isCollapsed)
                         {
-                            EditorGUI.indentLevel = 2;
+                            EditorGUI.indentLevel = 3;
                             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                                 EditorGUILayout.LabelField("SECRET KEY:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
                                 EditorGUILayout.TextField(""+title.Value.Title.SecretKey);
@@ -251,7 +252,7 @@ namespace PlayFab.Editor
                                 }
                                 GUILayout.FlexibleSpace();
                             GUILayout.EndHorizontal();  
-                            EditorGUI.indentLevel = 1;
+                            EditorGUI.indentLevel = 2;
                         }
                     }
 
@@ -566,7 +567,7 @@ namespace PlayFab.Editor
                         titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id;
                     }
                     
-                    if(PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id == PlayFabEditorDataService.envDetails.selectedTitleId && foundTitle == false)
+                    if(PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id.ToLower() == PlayFabEditorDataService.envDetails.selectedTitleId.ToLower() && foundTitle == false)
                     {   
                         foundTitle = true;
                         titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[z-1].Titles.Length];
@@ -586,6 +587,18 @@ namespace PlayFab.Editor
                     }
                 }
 
+            }
+
+            if((titleOptions == null || titleOptions.Length == 0) && _prevSelectedStudioIndex > 0)
+            {
+                // could not find our title, but lets build a list anyways 
+                titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[_prevSelectedStudioIndex-1].Titles.Length];
+                for(var x = 0; x < titleOptions.Length; x++)
+                {
+                    titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[_prevSelectedStudioIndex-1].Titles[x].Id;
+                }
+                _selectedTitleIdIndex = 0;
+                _prevSelectedTitleIdIndex = 0;
             }
         }
 
@@ -687,6 +700,9 @@ namespace PlayFab.Editor
             {
                 PlayFabEditor.EdExStateUpdate += StateUpdateHandler;
             }
+
+
+
         }
 
         /// <summary>
