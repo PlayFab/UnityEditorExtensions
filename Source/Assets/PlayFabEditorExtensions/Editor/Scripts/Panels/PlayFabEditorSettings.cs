@@ -58,6 +58,7 @@ namespace PlayFab.Editor
 
         private static bool _isSettingsSet = false;
         private static bool _foundUnknownTitleId = false;
+        private static bool _isFetchingStudios = false;
 
         private static Dictionary<string, StudioDisplaySet > studioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
         private static Vector2 TitleScrollPos = Vector2.zero;
@@ -202,11 +203,7 @@ namespace PlayFab.Editor
                 GUILayout.FlexibleSpace();
                 if(GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                 {
-                    PlayFabEditorApi.GetStudios(new PlayFab.Editor.EditorModels.GetStudiosRequest(), (getStudioResult) =>
-                    {
-                        PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
-                        PlayFabEditorDataService.SaveAccountDetails();
-                    }, PlayFabEditorHelper.SharedErrorCallback);
+
                 }
             GUILayout.EndHorizontal(); 
 
@@ -539,6 +536,16 @@ namespace PlayFab.Editor
         private static void BuildDropDownLists()
         {
             int studioCount = PlayFabEditorDataService.accountDetails.studios.Count;
+            if(studioCount == 0 && _isFetchingStudios == false)
+            {
+                RefreshStudiosList();
+                return;
+            }
+            else if (studioCount == 0)
+            {
+                return;
+            }
+
             studioOptions = new string[studioCount+1];
 
             for(var z = 0; z < studioCount+1; z++)
@@ -567,7 +574,10 @@ namespace PlayFab.Editor
                         titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id;
                     }
                     
-                    if(PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id.ToLower() == PlayFabEditorDataService.envDetails.selectedTitleId.ToLower() && foundTitle == false)
+                    string comp1 = PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id.ToLower();
+                    string comp2 = string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.selectedTitleId) ? "" : PlayFabEditorDataService.envDetails.selectedTitleId.ToLower(); 
+
+                    if(comp1 == comp2 && foundTitle == false)
                     {   
                         foundTitle = true;
                         titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[z-1].Titles.Length];
@@ -589,17 +599,29 @@ namespace PlayFab.Editor
 
             }
 
-            if((titleOptions == null || titleOptions.Length == 0) && _prevSelectedStudioIndex > 0)
+            if((titleOptions == null || titleOptions.Length == 0) && _prevSelectedStudioIndex == -1 && PlayFabEditorDataService.accountDetails.studios.Count > 0)
             {
                 // could not find our title, but lets build a list anyways 
-                titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[_prevSelectedStudioIndex-1].Titles.Length];
+                titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[0].Titles.Length];
                 for(var x = 0; x < titleOptions.Length; x++)
                 {
-                    titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[_prevSelectedStudioIndex-1].Titles[x].Id;
+                    titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[0].Titles[x].Id;
                 }
+                _selectedStudioIndex = 1;
+                _prevSelectedStudioIndex = 1;
                 _selectedTitleIdIndex = 0;
                 _prevSelectedTitleIdIndex = 0;
             }
+            else if(PlayFabEditorDataService.accountDetails.studios.Count <= 0)
+            {
+                // this should not happen. But it seems to be happening...
+                _selectedStudioIndex = 0;
+                _prevSelectedStudioIndex = 0;
+                _selectedTitleIdIndex = 0;
+                _prevSelectedTitleIdIndex = 0;
+                _foundUnknownTitleId = true;
+            }
+                
         }
 
 
@@ -703,6 +725,20 @@ namespace PlayFab.Editor
 
 
 
+        }
+
+
+        public static void RefreshStudiosList()
+        {
+            _isFetchingStudios = true;
+            PlayFabEditorApi.GetStudios(new PlayFab.Editor.EditorModels.GetStudiosRequest(), (getStudioResult) =>
+            {
+                _isFetchingStudios = false;
+                _isSettingsSet = false;
+                studioOptions = null;
+                PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
+                PlayFabEditorDataService.SaveAccountDetails();
+            }, PlayFabEditorHelper.SharedErrorCallback);
         }
 
         /// <summary>

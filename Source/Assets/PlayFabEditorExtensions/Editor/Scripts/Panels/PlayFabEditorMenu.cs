@@ -9,13 +9,11 @@
     #region panel variables
         internal enum MenuStates
         {
-            Data,
-            Services,
-            Sdks,
-            Settings,
-            Help,
-            Logout,
-            None
+            Sdks = 0,
+            Settings = 1,
+            Data = 2,
+            Help = 3,
+            Logout = 4
         }
 
         internal static MenuStates _menuState = MenuStates.Sdks;

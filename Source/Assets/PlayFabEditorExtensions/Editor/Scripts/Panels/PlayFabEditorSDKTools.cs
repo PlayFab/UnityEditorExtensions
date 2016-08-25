@@ -233,7 +233,7 @@ namespace PlayFab.Editor
         {
             PlayFabEditorHttp.MakeDownloadCall("https://api.playfab.com/sdks/download/unity-via-edex", (fileName) => 
             {
-                Debug.Log("PlayFab SDK Complete");
+                Debug.Log("PlayFab SDK Install: Complete");
                 AssetDatabase.ImportPackage(fileName, false); 
 
                 PlayFabEditorDataService.envDetails.sdkPath = PlayFabEditorHelper.DEFAULT_SDK_LOCATION;

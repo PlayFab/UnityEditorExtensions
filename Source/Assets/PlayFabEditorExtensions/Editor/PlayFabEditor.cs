@@ -132,8 +132,6 @@ namespace PlayFab.Editor
                                 case PlayFabEditorMenu.MenuStates.Sdks:
                                     PlayFabEditorSDKTools.DrawSdkPanel();
                                     break;
-                                case PlayFabEditorMenu.MenuStates.Services:
-                                    break;
                                 case PlayFabEditorMenu.MenuStates.Settings:
                                     PlayFabEditorSettings.DrawSettingsPanel();
                                     PlayFabEditorSettings.After();
