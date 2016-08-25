@@ -30,6 +30,7 @@ namespace PlayFab.Editor
             "yyyy-MM-dd HH:mm.ss.FF",
             "yyyy-MM-dd HH:mm.ss",
         };
+
         public const int DEFAULT_UTC_OUTPUT_INDEX = 2; // The default format everybody should use
         public const int DEFAULT_LOCAL_OUTPUT_INDEX = 8; // The default format if you want to use local time (This doesn't have universal support in all PlayFab code)
         private static DateTimeStyles _dateTimeStyles = DateTimeStyles.RoundtripKind;
@@ -38,6 +39,7 @@ namespace PlayFab.Editor
         {
             get { return DateTime.Now.ToString(_defaultDateTimeFormats[DEFAULT_LOCAL_OUTPUT_INDEX]); }
         }
+
 
         public static string utcTimeStamp
         {
