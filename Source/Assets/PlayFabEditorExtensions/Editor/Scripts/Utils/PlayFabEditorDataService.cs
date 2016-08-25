@@ -192,7 +192,6 @@ namespace PlayFab.Editor
             LoadEnvDetails();
             LoadEditorSettings();
 
-            //TODO make sure this should be called here...
             LoadFromScriptableObject();
 
             isDataLoaded = true;
@@ -214,7 +213,7 @@ namespace PlayFab.Editor
                     var type = playfabSettingsType.ToList().FirstOrDefault();
                     var props = type.GetProperties();
 
-                    envDetails.selectedTitleId = (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null) ?? envDetails.selectedTitleId;
+                    envDetails.selectedTitleId = string.IsNullOrEmpty((string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null)) ? envDetails.selectedTitleId : (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null);
                     envDetails.webRequestType = (PlayFabEditorSettings.WebRequestType)props.ToList().Find(p => p.Name == "RequestType").GetValue(null, null);
                     envDetails.timeOut = (int) props.ToList().Find(p => p.Name == "RequestTimeout").GetValue(null, null);
                     envDetails.keepAlive = (bool) props.ToList().Find(p => p.Name == "RequestKeepAlive").GetValue(null, null);
