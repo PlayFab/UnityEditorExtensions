@@ -160,6 +160,7 @@ namespace PlayFab.Editor
 
         }
 
+
         public static void LoadEditorSettings()
         {
             if(EditorPrefs.HasKey(keyPrefix+"PlayFab_EditorSettings"))

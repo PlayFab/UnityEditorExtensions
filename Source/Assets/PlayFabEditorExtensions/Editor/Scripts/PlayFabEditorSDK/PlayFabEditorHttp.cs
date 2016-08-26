@@ -24,7 +24,19 @@ namespace PlayFab.Editor
             EditorCoroutine.start(PostDownload(www, (response) =>
             {
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnHttpRes, url);
-                string fileSaveLocation = string.Format(PlayFabEditorHelper.EDITOR_ROOT + PlayFabEditorHelper.SDK_DOWNLOAD_PATH);
+
+                var fileName = string.Empty;
+                if(url.IndexOf("unity-edex") > -1)
+                {
+                    fileName = PlayFabEditorHelper.EDEX_DOWNLOAD_PATH;
+                }
+                else if(url.IndexOf("unity-via-edex") > -1)
+                {
+                    fileName = PlayFabEditorHelper.SDK_DOWNLOAD_PATH;
+                }
+
+
+                string fileSaveLocation = string.Format(PlayFabEditorHelper.EDITOR_ROOT + fileName);
                 System.IO.File.WriteAllBytes(fileSaveLocation, response);
                 resultCallback(fileSaveLocation);
 

@@ -464,12 +464,22 @@ namespace PlayFab.Editor
 
         private static void GetLatestSdkVersion()
         {
-            if(string.IsNullOrEmpty(latestSdkVersion))
+            //TODO start back here
+            DateTime threshold = PlayFabEditorDataService.editorSettings.lastSdkVersionCheck != DateTime.MinValue ? PlayFabEditorDataService.editorSettings.lastSdkVersionCheck.AddHours(1) : DateTime.MinValue;
+
+            if(DateTime.Today > threshold)
             {
                 PlayFabEditorHttp.MakeGitHubApiCall("https://api.github.com/repos/PlayFab/UnitySDK/git/refs/tags", (version) => 
                 {
                     latestSdkVersion = version ?? "Unknown";
+                    PlayFabEditorDataService.editorSettings.lastSdkVersionCheck = DateTime.UtcNow;
+                    PlayFabEditorDataService.editorSettings.latestSdkVersion = latestSdkVersion;
+                    PlayFabEditorDataService.SaveEditorSettings();
                 });
+            }
+            else
+            {
+                latestSdkVersion = PlayFabEditorDataService.editorSettings.latestSdkVersion;
             }
         }
 
