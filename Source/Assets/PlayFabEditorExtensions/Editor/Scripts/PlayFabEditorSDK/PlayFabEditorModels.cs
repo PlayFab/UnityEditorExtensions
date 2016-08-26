@@ -459,6 +459,10 @@ namespace PlayFab.Editor.EditorModels
     {
        public int currentMainMenu { get; set; }
        public bool isEdExShown { get; set; }
+       public string latestSdkVersion { get; set; }
+       public string latestEdExVersion { get; set; }
+       public System.DateTime lastSdkVersionCheck { get; set; }
+       public System.DateTime lastEdExVersionCheck { get; set; }
       
     }
 

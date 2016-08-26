@@ -385,13 +385,22 @@ namespace PlayFab.Editor
 
         private static void GetLatestEdExVersion()
         {
-            if(string.IsNullOrEmpty(latestEdExVersion))
+            //TODO start back here
+            DateTime threshold = PlayFabEditorDataService.editorSettings.lastEdExVersionCheck != DateTime.MinValue ? PlayFabEditorDataService.editorSettings.lastEdExVersionCheck.AddHours(1) : DateTime.MinValue;
+
+            if(DateTime.Today > threshold)
             {
                 PlayFabEditorHttp.MakeGitHubApiCall("https://api.github.com/repos/PlayFab/UnityEditorExtensions/git/refs/tags", (version) => 
                 {
                     latestEdExVersion = version ?? "Unknown";
-                    //Debug.Log(version);
+                    PlayFabEditorDataService.editorSettings.lastEdExVersionCheck = DateTime.UtcNow;
+                    PlayFabEditorDataService.editorSettings.latestEdExVersion = latestEdExVersion;
+                    PlayFabEditorDataService.SaveEditorSettings();
                 });
+            }
+            else
+            {
+                latestEdExVersion = PlayFabEditorDataService.editorSettings.latestEdExVersion;
             }
         }
 
@@ -461,7 +470,6 @@ namespace PlayFab.Editor
         {
             if( EditorUtility.DisplayDialog("Confirm EdEx Upgrade", "This action will remove the current PlayFab Editor Extensions and install the lastet version.", "Confirm", "Cancel"))
             {
-                RemoveEdEx(false, false);
                 ImportLatestEdEx();
             }
         }
@@ -470,12 +478,8 @@ namespace PlayFab.Editor
         {
             PlayFabEditorHttp.MakeDownloadCall("https://api.playfab.com/sdks/download/unity-edex", (fileName) => 
             {
-                Debug.Log("PlayFab EdEx Upgrade: Complete");
                 AssetDatabase.ImportPackage(fileName, false); 
-
-//                PlayFabEditorDataService.envDetails.edexPath = PlayFabEditorHelper.EDITOR_ROOT;
-//                PlayFabEditorDataService.SaveEnvDetails();
-                  
+                Debug.Log("PlayFab EdEx Upgrade: Complete");
             });
         }
 #endregion
