@@ -15,6 +15,8 @@ namespace PlayFab.Editor
         private static string installedSdkVersion = string.Empty;
         private static string latestSdkVersion = string.Empty;
 
+
+
         public static UnityEngine.Object sdkFolder;
         private static UnityEngine.Object _previoussSdkFolderPath;
         private static bool isObjectFieldActive;
