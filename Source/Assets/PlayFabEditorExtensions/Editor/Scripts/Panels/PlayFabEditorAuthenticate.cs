@@ -109,6 +109,24 @@ namespace PlayFab.Editor
 
 
             GUILayout.EndVertical();
+
+            //capture enter input for login
+            Event e = Event.current;
+            if (e.type == EventType.KeyUp && e.keyCode == KeyCode.Return)
+            {
+                switch(activeState)
+                {
+                    case PanelDisplayStates.Login:
+                        OnLoginButtonClicked();
+                    break;
+                    case PanelDisplayStates.Register:
+                        OnRegisterClicked();
+                    break;
+                    case PanelDisplayStates.TwoFactorPrompt:
+                        OnContinueButtonClicked();
+                    break;
+                }
+            }
         }
 
         public static void DrawLogin()
@@ -224,7 +242,9 @@ namespace PlayFab.Editor
             }, null, PlayFabEditorHelper.SharedErrorCallback);
 
             _userPass = string.Empty;
+
             _userPass2 = string.Empty;
+
 
             activeState = PanelDisplayStates.Login;
 

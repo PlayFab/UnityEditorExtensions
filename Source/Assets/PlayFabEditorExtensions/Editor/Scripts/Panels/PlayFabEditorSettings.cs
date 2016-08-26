@@ -203,7 +203,7 @@ namespace PlayFab.Editor
                 GUILayout.FlexibleSpace();
                 if(GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                 {
-
+                    RefreshStudiosList();
                 }
             GUILayout.EndHorizontal(); 
 

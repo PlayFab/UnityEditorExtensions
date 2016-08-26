@@ -18,14 +18,14 @@ namespace PlayFab.Editor
         public static EditorCoroutine start(IEnumerator _routine, WWW www)
         {
             EditorCoroutine coroutine = new EditorCoroutine(_routine);
-            _www = www;
+            coroutine._www = www;
             coroutine.start();
             return coroutine;
         }
 
 
         readonly IEnumerator routine;
-        private static WWW _www;
+        private WWW _www;
 
         EditorCoroutine(IEnumerator _routine)
         {
@@ -43,26 +43,30 @@ namespace PlayFab.Editor
 
         void update()
         {
-            if (_www != null)
+            try
             {
-                if (_www.isDone)
+                if (_www != null)
                 {
+                    if (_www.isDone && !routine.MoveNext())
+                    {
+                        stop();
+                    }
+                }
+                else
+                {
+                    /* NOTE: no need to try/catch MoveNext,
+    			     * if an IEnumerator throws its next iteration returns false.
+    			     * Also, Unity probably catches when calling EditorApplication.update.
+    			     */
                     if (!routine.MoveNext())
                     {
                         stop();
                     }
                 }
             }
-            else
+            catch (System.Exception ex)
             {
-                /* NOTE: no need to try/catch MoveNext,
-			     * if an IEnumerator throws its next iteration returns false.
-			     * Also, Unity probably catches when calling EditorApplication.update.
-			     */
-                if (!routine.MoveNext())
-                {
-                    stop();
-                }
+                Debug.Log(ex.StackTrace);
             }
         }
     }
