@@ -164,9 +164,8 @@ namespace PlayFab.Editor
 
         private static IEnumerator Post(WWW www, Action<string> callBack, Action<string> errorCallback)
         {
-          
             yield return www;
-            
+
             if (!string.IsNullOrEmpty(www.error))
             {
                 errorCallback(www.error);
@@ -175,6 +174,7 @@ namespace PlayFab.Editor
             {
                 callBack(www.text);
             }
+            yield break;
         }
 
 
