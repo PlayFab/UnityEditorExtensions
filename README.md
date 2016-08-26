@@ -59,7 +59,8 @@ Did you find an issue or is Editor Extensions giving you a bad experience?
 ###Version History:
 See [GitHub Releases](https://github.com/PlayFab/UnityEditorExtensions/releases "GitHub Versions") for the latest stable build and patch notes.  
 
-When in the app, Our Editor Extension
+Editor Extension details can be found under the **HELP** tab. Here you will find useful links for learning more about PlayFab, troubleshooting as well as EdEx **UPGRADE** and **UNINSTALL** options.
+
  ![EditorExtensions_About](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_About.png "EdEx Details can be found under the Help Tab")
 
 ### Ongoing Development:
