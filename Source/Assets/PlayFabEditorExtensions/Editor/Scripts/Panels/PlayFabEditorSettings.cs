@@ -291,15 +291,7 @@ namespace PlayFab.Editor
 
                     _selectedTitleIdIndex = _selectedTitleIdIndex > PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length ? 0 : _selectedTitleIdIndex; // reset our titles index
                   
-                    titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length];
-                    for(var z = 0; z < PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length; z++)
-                    {
-                        titleOptions[z] = PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].Id;
-
-                        #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                            _DeveloperSecretKey = PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].SecretKey;
-                        #endif
-                    }
+                    CompoundTitlesList();
 
                     _prevSelectedStudioIndex = _selectedStudioIndex;
                 }
@@ -571,7 +563,7 @@ namespace PlayFab.Editor
                     if(foundTitle) 
                     {
                         // then we know this is the correct studio
-                        titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id;
+                        titleOptions[x] = string.Format("[{0}] {1}", PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id, PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Name);
                     }
                     
                     string comp1 = PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id.ToLower();
@@ -605,7 +597,7 @@ namespace PlayFab.Editor
                 titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[0].Titles.Length];
                 for(var x = 0; x < titleOptions.Length; x++)
                 {
-                    titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[0].Titles[x].Id;
+                    titleOptions[x] = string.Format("[{0}] {1}", PlayFabEditorDataService.accountDetails.studios[0].Titles[x].Id, PlayFabEditorDataService.accountDetails.studios[0].Titles[x].Name);
                 }
                 _selectedStudioIndex = 1;
                 _prevSelectedStudioIndex = 1;
@@ -666,7 +658,7 @@ namespace PlayFab.Editor
                 else
                 {
                     // if we switched titles clear titledata 
-                    if(PlayFabEditorDataService.envDetails.selectedTitleId != titleOptions[_selectedTitleIdIndex])
+                    if(PlayFabEditorDataService.envDetails.selectedTitleId != GetSelectedTitleIdFromOptions())
                     {
                         PlayFabEditorDataService.envDetails.titleData.Clear();
                         if(PlayFabEditorDataMenu.tdViewer != null)
@@ -675,7 +667,7 @@ namespace PlayFab.Editor
                         }
                      }
 
-                    PlayFabEditorDataService.envDetails.selectedTitleId = titleOptions[_selectedTitleIdIndex];
+                    PlayFabEditorDataService.envDetails.selectedTitleId = GetSelectedTitleIdFromOptions();
                 }
 
 
@@ -727,6 +719,24 @@ namespace PlayFab.Editor
 
         }
 
+        private static string GetSelectedTitleIdFromOptions()
+        {
+            if(titleOptions != null &&  titleOptions.Length > 0)
+            {
+                return titleOptions[_selectedTitleIdIndex].Substring(1, titleOptions[_selectedTitleIdIndex].IndexOf(']') -1);
+            }
+
+            return string.Empty;
+        } 
+
+        private static void CompoundTitlesList()
+        {
+            titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length];
+            for(var z = 0; z < PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length; z++)
+            {
+                titleOptions[z] = string.Format("[{0}] {1}", PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].Id, PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].Name);
+            }
+        }
 
         public static void RefreshStudiosList()
         {
