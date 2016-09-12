@@ -6,7 +6,7 @@ using UnityEditor;
 using PlayFab.Editor.Json;
 using PlayFab.Editor.EditorModels;
 
-#if UNITY_5_4
+#if UNITY_5_4 || UNITY_5_5
     using UnityEngine.Networking;
 #else
     using UnityEngine.Experimental.Networking;
