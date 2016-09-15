@@ -441,6 +441,7 @@ namespace PlayFab.Editor.EditorModels
         public string selectedTitleId { get; set; }
         public string developerSecretKey { get; set; }
         public Dictionary<string, string> titleData { get; set; }
+        public Dictionary<string, string> titleInternalData { get; set; }
         public string sdkPath { get; set; }
         public string edexPath { get; set; }
 
@@ -452,6 +453,7 @@ namespace PlayFab.Editor.EditorModels
         public PlayFab_DeveloperEnvironmentDetails()
         {
             titleData = new Dictionary<string, string>();
+            titleInternalData = new Dictionary<string, string>();
         }
     }
 
@@ -477,6 +479,47 @@ namespace PlayFab.Editor.EditorModels
     {
         public PlayFab.Editor.EditorModels.Title Title;
         public bool isCollapsed = true;
+    }
+
+    public class KvpItem
+    {
+        public string Key;
+        public string Value;
+
+        public string _prvKey;
+        public string _prvValue;
+
+        public bool isDirty;
+
+        public KvpItem(string k, string v)
+        {
+            this.Key = k;
+            this.Value = v;
+
+            this._prvKey = k;
+            this._prvValue = v;
+        }
+
+        public void CleanItem()
+        {
+            _prvKey = Key;
+            _prvValue = Value;
+            isDirty = false;
+        }
+
+        public void DataEditedCheck()
+        {
+            if(Key != _prvKey || Value != _prvValue)
+            {
+                this.isDirty = true;
+            }
+            else
+            {
+               
+            }
+        }
+
+
     }
     #endregion
 

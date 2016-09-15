@@ -71,6 +71,24 @@ namespace PlayFab.Editor
                 PlayFabEditorHttp.MakeApiCall<SetTitleDataRequest, SetTitleDataResult>("/Admin/SetTitleData", apiEndpoint, req, resultCb, errorCallback);
             }
         }
+        public static void GetTitleInternalData( Action<GetTitleDataResult> resultCb, Action<EditorModels.PlayFabError> errorCallback)
+        {
+            var titleId = PlayFabEditorDataService.envDetails.selectedTitleId;
+            var apiEndpoint = String.Format("https://{0}{1}", titleId, PlayFabEditorHelper.TITLE_ENDPOINT);
+            PlayFabEditorHttp.MakeApiCall<GetTitleDataRequest, GetTitleDataResult>("/Server/GetTitleInternalData", apiEndpoint, new GetTitleDataRequest(), resultCb, errorCallback);
+        }
+
+        public static void SetTitleInternalData(Dictionary<string, string> keys, Action<SetTitleDataResult> resultCb, Action<EditorModels.PlayFabError> errorCallback)
+        {
+            foreach(var pair in keys)
+            {
+                var req = new SetTitleDataRequest() { Key = pair.Key, Value = pair.Value };
+
+                var titleId = PlayFabEditorDataService.envDetails.selectedTitleId;
+                var apiEndpoint = String.Format("https://{0}{1}", titleId, PlayFabEditorHelper.TITLE_ENDPOINT);
+                PlayFabEditorHttp.MakeApiCall<SetTitleDataRequest, SetTitleDataResult>("/Admin/SetTitleInternalData", apiEndpoint, req, resultCb, errorCallback);
+            }
+        }
 #endregion
     }
 }
