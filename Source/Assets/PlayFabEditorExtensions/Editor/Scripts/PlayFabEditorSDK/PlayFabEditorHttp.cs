@@ -34,6 +34,10 @@ namespace PlayFab.Editor
                 {
                     fileName = PlayFabEditorHelper.SDK_DOWNLOAD_PATH;
                 }
+                else
+                {
+                    fileName = PlayFabEditorHelper.EDEX_PACKAGES_PATH;
+                }
 
 
                 string fileSaveLocation = string.Format(PlayFabEditorHelper.EDITOR_ROOT + fileName);

@@ -62,6 +62,7 @@ namespace PlayFab.Editor
 
         private static Dictionary<string, StudioDisplaySet > studioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
         private static Vector2 TitleScrollPos = Vector2.zero;
+        private static Vector2 PackagesScrollPos = Vector2.zero;
         private static GUIStyle foldOutStyle;
         #endregion
 
@@ -152,6 +153,10 @@ namespace PlayFab.Editor
                 OnApiSettingsClicked();
             }
 
+            if (GUILayout.Button("PACKAGES", apiSettingsButtonStyle, GUILayout.MinWidth(70) ))
+            {
+                OnPackagesClicked();
+            }
 
             GUILayout.EndHorizontal();
 
@@ -165,6 +170,9 @@ namespace PlayFab.Editor
                     break;
                  case SubMenuStates.TitleSettings:
                     DrawTitleSettingsSubPanel();
+                    break;
+                 case SubMenuStates.Packages:
+                    DrawPackagesSubPanel();
                     break;
             }
         }
@@ -410,6 +418,31 @@ namespace PlayFab.Editor
             GUILayout.EndVertical();
         }
 
+
+        public static void DrawPackagesSubPanel()
+        {
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                    GUILayout.Label("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
+            GUILayout.EndHorizontal();
+
+            if(PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
+            {
+                float labelWidth = 245;
+                PackagesScrollPos = GUILayout.BeginScrollView(PackagesScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                    using (FixedWidthLabel fwl = new FixedWidthLabel("Push Notification Plugin (Android): "))
+                    {
+                        GUILayout.Space(labelWidth - fwl.fieldWidth);
+                        PlayFabEditorPackageManager.AndroidPushPlugin = EditorGUILayout.Toggle(PlayFabEditorPackageManager.AndroidPushPlugin, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"));
+
+                        if(GUILayout.Button("VIEW HELP", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+                        {
+                           
+                        }
+                    }
+                GUILayout.EndScrollView();
+            }
+        }
+
         #endregion
 
         #region unity-like loops
@@ -617,6 +650,10 @@ namespace PlayFab.Editor
         }
 
 
+        private static void OnPackagesClicked()
+        {
+            _subMenuState = SubMenuStates.Packages;
+        }
 
         private static void OnApiSettingsClicked()
         {

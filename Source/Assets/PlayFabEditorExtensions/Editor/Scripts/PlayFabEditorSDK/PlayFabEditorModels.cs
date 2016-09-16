@@ -442,6 +442,7 @@ namespace PlayFab.Editor.EditorModels
         public string developerSecretKey { get; set; }
         public Dictionary<string, string> titleData { get; set; }
         public Dictionary<string, string> titleInternalData { get; set; }
+        public Dictionary<string, string> installedPackages { get; set; } //TODO store a package manifest here (used to uninstall a specific package)
         public string sdkPath { get; set; }
         public string edexPath { get; set; }
 
@@ -454,6 +455,7 @@ namespace PlayFab.Editor.EditorModels
         {
             titleData = new Dictionary<string, string>();
             titleInternalData = new Dictionary<string, string>();
+            installedPackages = new Dictionary<string, string>();
         }
     }
 

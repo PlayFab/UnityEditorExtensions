@@ -130,8 +130,8 @@
             if ( menu == null)
             {
                 menu = ScriptableObject.CreateInstance<MenuComponent>();
-                menu.RegisterMenuItem("TITLE DATA", OnTitleDataClicked);
-                menu.RegisterMenuItem("INTERNAL DATA", OnInternalTitleDataClicked);
+                menu.RegisterMenuItem("TITLE", OnTitleDataClicked);
+                menu.RegisterMenuItem("INTERNAL", OnInternalTitleDataClicked);
             }
         }
 

@@ -117,7 +117,7 @@ namespace PlayFab.Editor
 
                 //Run all updaters prior to drawing;  
                 PlayFabEditorSettings.Update();
-
+                PlayFabEditorPackageManager.Update();
                 PlayFabEditorHeader.DrawHeader();
 
 

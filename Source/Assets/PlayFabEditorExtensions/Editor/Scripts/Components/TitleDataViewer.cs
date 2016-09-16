@@ -16,6 +16,10 @@
         // this gets called after the Base draw loop
         public void Draw()
         {
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                GUILayout.Label("TitleData provides Key-Value storage available to all API sets. TitleData is designed to store game-wide configuration data.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
+            GUILayout.EndHorizontal();
+
             EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
                 if(GUILayout.Button("REFRESH",  PlayFabEditorHelper.uiStyle.GetStyle("Button")))
@@ -30,7 +34,6 @@
                 }
 
             EditorGUILayout.EndHorizontal();
-
 
             if(items.Count > 0)
             {

@@ -21,6 +21,8 @@ namespace PlayFab.Editor
         public static string PLAYFAB_EDEX_MAINFILE = "PlayFabEditor.cs";
         public static string SDK_DOWNLOAD_PATH = "/Resources/PlayFabUnitySdk.unitypackage";
         public static string EDEX_DOWNLOAD_PATH = "/Resources/PlayFabUnityEditorExtensions.unitypackage";
+        public static string EDEX_PACKAGES_PATH = "/Resources/MostRecentPackage.unitypackage";
+
         public static string VAR_REQUEST_TIMING = "PLAYFAB_REQUEST_TIMING";
 
         public static string ADMIN_API = "ENABLE_PLAYFABADMIN_API";

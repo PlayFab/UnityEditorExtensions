@@ -9,7 +9,7 @@ namespace PlayFab.Editor {
 
     public class TitleInternalDataViewer : Editor {
         public List<KvpItem> items;
-        public static TitleDataEditor tdEditor;
+        public static TitleInternalDataEditor tdEditor;
         public string displayTitle = "";
         public Vector2 scrollPos = Vector2.zero;
         private bool showSave = false;
@@ -17,6 +17,10 @@ namespace PlayFab.Editor {
         // this gets called after the Base draw loop
         public void Draw()
         {
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                GUILayout.Label("Internal TitleData provides Key-Value storage available only to Admin & Server API sets. This is useful for storing configuration data that should be hidden from players.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
+            GUILayout.EndHorizontal();
+
             EditorGUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
                 if(GUILayout.Button("REFRESH",  PlayFabEditorHelper.uiStyle.GetStyle("Button")))
@@ -31,7 +35,6 @@ namespace PlayFab.Editor {
                 }
 
             EditorGUILayout.EndHorizontal();
-
 
             if(items.Count > 0)
             {
@@ -67,7 +70,7 @@ namespace PlayFab.Editor {
                         if(GUILayout.Button("Edit",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(35)))
                             {
                                 tdEditor.LoadData(items[z].Key, items[z].Value);
-                                TitleDataEditor.ShowWindow(tdEditor);
+                                TitleInternalDataEditor.ShowWindow(tdEditor);
                             } 
                         if(GUILayout.Button("X",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(20)))
                             {
@@ -163,7 +166,7 @@ namespace PlayFab.Editor {
         {
             if(tdEditor == null)
             {
-                tdEditor = ScriptableObject.CreateInstance<TitleDataEditor>();
+                tdEditor = ScriptableObject.CreateInstance<TitleInternalDataEditor>();
             }
         }
 
