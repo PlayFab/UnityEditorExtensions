@@ -147,7 +147,45 @@ namespace PlayFab.Editor.EditorModels
     {
     }
 
+    public class CloudScriptFile
+    {
+        /// <summary>
+        /// Name of the javascript file. These names are not used internally by the server, they are only for developer organizational purposes.
+        /// </summary>
+        public string Filename { get; set;}
+        /// <summary>
+        /// Contents of the Cloud Script javascript. Must be string-escaped javascript.
+        /// </summary>
+        public string FileContents { get; set;}
+    }
 
+    public class UpdateCloudScriptRequest
+    {
+        /// <summary>
+        /// List of Cloud Script files to upload to create the new revision. Must have at least one file.
+        /// </summary>
+        public List<CloudScriptFile> Files { get; set; }
+        /// <summary>
+        /// Immediately publish the new revision
+        /// </summary>
+        public bool Publish { get; set;}
+        /// <summary>
+        /// PlayFab user ID of the developer initiating the request.
+        /// </summary>
+        public string DeveloperPlayFabId { get; set; }
+    }
+
+    public class UpdateCloudScriptResult
+    {
+        /// <summary>
+        /// Cloud Script version updated
+        /// </summary>
+        public int Version { get; set;}
+        /// <summary>
+        /// New revision number created
+        /// </summary>
+        public int Revision { get; set;}
+    }
 
 
 

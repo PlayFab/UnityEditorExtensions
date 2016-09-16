@@ -147,6 +147,9 @@ namespace PlayFab.Editor
                                 case PlayFabEditorMenu.MenuStates.Data:
                                     PlayFabEditorDataMenu.DrawDataPanel();
                                     break;
+                                case PlayFabEditorMenu.MenuStates.Tools:
+                                    PlayFabEditorToolsMenu.DrawToolsPanel();
+                                    break;
                                 default:
                                     break;
                             }
