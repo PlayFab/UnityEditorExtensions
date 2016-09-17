@@ -44,7 +44,7 @@ namespace PlayFab.Editor
                     GUILayout.EndHorizontal();
 
 
-                    if(File.Exists(PlayFabEditorDataService.envDetails.localCloudScriptPath) || File.Exists(PlayFabEditorHelper.CLOUDSCRIPT_PATH))
+                    if(File.Exists(PlayFabEditorDataService.envDetails.localCloudScriptPath))
                     {
                         var path = File.Exists(PlayFabEditorDataService.envDetails.localCloudScriptPath) ? PlayFabEditorDataService.envDetails.localCloudScriptPath : PlayFabEditorHelper.CLOUDSCRIPT_PATH;
                         var shortPath = "..." + path.Substring(path.LastIndexOf('/'));
