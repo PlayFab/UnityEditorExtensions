@@ -13,7 +13,7 @@ namespace PlayFab.Editor
     {
         #region EDITOR_STRINGS
         public static string EDEX_NAME = "PlayFab_EditorExtensions";
-        public static string EDEX_VERSION = "0.0.991";
+        public static string EDEX_VERSION = "0.0.992";
         public static string EDEX_ROOT =  Application.dataPath + "/PlayFabEditorExtensions/Editor";
         public static string DEV_API_ENDPOINT = "https://editor.playfabapi.com";
         public static string TITLE_ENDPOINT = ".playfabapi.com";
