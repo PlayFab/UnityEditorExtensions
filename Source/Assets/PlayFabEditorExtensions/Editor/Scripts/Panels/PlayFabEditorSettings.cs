@@ -33,9 +33,9 @@ namespace PlayFab.Editor
         private static string[] titleOptions;
         private static string[] studioOptions;
        
-        private static int _selectedTitleIdIndex = -1;
+        private static int _selectedTitleIdIndex = 0;
         private static int _selectedStudioIndex = -1;
-        private static int _prevSelectedTitleIdIndex = -1;
+        private static int _prevSelectedTitleIdIndex = 0;
         private static int _prevSelectedStudioIndex = -1;
 
         private static string _TitleId;
@@ -57,10 +57,13 @@ namespace PlayFab.Editor
        
 
         private static bool _isSettingsSet = false;
-        private static bool _foundUnknownTitleId = true;
+        private static bool _foundUnknownTitleId = false;
+        private static bool _isFetchingStudios = false;
 
         private static Dictionary<string, StudioDisplaySet > studioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
         private static Vector2 TitleScrollPos = Vector2.zero;
+        private static Vector2 PackagesScrollPos = Vector2.zero;
+        private static GUIStyle foldOutStyle;
         #endregion
 
         #region draw calls
@@ -106,6 +109,7 @@ namespace PlayFab.Editor
             var apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var titleSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            var packagesButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
 
             if (_subMenuState == SubMenuStates.StandardSettings)
             {
@@ -150,6 +154,10 @@ namespace PlayFab.Editor
                 OnApiSettingsClicked();
             }
 
+            if (GUILayout.Button("PACKAGES", packagesButtonStyle, GUILayout.MinWidth(70) ))
+            {
+                OnPackagesClicked();
+            }
 
             GUILayout.EndHorizontal();
 
@@ -164,6 +172,9 @@ namespace PlayFab.Editor
                  case SubMenuStates.TitleSettings:
                     DrawTitleSettingsSubPanel();
                     break;
+                 case SubMenuStates.Packages:
+                    DrawPackagesSubPanel();
+                    break;
             }
         }
 
@@ -171,8 +182,7 @@ namespace PlayFab.Editor
         public static void DrawTitleSettingsSubPanel()
         {
             float labelWidth = 100;
-
-            // this probably does not need to run every update.
+           
 
             if(PlayFabEditorDataService.accountDetails.studios.Count != studioFoldOutStates.Count)
             {
@@ -202,11 +212,7 @@ namespace PlayFab.Editor
                 GUILayout.FlexibleSpace();
                 if(GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                 {
-                    PlayFabEditorApi.GetStudios(new PlayFab.Editor.EditorModels.GetStudiosRequest(), (getStudioResult) =>
-                    {
-                        PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
-                        PlayFabEditorDataService.SaveAccountDetails();
-                    }, PlayFabEditorHelper.SharedErrorCallback);
+                    RefreshStudiosList();
                 }
             GUILayout.EndHorizontal(); 
 
@@ -219,24 +225,25 @@ namespace PlayFab.Editor
                     style.fontStyle = FontStyle.Normal;
                 }
 
-                studio.Value.isCollapsed = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), studio.Value.isCollapsed, string.Format("{0} ({1})", studio.Value.Studio.Name, studio.Value.Studio.Titles.Length), true, style);
+                studio.Value.isCollapsed = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), studio.Value.isCollapsed, string.Format("{0} ({1})", studio.Value.Studio.Name, studio.Value.Studio.Titles.Length), true, PlayFabEditorHelper.uiStyle.GetStyle("foldOut_std"));
 
                 if(!studio.Value.isCollapsed)
                 {
-                    EditorGUI.indentLevel = 1;
+                    EditorGUI.indentLevel = 2;
 
                     GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                         EditorGUILayout.LabelField("TITLES:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
                     GUILayout.EndHorizontal();
+                    GUILayout.Space(5);
 
                     // draw title foldouts
                     foreach(var title in studio.Value.titleFoldOutStates)
                     {
-                        title.Value.isCollapsed = EditorGUILayout.Foldout(title.Value.isCollapsed, string.Format("{0} [{1}]", title.Value.Title.Name, title.Value.Title.Id));
+                        title.Value.isCollapsed = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), title.Value.isCollapsed, string.Format("{0} [{1}]", title.Value.Title.Name, title.Value.Title.Id), true, PlayFabEditorHelper.uiStyle.GetStyle("foldOut_std"));
                        
                         if(! title.Value.isCollapsed)
                         {
-                            EditorGUI.indentLevel = 2;
+                            EditorGUI.indentLevel = 3;
                             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                                 EditorGUILayout.LabelField("SECRET KEY:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
                                 EditorGUILayout.TextField(""+title.Value.Title.SecretKey);
@@ -251,7 +258,7 @@ namespace PlayFab.Editor
                                 }
                                 GUILayout.FlexibleSpace();
                             GUILayout.EndHorizontal();  
-                            EditorGUI.indentLevel = 1;
+                            EditorGUI.indentLevel = 2;
                         }
                     }
 
@@ -293,15 +300,7 @@ namespace PlayFab.Editor
 
                     _selectedTitleIdIndex = _selectedTitleIdIndex > PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length ? 0 : _selectedTitleIdIndex; // reset our titles index
                   
-                    titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length];
-                    for(var z = 0; z < PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length; z++)
-                    {
-                        titleOptions[z] = PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].Id;
-
-                        #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                            _DeveloperSecretKey = PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].SecretKey;
-                        #endif
-                    }
+                    CompoundTitlesList();
 
                     _prevSelectedStudioIndex = _selectedStudioIndex;
                 }
@@ -418,6 +417,31 @@ namespace PlayFab.Editor
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
+        }
+
+
+        public static void DrawPackagesSubPanel()
+        {
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                    GUILayout.Label("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
+            GUILayout.EndHorizontal();
+
+            if(PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
+            {
+                float labelWidth = 245;
+                PackagesScrollPos = GUILayout.BeginScrollView(PackagesScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                    using (FixedWidthLabel fwl = new FixedWidthLabel("Push Notification Plugin (Android): "))
+                    {
+                        GUILayout.Space(labelWidth - fwl.fieldWidth);
+                        PlayFabEditorPackageManager.AndroidPushPlugin = EditorGUILayout.Toggle(PlayFabEditorPackageManager.AndroidPushPlugin, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"));
+
+                        if(GUILayout.Button("VIEW GUIDE", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+                        {
+                            Application.OpenURL("https://github.com/PlayFab/UnitySDK/tree/master/PluginsSource/UnityAndroidPluginSource");
+                        }
+                    }
+                GUILayout.EndScrollView();
+            }
         }
 
         #endregion
@@ -538,6 +562,16 @@ namespace PlayFab.Editor
         private static void BuildDropDownLists()
         {
             int studioCount = PlayFabEditorDataService.accountDetails.studios.Count;
+            if(studioCount == 0 && _isFetchingStudios == false)
+            {
+                RefreshStudiosList();
+                return;
+            }
+            else if (studioCount == 0)
+            {
+                return;
+            }
+
             studioOptions = new string[studioCount+1];
 
             for(var z = 0; z < studioCount+1; z++)
@@ -563,10 +597,13 @@ namespace PlayFab.Editor
                     if(foundTitle) 
                     {
                         // then we know this is the correct studio
-                        titleOptions[x] = PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id;
+                        titleOptions[x] = string.Format("[{0}] {1}", PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id, PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Name);
                     }
                     
-                    if(PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id == PlayFabEditorDataService.envDetails.selectedTitleId && foundTitle == false)
+                    string comp1 = PlayFabEditorDataService.accountDetails.studios[z-1].Titles[x].Id.ToLower();
+                    string comp2 = string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.selectedTitleId) ? "" : PlayFabEditorDataService.envDetails.selectedTitleId.ToLower(); 
+
+                    if(comp1 == comp2 && foundTitle == false)
                     {   
                         foundTitle = true;
                         titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[z-1].Titles.Length];
@@ -587,9 +624,37 @@ namespace PlayFab.Editor
                 }
 
             }
+
+            if((titleOptions == null || titleOptions.Length == 0) && _prevSelectedStudioIndex == -1 && PlayFabEditorDataService.accountDetails.studios.Count > 0)
+            {
+                // could not find our title, but lets build a list anyways 
+                titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[0].Titles.Length];
+                for(var x = 0; x < titleOptions.Length; x++)
+                {
+                    titleOptions[x] = string.Format("[{0}] {1}", PlayFabEditorDataService.accountDetails.studios[0].Titles[x].Id, PlayFabEditorDataService.accountDetails.studios[0].Titles[x].Name);
+                }
+                _selectedStudioIndex = 1;
+                _prevSelectedStudioIndex = 1;
+                _selectedTitleIdIndex = 0;
+                _prevSelectedTitleIdIndex = 0;
+            }
+            else if(PlayFabEditorDataService.accountDetails.studios.Count <= 0)
+            {
+                // this should not happen. But it seems to be happening...
+                _selectedStudioIndex = 0;
+                _prevSelectedStudioIndex = 0;
+                _selectedTitleIdIndex = 0;
+                _prevSelectedTitleIdIndex = 0;
+                _foundUnknownTitleId = true;
+            }
+                
         }
 
 
+        private static void OnPackagesClicked()
+        {
+            _subMenuState = SubMenuStates.Packages;
+        }
 
         private static void OnApiSettingsClicked()
         {
@@ -631,7 +696,7 @@ namespace PlayFab.Editor
                 else
                 {
                     // if we switched titles clear titledata 
-                    if(PlayFabEditorDataService.envDetails.selectedTitleId != titleOptions[_selectedTitleIdIndex])
+                    if(PlayFabEditorDataService.envDetails.selectedTitleId != GetSelectedTitleIdFromOptions())
                     {
                         PlayFabEditorDataService.envDetails.titleData.Clear();
                         if(PlayFabEditorDataMenu.tdViewer != null)
@@ -640,7 +705,7 @@ namespace PlayFab.Editor
                         }
                      }
 
-                    PlayFabEditorDataService.envDetails.selectedTitleId = titleOptions[_selectedTitleIdIndex];
+                    PlayFabEditorDataService.envDetails.selectedTitleId = GetSelectedTitleIdFromOptions();
                 }
 
 
@@ -658,6 +723,7 @@ namespace PlayFab.Editor
 
                 PlayFabEditorDataService.SaveEnvDetails();
 
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSuccess);
 
             }
             else
@@ -686,6 +752,41 @@ namespace PlayFab.Editor
             {
                 PlayFabEditor.EdExStateUpdate += StateUpdateHandler;
             }
+
+
+
+        }
+
+        private static string GetSelectedTitleIdFromOptions()
+        {
+            if(titleOptions != null &&  titleOptions.Length > 0)
+            {
+                return titleOptions[_selectedTitleIdIndex].Substring(1, titleOptions[_selectedTitleIdIndex].IndexOf(']') -1);
+            }
+
+            return string.Empty;
+        } 
+
+        private static void CompoundTitlesList()
+        {
+            titleOptions = new string[PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length];
+            for(var z = 0; z < PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles.Length; z++)
+            {
+                titleOptions[z] = string.Format("[{0}] {1}", PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].Id, PlayFabEditorDataService.accountDetails.studios[_selectedStudioIndex-1].Titles[z].Name);
+            }
+        }
+
+        public static void RefreshStudiosList()
+        {
+            _isFetchingStudios = true;
+            PlayFabEditorApi.GetStudios(new PlayFab.Editor.EditorModels.GetStudiosRequest(), (getStudioResult) =>
+            {
+                _isFetchingStudios = false;
+                _isSettingsSet = false;
+                studioOptions = null;
+                PlayFabEditorDataService.accountDetails.studios = getStudioResult.Studios.ToList();
+                PlayFabEditorDataService.SaveAccountDetails();
+            }, PlayFabEditorHelper.SharedErrorCallback);
         }
 
         /// <summary>

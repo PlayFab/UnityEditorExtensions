@@ -22,7 +22,11 @@ namespace PlayFab.Editor
         public static Dictionary<string, float> blockingRequests = new Dictionary<string, float>(); // key and blockingRequest start time
         private static float blockingRequestTimeOut = 10f; // abandon the block after this many seconds.
 
+        public static string latestEdExVersion = string.Empty;
+
         internal static PlayFabEditor window;
+
+        //private
  #endregion
 
 
@@ -41,6 +45,7 @@ namespace PlayFab.Editor
             }
 
             RaiseStateUpdate(EdExStates.OnEnable);
+            GetLatestEdExVersion();
         }
 
         void OnDisable()
@@ -106,11 +111,13 @@ namespace PlayFab.Editor
         {
             try
             {
+                GUI.skin = PlayFabEditorHelper.uiStyle;
+
                 GUILayout.BeginVertical();
 
                 //Run all updaters prior to drawing;  
                 PlayFabEditorSettings.Update();
-
+                PlayFabEditorPackageManager.Update();
                 PlayFabEditorHeader.DrawHeader();
 
 
@@ -130,8 +137,6 @@ namespace PlayFab.Editor
                                 case PlayFabEditorMenu.MenuStates.Sdks:
                                     PlayFabEditorSDKTools.DrawSdkPanel();
                                     break;
-                                case PlayFabEditorMenu.MenuStates.Services:
-                                    break;
                                 case PlayFabEditorMenu.MenuStates.Settings:
                                     PlayFabEditorSettings.DrawSettingsPanel();
                                     PlayFabEditorSettings.After();
@@ -141,6 +146,9 @@ namespace PlayFab.Editor
                                     break;
                                 case PlayFabEditorMenu.MenuStates.Data:
                                     PlayFabEditorDataMenu.DrawDataPanel();
+                                    break;
+                                case PlayFabEditorMenu.MenuStates.Tools:
+                                    PlayFabEditorToolsMenu.DrawToolsPanel();
                                     break;
                                 default:
                                     break;
@@ -173,6 +181,17 @@ namespace PlayFab.Editor
                         GUILayout.EndHorizontal();
 
                         //TODO Add plugin upgrade option here (if available);
+                        if(ShowEdExUpgrade())
+                        {
+                            GUILayout.BeginHorizontal();
+                                GUILayout.FlexibleSpace();
+                                if(GUILayout.Button("UPGRADE EDEX", PlayFabEditorHelper.uiStyle.GetStyle("textButtonOr") ))
+                                {
+                                   UpgradeEdEx();
+                                }
+                                GUILayout.FlexibleSpace();
+                            GUILayout.EndHorizontal();
+                        }
 
 
                         GUILayout.BeginHorizontal();
@@ -193,32 +212,13 @@ namespace PlayFab.Editor
                             GUILayout.FlexibleSpace();
                         GUILayout.EndHorizontal();
 
-                        if(!string.IsNullOrEmpty(PlayFabEditorHelper.EDITOR_ROOT))
+                        if(!string.IsNullOrEmpty(PlayFabEditorHelper.EDEX_ROOT))
                         {
                             GUILayout.BeginHorizontal();
                                 GUILayout.FlexibleSpace();
                                 if(GUILayout.Button("UNINSTALL ", PlayFabEditorHelper.uiStyle.GetStyle("textButton") ))
                                 {
-                                    if(EditorUtility.DisplayDialog("Confirm Editor Extensions Removal", "This action will remove PlayFab Editor Extensions from the current project.", "Confirm", "Cancel"))
-                                    {
-                                        try
-                                        {
-                                            PlayFabEditor.window.Close();
-                                            var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDITOR_ROOT);
-
-                                            FileUtil.DeleteFileOrDirectory(edExRoot.Parent.FullName);
-                                            PlayFabEditorDataService.RemoveEditorPrefs();
-
-
-                                            AssetDatabase.Refresh();
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            RaiseStateUpdate(EdExStates.OnError, ex.Message);
-                                            PlayFabServices();
-                                        }   
-                                    }
-           
+                                    RemoveEdEx();
                                 }
                                 GUILayout.FlexibleSpace();
                             GUILayout.EndHorizontal();
@@ -363,6 +363,11 @@ namespace PlayFab.Editor
                     ClearBlockingRequest();
                     Debug.LogWarning(string.Format("PlayFab EditorExtensions: {0}", status)); 
                 break;
+
+                case EdExStates.OnSuccess:
+                    ClearBlockingRequest();
+                    ProgressBar.UpdateState(ProgressBar.ProgressBarStates.success);
+                    break;
             }
         }
 
@@ -379,6 +384,106 @@ namespace PlayFab.Editor
                 }
             }
             return false;
+        }
+
+        private static void GetLatestEdExVersion()
+        {
+            //TODO start back here
+            DateTime threshold = PlayFabEditorDataService.editorSettings.lastEdExVersionCheck != DateTime.MinValue ? PlayFabEditorDataService.editorSettings.lastEdExVersionCheck.AddHours(1) : DateTime.MinValue;
+
+            if(DateTime.Today > threshold)
+            {
+                PlayFabEditorHttp.MakeGitHubApiCall("https://api.github.com/repos/PlayFab/UnityEditorExtensions/git/refs/tags", (version) => 
+                {
+                    latestEdExVersion = version ?? "Unknown";
+                    PlayFabEditorDataService.editorSettings.lastEdExVersionCheck = DateTime.UtcNow;
+                    PlayFabEditorDataService.editorSettings.latestEdExVersion = latestEdExVersion;
+                    PlayFabEditorDataService.SaveEditorSettings();
+                });
+            }
+            else
+            {
+                latestEdExVersion = PlayFabEditorDataService.editorSettings.latestEdExVersion;
+            }
+        }
+
+        private static bool ShowEdExUpgrade()
+        {
+            if(string.IsNullOrEmpty(latestEdExVersion) || latestEdExVersion == "Unknown")
+            {
+                return false;
+            }
+
+            if(string.IsNullOrEmpty(PlayFabEditorHelper.EDEX_VERSION) || PlayFabEditorHelper.EDEX_VERSION == "Unknown")
+            {
+                return true;
+            }
+
+           string[] currrent = PlayFabEditorHelper.EDEX_VERSION.Split('.');
+           string[] latest = latestEdExVersion.Split('.');
+
+           if(int.Parse(latest[0]) > int.Parse(currrent[0]))
+           {
+                return true;
+           }
+            else if(int.Parse(latest[1]) > int.Parse(currrent[1]))
+           {
+                return true;
+           }
+            else if(int.Parse(latest[2]) > int.Parse(currrent[2]))
+           {
+                return true;
+           }
+
+           return false;
+        }
+
+        public static void RemoveEdEx(bool clearPrefs = true, bool prompt = true)
+        {
+            if(prompt)
+            {
+                if(!EditorUtility.DisplayDialog("Confirm Editor Extensions Removal", "This action will remove PlayFab Editor Extensions from the current project.", "Confirm", "Cancel"))
+                {
+                    return;
+                }
+            }
+              
+            try
+            {
+                PlayFabEditor.window.Close();
+                var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDEX_ROOT);
+
+                FileUtil.DeleteFileOrDirectory(edExRoot.Parent.FullName);
+
+                if(clearPrefs)
+                {
+                    PlayFabEditorDataService.RemoveEditorPrefs();
+                }
+
+
+                AssetDatabase.Refresh();
+            }
+            catch (Exception ex)
+            {
+                RaiseStateUpdate(EdExStates.OnError, ex.Message);
+            }   
+        }
+
+        private static void UpgradeEdEx()
+        {
+            if( EditorUtility.DisplayDialog("Confirm EdEx Upgrade", "This action will remove the current PlayFab Editor Extensions and install the lastet version.", "Confirm", "Cancel"))
+            {
+                ImportLatestEdEx();
+            }
+        }
+
+        public static void ImportLatestEdEx()
+        {
+            PlayFabEditorHttp.MakeDownloadCall("https://api.playfab.com/sdks/download/unity-edex-upgrade", (fileName) => 
+            {
+                AssetDatabase.ImportPackage(fileName, false); 
+                Debug.Log("PlayFab EdEx Upgrade: Complete");
+            });
         }
 #endregion
     }

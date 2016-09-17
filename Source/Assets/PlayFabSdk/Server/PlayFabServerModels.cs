@@ -44,6 +44,24 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
+    public class AddPlayerTagRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Unique PlayFab assigned ID of the user on whom the operation will be performed.
+        /// </summary>
+        public string PlayFabId { get; set;}
+        /// <summary>
+        /// Unique tag for player profile.
+        /// </summary>
+        public string TagName { get; set;}
+    }
+
+    [Serializable]
+    public class AddPlayerTagResult : PlayFabResultCommon
+    {
+    }
+
+    [Serializable]
     public class AddSharedGroupMembersRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -287,6 +305,14 @@ namespace PlayFab.ServerModels
         /// URL to the item image. For Facebook purchase to display the image on the item purchase page, this must be set to an HTTP URL.
         /// </summary>
         public string ItemImageUrl { get; set;}
+        /// <summary>
+        /// BETA: If true, then only a fixed number can ever be granted.
+        /// </summary>
+        public bool IsLimitedEdition { get; set;}
+        /// <summary>
+        /// BETA: If IsLImitedEdition is true, then this determines amount of the item initially available. Note that this fieldis ignored if the catalog item already existed in this catalog, or the field is less than 1.
+        /// </summary>
+        public int InitialLimitedEditionCount { get; set;}
     }
 
     [Serializable]
@@ -731,6 +757,10 @@ namespace PlayFab.ServerModels
         /// </summary>
         public List<LogStatement> Logs { get; set;}
         public double ExecutionTimeSeconds { get; set;}
+        /// <summary>
+        /// Processor time consumed while executing the function. This does not include time spent waiting on API calls or HTTP requests.
+        /// </summary>
+        public double ProcessorTimeSeconds { get; set;}
         public uint MemoryConsumedBytes { get; set;}
         /// <summary>
         /// Number of PlayFab API requests issued by the CloudScript function
@@ -829,6 +859,33 @@ namespace PlayFab.ServerModels
     {
         Open,
         Closed
+    }
+
+    [Serializable]
+    public class GetActionGroupResult : PlayFabResultCommon
+    {
+        /// <summary>
+        /// Action Group name
+        /// </summary>
+        public string Name { get; set;}
+        /// <summary>
+        /// Action Group ID
+        /// </summary>
+        public string Id { get; set;}
+    }
+
+    [Serializable]
+    public class GetAllActionGroupsRequest : PlayFabRequestCommon
+    {
+    }
+
+    [Serializable]
+    public class GetAllActionGroupsResult : PlayFabResultCommon
+    {
+        /// <summary>
+        /// List of Action Groups.
+        /// </summary>
+        public List<GetActionGroupResult> ActionGroups { get; set;}
     }
 
     [Serializable]
@@ -1163,7 +1220,7 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
-    public class GetPlayerCombinedInfoRequestParams : PlayFabRequestCommon
+    public class GetPlayerCombinedInfoRequestParams
     {
         /// <summary>
         /// Whether to get the player's account Info. Defaults to false
@@ -1233,7 +1290,7 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
-    public class GetPlayerCombinedInfoResultPayload : PlayFabResultCommon
+    public class GetPlayerCombinedInfoResultPayload
     {
         /// <summary>
         /// Account information for the user. This is always retrieved.
@@ -1390,6 +1447,32 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
+    public class GetPlayerTagsRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Unique PlayFab assigned ID of the user on whom the operation will be performed.
+        /// </summary>
+        public string PlayFabId { get; set;}
+        /// <summary>
+        /// Optional namespace to filter results by
+        /// </summary>
+        public string Namespace { get; set;}
+    }
+
+    [Serializable]
+    public class GetPlayerTagsResult : PlayFabResultCommon
+    {
+        /// <summary>
+        /// Unique PlayFab assigned ID of the user on whom the operation will be performed.
+        /// </summary>
+        public string PlayFabId { get; set;}
+        /// <summary>
+        /// Canonical tags (including namespace and tag's name) for the requested user
+        /// </summary>
+        public List<string> Tags { get; set;}
+    }
+
+    [Serializable]
     public class GetPlayFabIDsFromFacebookIDsRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -1413,7 +1496,7 @@ namespace PlayFab.ServerModels
         /// <summary>
         /// Deprecated: Please use SteamStringIDs
         /// </summary>
-        [Obsolete("Use 'SteamStringIDs' instead", false)]
+        [Obsolete("Use 'SteamStringIDs' instead", true)]
         public List<ulong> SteamIDs { get; set;}
         /// <summary>
         /// Array of unique Steam identifiers (Steam profile IDs) for which the title needs to get PlayFab identifiers.
@@ -2298,7 +2381,11 @@ namespace PlayFab.ServerModels
         /// </summary>
         public Dictionary<string,int> Statistics { get; set;}
         /// <summary>
-        /// Dictionary of player's total currency purchases. The key VTD is a sum of all player_realmoney_purchase events OrderTotals.
+        /// A sum of player's total purchases in USD across all currencies.
+        /// </summary>
+        public uint? TotalValueToDateInUSD { get; set;}
+        /// <summary>
+        /// Dictionary of player's total purchases by currency.
         /// </summary>
         public Dictionary<string,uint> ValuesToDate { get; set;}
         /// <summary>
@@ -2397,7 +2484,7 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
-    public class RandomResultTableListing : PlayFabResultCommon
+    public class RandomResultTableListing
     {
         /// <summary>
         /// Catalog version this table is associated with
@@ -2470,6 +2557,24 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
+    public class RemovePlayerTagRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// Unique PlayFab assigned ID of the user on whom the operation will be performed.
+        /// </summary>
+        public string PlayFabId { get; set;}
+        /// <summary>
+        /// Unique tag for player profile.
+        /// </summary>
+        public string TagName { get; set;}
+    }
+
+    [Serializable]
+    public class RemovePlayerTagResult : PlayFabResultCommon
+    {
+    }
+
+    [Serializable]
     public class RemoveSharedGroupMembersRequest : PlayFabRequestCommon
     {
         /// <summary>
@@ -2522,7 +2627,7 @@ namespace PlayFab.ServerModels
     }
 
     [Serializable]
-    public class ResultTableNode : PlayFabResultCommon
+    public class ResultTableNode
     {
         /// <summary>
         /// Whether this entry in the table is an item or a link to another table
@@ -2787,7 +2892,7 @@ namespace PlayFab.ServerModels
         /// <summary>
         /// Deprecated: Please use SteamStringId
         /// </summary>
-        [Obsolete("Use 'SteamStringId' instead", false)]
+        [Obsolete("Use 'SteamStringId' instead", true)]
         public ulong SteamId { get; set;}
         /// <summary>
         /// Unique Steam identifier for a user.

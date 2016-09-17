@@ -160,6 +160,7 @@ namespace PlayFab.Editor
 
         }
 
+
         public static void LoadEditorSettings()
         {
             if(EditorPrefs.HasKey(keyPrefix+"PlayFab_EditorSettings"))
@@ -192,7 +193,6 @@ namespace PlayFab.Editor
             LoadEnvDetails();
             LoadEditorSettings();
 
-            //TODO make sure this should be called here...
             LoadFromScriptableObject();
 
             isDataLoaded = true;
@@ -209,12 +209,12 @@ namespace PlayFab.Editor
                     where type.Name == "PlayFabSettings"
                     select type);
 
-                if (playfabSettingsType.ToList().Count > 0)
+                if (playfabSettingsType.ToList().Count > 0 && PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
                 {
                     var type = playfabSettingsType.ToList().FirstOrDefault();
                     var props = type.GetProperties();
 
-                    envDetails.selectedTitleId = (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null) ?? envDetails.selectedTitleId;
+                    envDetails.selectedTitleId = string.IsNullOrEmpty((string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null)) ? envDetails.selectedTitleId : (string) props.ToList().Find(p => p.Name == "TitleId").GetValue(null, null);
                     envDetails.webRequestType = (PlayFabEditorSettings.WebRequestType)props.ToList().Find(p => p.Name == "RequestType").GetValue(null, null);
                     envDetails.timeOut = (int) props.ToList().Find(p => p.Name == "RequestTimeout").GetValue(null, null);
                     envDetails.keepAlive = (bool) props.ToList().Find(p => p.Name == "RequestKeepAlive").GetValue(null, null);
@@ -237,7 +237,7 @@ namespace PlayFab.Editor
                     from type in assembly.GetTypes()
                     where type.Name == "PlayFabSettings"
                     select type);
-                if (playfabSettingsType.ToList().Count > 0)
+                if (playfabSettingsType.ToList().Count > 0 && PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
                 {
                     var type = playfabSettingsType.ToList().FirstOrDefault();
                    // var fields = type.GetFields();

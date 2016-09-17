@@ -18,7 +18,7 @@ We will be adding to this platform as PlayFab's features grow.
 
 ##Setup:
   
-  1. Download [this Asset Package](/Packages/ "PlayFabEditorExtensions.unitypackage") and import into a new or existing project.
+  1. Download [this Asset Package](https://api.playfab.com/sdks/download/unity-edex "PlayFabEditorExtensions.unitypackage") and import into a new or existing project.
   2. Open the Editor Extensions via the Unity menu: **Window > PlayFab > Editor Extensions** 
   3. Log in using an existing PlayFab developer account (or create a new account) to continue.
   4. Editor Extensions will automatically detect if you have a PlayFab SDK installed. 
@@ -48,9 +48,6 @@ Now that Admin & Server APIs and Models are all included in one single SDK, we r
  
  ![EditorExtensions_Override](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_Override.png "Select _OVERRIDE_ to manually input your Title Id")
  
- 
-#####A word of caution:
-You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
 
 ## Troubleshooting and Support:
 This project is designed to work with Unity 5.4+. Using this plugin on earlier versions should work; however, If you choose to remove Editor Extensions make sure to close the Inspector window prior to deleting the files. 
@@ -61,6 +58,10 @@ Did you find an issue or is Editor Extensions giving you a bad experience?
 
 ###Version History:
 See [GitHub Releases](https://github.com/PlayFab/UnityEditorExtensions/releases "GitHub Versions") for the latest stable build and patch notes.  
+
+Editor Extension details can be found under the **HELP** tab. Here you will find useful links for learning more about PlayFab, troubleshooting as well as EdEx **UPGRADE** and **UNINSTALL** options.
+
+ ![EditorExtensions_About](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_About.png "EdEx Details can be found under the Help Tab")
 
 ### Ongoing Development:
 Editor Extensions is our attempt to make a first class PlayFab development experience within the Unity Editor. We consider this project a sandbox and are always open to feedback from our community developers. 
@@ -82,7 +83,10 @@ Let us know what we are missing and we will do our best to accommodate.
     * This typically is caused when the PlayFabEditorExtensions directory has been renamed.
   2. Plugins and other packages must be installed / removed / upgraded separately 
   3. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
-    *  This can be manually set via under  **Build Settings > Player Settings**. More information can be found [here](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
+    *  This can be manually set via under  **Build Settings > Player Settings**. [More Information](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
+
+#####A word of caution:
+You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
 
 A complete list of issues can be found [here](https://github.com/PlayFab/UnityEditorExtensions/issues)
    

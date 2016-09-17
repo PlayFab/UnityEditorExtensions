@@ -4,6 +4,7 @@
     using UnityEngine;
     using UnityEditor;
     using System.Collections.Generic;
+    using EditorModels;
 
     public class TitleDataViewer : Editor {
         public List<KvpItem> items;
@@ -15,8 +16,12 @@
         // this gets called after the Base draw loop
         public void Draw()
         {
+            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                GUILayout.Label("TitleData provides Key-Value storage available to all API sets. TitleData is designed to store game-wide configuration data.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
+            GUILayout.EndHorizontal();
+
             EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField(this.displayTitle);
+                GUILayout.FlexibleSpace();
                 if(GUILayout.Button("REFRESH",  PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                 {
                      RefreshRecords();
@@ -29,7 +34,6 @@
                 }
 
             EditorGUILayout.EndHorizontal();
-
 
             if(items.Count > 0)
             {
@@ -66,12 +70,12 @@
                             EditorGUILayout.LabelField(":", GUILayout.MaxWidth(10));
                             GUILayout.Label(""+items[z].Value, valStyle, GUILayout.MaxWidth(valueInputBoxWidth), GUILayout.MaxHeight(25));  
 
-                        if(GUILayout.Button("E",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MaxWidth(20)))
+                        if(GUILayout.Button("Edit",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(35)))
                             {
                                 tdEditor.LoadData(items[z].Key, items[z].Value);
                                 TitleDataEditor.ShowWindow(tdEditor);
                             } 
-                        if(GUILayout.Button("X",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MaxWidth(20)))
+                        if(GUILayout.Button("X",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(20)))
                             {
                                 items[z].isDirty = true;
                                 items[z].Value = null;
@@ -179,45 +183,6 @@
     }
 
 
-    public class KvpItem
-    {
-        public string Key;
-        public string Value;
-
-        public string _prvKey;
-        public string _prvValue;
-
-        public bool isDirty;
-
-        public KvpItem(string k, string v)
-        {
-            this.Key = k;
-            this.Value = v;
-
-            this._prvKey = k;
-            this._prvValue = v;
-        }
-
-        public void CleanItem()
-        {
-            _prvKey = Key;
-            _prvValue = Value;
-            isDirty = false;
-        }
-
-        public void DataEditedCheck()
-        {
-            if(Key != _prvKey || Value != _prvValue)
-            {
-                this.isDirty = true;
-            }
-            else
-            {
-               
-            }
-        }
-
-
-    }
+  
 }
 

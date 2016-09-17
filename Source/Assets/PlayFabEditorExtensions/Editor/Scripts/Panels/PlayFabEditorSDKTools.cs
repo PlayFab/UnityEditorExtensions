@@ -15,6 +15,8 @@ namespace PlayFab.Editor
         private static string installedSdkVersion = string.Empty;
         private static string latestSdkVersion = string.Empty;
 
+
+
         public static UnityEngine.Object sdkFolder;
         private static UnityEngine.Object _previoussSdkFolderPath;
         private static bool isObjectFieldActive;
@@ -231,9 +233,9 @@ namespace PlayFab.Editor
 
         public static void ImportLatestSDK()
         {
-            PlayFabEditorHttp.MakeDownloadCall("https://github.com/PlayFab/UnitySDK/raw/versioned/Packages/UnitySDK.unitypackage", (fileName) => 
+            PlayFabEditorHttp.MakeDownloadCall("https://api.playfab.com/sdks/download/unity-via-edex", (fileName) => 
             {
-                Debug.Log("PlayFab SDK Complete");
+                Debug.Log("PlayFab SDK Install: Complete");
                 AssetDatabase.ImportPackage(fileName, false); 
 
                 PlayFabEditorDataService.envDetails.sdkPath = PlayFabEditorHelper.DEFAULT_SDK_LOCATION;
@@ -462,12 +464,22 @@ namespace PlayFab.Editor
 
         private static void GetLatestSdkVersion()
         {
-            if(string.IsNullOrEmpty(latestSdkVersion))
+            //TODO start back here
+            DateTime threshold = PlayFabEditorDataService.editorSettings.lastSdkVersionCheck != DateTime.MinValue ? PlayFabEditorDataService.editorSettings.lastSdkVersionCheck.AddHours(1) : DateTime.MinValue;
+
+            if(DateTime.Today > threshold)
             {
                 PlayFabEditorHttp.MakeGitHubApiCall("https://api.github.com/repos/PlayFab/UnitySDK/git/refs/tags", (version) => 
                 {
                     latestSdkVersion = version ?? "Unknown";
+                    PlayFabEditorDataService.editorSettings.lastSdkVersionCheck = DateTime.UtcNow;
+                    PlayFabEditorDataService.editorSettings.latestSdkVersion = latestSdkVersion;
+                    PlayFabEditorDataService.SaveEditorSettings();
                 });
+            }
+            else
+            {
+                latestSdkVersion = PlayFabEditorDataService.editorSettings.latestSdkVersion;
             }
         }
 
