@@ -96,6 +96,13 @@ namespace PlayFab.Editor
             var apiEndpoint = String.Format("https://{0}{1}", titleId, PlayFabEditorHelper.TITLE_ENDPOINT);
             PlayFabEditorHttp.MakeApiCall<UpdateCloudScriptRequest, UpdateCloudScriptResult>("/Admin/UpdateCloudScript", apiEndpoint, request, resultCb, errorCb);
         }
+
+        public static void GetCloudScriptRevision(GetCloudScriptRevisionRequest request, Action<GetCloudScriptRevisionResult> resultCb, Action<EditorModels.PlayFabError> errorCb)
+        {
+            var titleId = PlayFabEditorDataService.envDetails.selectedTitleId;
+            var apiEndpoint = String.Format("https://{0}{1}", titleId, PlayFabEditorHelper.TITLE_ENDPOINT);
+            PlayFabEditorHttp.MakeApiCall<GetCloudScriptRevisionRequest, GetCloudScriptRevisionResult>("/Admin/GetCloudScriptRevision", apiEndpoint, request, resultCb, errorCb);
+        }
 #endregion
     }
 }

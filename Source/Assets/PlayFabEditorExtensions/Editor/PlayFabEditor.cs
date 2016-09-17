@@ -212,7 +212,7 @@ namespace PlayFab.Editor
                             GUILayout.FlexibleSpace();
                         GUILayout.EndHorizontal();
 
-                        if(!string.IsNullOrEmpty(PlayFabEditorHelper.EDITOR_ROOT))
+                        if(!string.IsNullOrEmpty(PlayFabEditorHelper.EDEX_ROOT))
                         {
                             GUILayout.BeginHorizontal();
                                 GUILayout.FlexibleSpace();
@@ -451,7 +451,7 @@ namespace PlayFab.Editor
             try
             {
                 PlayFabEditor.window.Close();
-                var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDITOR_ROOT);
+                var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDEX_ROOT);
 
                 FileUtil.DeleteFileOrDirectory(edExRoot.Parent.FullName);
 
@@ -479,7 +479,7 @@ namespace PlayFab.Editor
 
         public static void ImportLatestEdEx()
         {
-            PlayFabEditorHttp.MakeDownloadCall("https://api.playfab.com/sdks/download/unity-edex", (fileName) => 
+            PlayFabEditorHttp.MakeDownloadCall("https://api.playfab.com/sdks/download/unity-edex-upgrade", (fileName) => 
             {
                 AssetDatabase.ImportPackage(fileName, false); 
                 Debug.Log("PlayFab EdEx Upgrade: Complete");

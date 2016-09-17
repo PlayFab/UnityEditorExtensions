@@ -187,7 +187,41 @@ namespace PlayFab.Editor.EditorModels
         public int Revision { get; set;}
     }
 
+    public class GetCloudScriptRevisionRequest
+    {
+        /// <summary>
+        /// Version number. If left null, defaults to the latest version
+        /// </summary>
+        public int? Version { get; set;}
+        /// <summary>
+        /// Revision number. If left null, defaults to the latest revision
+        /// </summary>
+        public int? Revision { get; set;}
+    }
 
+    public class GetCloudScriptRevisionResult
+    {
+        /// <summary>
+        /// Version number.
+        /// </summary>
+        public int Version { get; set;}
+        /// <summary>
+        /// Revision number.
+        /// </summary>
+        public int Revision { get; set;}
+        /// <summary>
+        /// Time this revision was created
+        /// </summary>
+        public System.DateTime CreatedAt { get; set;}
+        /// <summary>
+        /// List of Cloud Script files in this revision.
+        /// </summary>
+        public List<CloudScriptFile> Files { get; set;}
+        /// <summary>
+        /// True if this is the currently published revision
+        /// </summary>
+        public bool IsPublished { get; set;}
+    }
 
 
     public class PlayFabError
@@ -483,6 +517,7 @@ namespace PlayFab.Editor.EditorModels
         public Dictionary<string, string> installedPackages { get; set; } //TODO store a package manifest here (used to uninstall a specific package)
         public string sdkPath { get; set; }
         public string edexPath { get; set; }
+        public string localCloudScriptPath { get; set; }
 
         public PlayFabEditorSettings.WebRequestType webRequestType { get; set; }
         public bool compressApiData { get; set; }
@@ -505,7 +540,6 @@ namespace PlayFab.Editor.EditorModels
        public string latestEdExVersion { get; set; }
        public System.DateTime lastSdkVersionCheck { get; set; }
        public System.DateTime lastEdExVersionCheck { get; set; }
-      
     }
 
     public class StudioDisplaySet

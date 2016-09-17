@@ -118,7 +118,7 @@
                         }
                     }
 
-                    if( EditorUtility.DisplayDialog("Confirm Removal of Android Libraries", "These libraries are used by the PlayFab Plugin; however, they may also be shared among other unrelated plugins. Discretion Advised!", "Confirm", "Cancel"))
+                if( EditorUtility.DisplayDialog("Confirm Removal of Android Libraries", "Do you also want to remove the Android .aar libraries are used by the PlayFab Plugin? Discretion is advised, these files may also be shared among other unrelated plugins. ", "Yes", "No"))
                     {
                         List<string> optionalFilesToRemove = new List<string>(){
                             "appcompat-v7*.aar",
@@ -152,7 +152,7 @@
                         }
                     }
 
-                    if( EditorUtility.DisplayDialog("Confirm Removal of AndroidManifest.xml", "Removing this file could impact your Android build. Discretion Advised!", "Confirm", "Cancel"))
+                    if( EditorUtility.DisplayDialog("Confirm Removal of AndroidManifest.xml", "Do you want to also remove AndroidManifest.xml? Discretion is advised, as this may impact the performance of your Android builds.", "Yes", "No"))
                     {
                         FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Plugins/Android/AndroidManifest.xml");
                     }    
@@ -167,6 +167,7 @@
                 }
             }
 
+            //only scans for >5.0 plugins
             static void ScanForInstalledPackages()
             {
                 //TODO will need to update once whe have more than 1 package.

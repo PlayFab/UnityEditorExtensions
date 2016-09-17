@@ -109,6 +109,7 @@ namespace PlayFab.Editor
             var apiSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var standardSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var titleSettingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
+            var packagesButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
 
             if (_subMenuState == SubMenuStates.StandardSettings)
             {
@@ -153,7 +154,7 @@ namespace PlayFab.Editor
                 OnApiSettingsClicked();
             }
 
-            if (GUILayout.Button("PACKAGES", apiSettingsButtonStyle, GUILayout.MinWidth(70) ))
+            if (GUILayout.Button("PACKAGES", packagesButtonStyle, GUILayout.MinWidth(70) ))
             {
                 OnPackagesClicked();
             }
@@ -434,9 +435,9 @@ namespace PlayFab.Editor
                         GUILayout.Space(labelWidth - fwl.fieldWidth);
                         PlayFabEditorPackageManager.AndroidPushPlugin = EditorGUILayout.Toggle(PlayFabEditorPackageManager.AndroidPushPlugin, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"));
 
-                        if(GUILayout.Button("VIEW HELP", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+                        if(GUILayout.Button("VIEW GUIDE", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                         {
-                           
+                            Application.OpenURL("https://github.com/PlayFab/UnitySDK/tree/master/PluginsSource/UnityAndroidPluginSource");
                         }
                     }
                 GUILayout.EndScrollView();
