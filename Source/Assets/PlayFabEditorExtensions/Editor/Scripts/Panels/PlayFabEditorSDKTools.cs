@@ -162,7 +162,7 @@ namespace PlayFab.Editor
                     GUILayout.EndVertical();
                   }
                
-                if(string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.selectedTitleId))
+                if(isSdkSupported && string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.selectedTitleId))
                 {
                     GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
                         GUILayout.Label("Before making PlayFab API calls, the SDK must be configured to your PlayFab Title.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
@@ -188,9 +188,6 @@ namespace PlayFab.Editor
 
                     GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
-
-
-               
 
             }
             else
