@@ -473,6 +473,7 @@ namespace PlayFab.Editor
         {
             if( EditorUtility.DisplayDialog("Confirm EdEx Upgrade", "This action will remove the current PlayFab Editor Extensions and install the lastet version.", "Confirm", "Cancel"))
             {
+                PlayFabEditor.window.Close();
                 ImportLatestEdEx();
             }
         }
