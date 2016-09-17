@@ -106,8 +106,7 @@ namespace PlayFab.Editor
 
                 if(sdkFolder != null)
                 {
-
-                  
+               
                     //TODO START BACK HERE...
 
                     GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
@@ -130,7 +129,6 @@ namespace PlayFab.Editor
                             }
                             GUILayout.FlexibleSpace();
                             GUILayout.EndHorizontal();
-                            return;
                         }
                         else if(numerical >= 2)
                         {
