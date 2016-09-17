@@ -40,7 +40,7 @@
 
             EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
             GUILayout.FlexibleSpace();
-            if(GUILayout.Button("Save",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(200)))
+            if(GUILayout.Button("SAVE",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(200)))
                 {
                     for(int z = 0; z < PlayFabEditorDataMenu.tdViewer.items.Count; z++)
                     {

@@ -67,7 +67,7 @@ namespace PlayFab.Editor {
                             EditorGUILayout.LabelField(":", GUILayout.MaxWidth(10));
                             GUILayout.Label(""+items[z].Value, valStyle, GUILayout.MaxWidth(valueInputBoxWidth), GUILayout.MaxHeight(25));  
 
-                        if(GUILayout.Button("Edit",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(35)))
+                        if(GUILayout.Button("EDIT",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(35)))
                             {
                                 tdEditor.LoadData(items[z].Key, items[z].Value);
                                 TitleInternalDataEditor.ShowWindow(tdEditor);

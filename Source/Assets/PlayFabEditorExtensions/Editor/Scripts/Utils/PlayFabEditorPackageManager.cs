@@ -171,15 +171,21 @@
             static void ScanForInstalledPackages()
             {
                 //TODO will need to update once whe have more than 1 package.
-
-                DirectoryInfo pluginDir = new DirectoryInfo(Application.dataPath + "/Plugins/Android/");
-                var files = pluginDir.GetFiles("PlayFabUnityAndroid.aar", SearchOption.TopDirectoryOnly);
-                if(files.Length > 0)
+                try
                 {
-                    AndroidPushPlugin = true;
-                    _androidPushPluginPreviousState = true;
-                }
-                   
+                    DirectoryInfo pluginDir = new DirectoryInfo(Application.dataPath + "/Plugins/Android/");
+                    var files = pluginDir.GetFiles("PlayFabUnityAndroid.aar", SearchOption.TopDirectoryOnly);
+                    if(files.Length > 0)
+                    {
+                        AndroidPushPlugin = true;
+                        _androidPushPluginPreviousState = true;
+                    }
+               }
+               catch
+               {
+                    AndroidPushPlugin = false;
+                    _androidPushPluginPreviousState = false;
+               }
             }
         #endregion
 
