@@ -209,7 +209,7 @@ namespace PlayFab.Editor
                     where type.Name == "PlayFabSettings"
                     select type);
 
-                if (playfabSettingsType.ToList().Count > 0)
+                if (playfabSettingsType.ToList().Count > 0 && PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
                 {
                     var type = playfabSettingsType.ToList().FirstOrDefault();
                     var props = type.GetProperties();
@@ -237,7 +237,7 @@ namespace PlayFab.Editor
                     from type in assembly.GetTypes()
                     where type.Name == "PlayFabSettings"
                     select type);
-                if (playfabSettingsType.ToList().Count > 0)
+                if (playfabSettingsType.ToList().Count > 0 && PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
                 {
                     var type = playfabSettingsType.ToList().FirstOrDefault();
                    // var fields = type.GetFields();

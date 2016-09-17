@@ -28,15 +28,19 @@ namespace PlayFab.Editor
                 var fileName = string.Empty;
                 if(url.IndexOf("unity-edex") > -1)
                 {
-                    fileName = PlayFabEditorHelper.EDEX_DOWNLOAD_PATH;
+                    fileName = PlayFabEditorHelper.EDEX_UPGRADE_PATH;
                 }
                 else if(url.IndexOf("unity-via-edex") > -1)
                 {
                     fileName = PlayFabEditorHelper.SDK_DOWNLOAD_PATH;
                 }
+                else
+                {
+                    fileName = PlayFabEditorHelper.EDEX_PACKAGES_PATH;
+                }
 
 
-                string fileSaveLocation = string.Format(PlayFabEditorHelper.EDITOR_ROOT + fileName);
+                string fileSaveLocation = string.Format(PlayFabEditorHelper.EDEX_ROOT + fileName);
                 System.IO.File.WriteAllBytes(fileSaveLocation, response);
                 resultCallback(fileSaveLocation);
 
