@@ -137,7 +137,7 @@ namespace PlayFab.Editor
 
                         GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
 
-                        if(ShowSDKUpgrade())
+                        if(ShowSDKUpgrade() && isSdkSupported)
                         {
                             GUILayout.FlexibleSpace();
                             if (GUILayout.Button("Upgrade to " + latestSdkVersion, PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32)))
