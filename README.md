@@ -26,14 +26,14 @@ We will be adding to this platform as PlayFab's features grow.
     * If you have an older SDK, we recommend reading [this upgrade guide](https://github.com/PlayFab/UnitySDK/blob/master/UPGRADE.md) prior to upgrading.
     * If no SDK was detected, this plugin can download and install the latest SDK version from gitHub.
   5. After a supported SDK is installed, you will need to select a studio and title id.
-  6. After a studio and title id are selected, you may now call APIs and use the Editor Extensions to configure the SDK settings from within the IDE.   
+  6. After a studio and title ID are selected, you can call APIs and use the Editor Extensions to configure the SDK settings from within the IDE.   
 
 ![EditorExtensions_SKDs](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_SDKs.png "View the current SDK and upgrade to the latest SDK.")
 
 ## How it works:
 PlayFab Editor Extensions is a stand-alone Unity plug-in that streamlines getting started with PlayFab.  All of the Editor Extensions code lives in editor folders within your Unity Project. This prevents any of the editor code from being compiled into the game build. 
 
-When a supported SDK is installed, additional service menus are available. These menus provide access to SDK configurations. These configurations settings are saved in a combination of places to ensure that the data persists throughout Unity compilations and deployments. 
+When a supported SDK is installed, additional service menus are available. These menus provide access to SDK configurations. These configuration settings are saved in a combination of places to ensure that the data persists throughout Unity compilations and deployments. 
  
 Now that Admin & Server APIs and Models are all included in one single SDK, we require *#IFDEF*'s to [selectively ignore sets](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html "Unity Scripting Define Symbols") that are not needed. In doing so, we also include and omit the **DeveloperSecretKey** to match the selected settings.  As always, never publish your developer secret key in any client facing code.
 
@@ -41,8 +41,8 @@ Now that Admin & Server APIs and Models are all included in one single SDK, we r
   * Editor HTTP Service & Coroutine Manager
   * Isolated API set (independent from the PlayFab SDK)
   * Configured to fetch our [latest SDK](https://github.com/PlayFab/UnitySDK/blob/versioned/Packages/UnitySDK.unitypackage "GitHub Versioned Repo")
-  * Saves Account and Environment settings via Unity's [EditorPrefs](https://docs.unity3d.com/ScriptReference/EditorPrefs.html "Unity3d Docs") and [ScripableObjects](https://docs.unity3d.com/ScriptReference/ScriptableObject.html "Unity3d Docs")
-  * Saves configuration data to the SDK via reflecting on the installed assemblies. 
+  * Saves Account and Environment settings via Unity's [EditorPrefs](https://docs.unity3d.com/ScriptReference/EditorPrefs.html "Unity3d Docs") and [ScriptableObjects](https://docs.unity3d.com/ScriptReference/ScriptableObject.html "Unity3d Docs")
+  * Saves configuration data to the SDK via reflection on the installed assemblies. 
   * Setting the *STUDIO* to **_OVERRIDE_** will blank the *TITLE ID* and *DEVELOPER SECRET KEY* for manual input. Use this option when you need to connect to a studio to which you do not belong. Generally speaking, it is a good practice to only connect to titles to which you are a member; however, this mode can be useful when getting familiar with PlayFab. 
  
  
@@ -81,7 +81,7 @@ Let us know what we are missing and we will do our best to accommodate.
 
   1. The EditorExtensions Tab is open and nothing is being drawn. 
     * This typically is caused when the PlayFabEditorExtensions directory has been renamed.
-  2. Plugins and other packages must be installed / removed / upgraded separately 
+  2. Legacy plugins and other packages must be installed / removed / upgraded separately 
   3. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
     *  This can be manually set via under  **Build Settings > Player Settings**. [More Information](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
 
