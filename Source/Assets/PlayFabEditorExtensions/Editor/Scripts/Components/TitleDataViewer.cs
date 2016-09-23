@@ -72,8 +72,15 @@
 
                         if(GUILayout.Button("EDIT",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(35)))
                             {
+                                if(tdEditor == null)
+                                {
+                                    tdEditor = EditorWindow.GetWindow<TitleDataEditor>();
+                                    tdEditor.titleContent = new GUIContent("Title Data");
+                                    tdEditor.minSize = new Vector2(300,400);
+                                }
+
                                 tdEditor.LoadData(items[z].Key, items[z].Value);
-                                TitleDataEditor.ShowWindow(tdEditor);
+                                tdEditor.Show();
                             } 
                         if(GUILayout.Button("X",  PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(20)))
                             {
@@ -172,14 +179,10 @@
             this.items = new List<KvpItem>();
         }
 
-        public void OnEnable()
+        public void OnDestroy()
         {
-            if(tdEditor == null)
-            {
-                tdEditor = ScriptableObject.CreateInstance<TitleDataEditor>();
-            }
+            tdEditor = null;
         }
-
     }
 
 
