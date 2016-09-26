@@ -13,7 +13,7 @@ namespace PlayFab.Editor
     {
         #region EDITOR_STRINGS
         public static string EDEX_NAME = "PlayFab_EditorExtensions";
-        public static string EDEX_VERSION = "0.0.993";
+        public static string EDEX_VERSION = "0.0.994";
         public static string EDEX_ROOT =  Application.dataPath + "/PlayFabEditorExtensions/Editor";
         public static string DEV_API_ENDPOINT = "https://editor.playfabapi.com";
         public static string TITLE_ENDPOINT = ".playfabapi.com";
@@ -40,8 +40,6 @@ namespace PlayFab.Editor
 
         public static string EDPREF_INSTALLED = "NewlyInstalled";
 
-        //public static string MSG_SPIN = "{\"useSpinner\":true}";
-        //public static string MSG_BLOCK = "{\"blockUi\":true }";
         #endregion
             
         public static GUISkin uiStyle = GetUiStyle();
