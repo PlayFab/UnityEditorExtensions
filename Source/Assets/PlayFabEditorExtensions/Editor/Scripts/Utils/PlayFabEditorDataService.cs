@@ -163,21 +163,24 @@ namespace PlayFab.Editor
 
         public static void LoadEditorSettings()
         {
-            if(EditorPrefs.HasKey(keyPrefix+"PlayFab_EditorSettings"))
+            if (EditorPrefs.HasKey(keyPrefix + "PlayFab_EditorSettings"))
             {
-                var serialized = EditorPrefs.GetString(keyPrefix+"PlayFab_EditorSettings");
+                var serialized = EditorPrefs.GetString(keyPrefix + "PlayFab_EditorSettings");
                 try
                 {
                     editorSettings = Json.JsonWrapper.DeserializeObject<PlayFab_EditorSettings>(serialized);
                     LoadFromScriptableObject();
                     return;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
                 }
             }
-            editorSettings = new PlayFab_EditorSettings();
+            else
+            {
+                editorSettings = new PlayFab_EditorSettings();
+            }
         }
 
         public static void SaveAllData()
@@ -227,8 +230,6 @@ namespace PlayFab.Editor
                         // do nothing, this cathes issues in really old sdks; clearly there is something wrong here.
                         PlayFabEditorSDKTools.isSdkSupported = false;
                     }
-
-
 
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
                     envDetails.developerSecretKey = (string) props.ToList().Find(p => p.Name == "DeveloperSecretKey").GetValue(null, null) ?? envDetails.developerSecretKey;
@@ -316,7 +317,6 @@ namespace PlayFab.Editor
             return false;
         }
 
-
         public static bool DoesTitleExistInStudios(string searchFor, out int studioIndex, out int titleIndex) //out Studio studio
         {
             for(int z = 0; z < PlayFabEditorDataService.accountDetails.studios.Count; z++)
@@ -337,8 +337,6 @@ namespace PlayFab.Editor
             return false;
 
         }
-
-
 
         //CTOR
         static PlayFabEditorDataService()

@@ -318,12 +318,13 @@ namespace PlayFab.Editor
             switch(state)
             {
                 case EdExStates.OnMenuItemClicked:
-                    //Debug.Log(string.Format("MenuItem: {0} Clicked", status));
+                    //Debug.Log(string.Format("State: {0} - MenuItem: {1} Clicked", state, status));
                     PlayFabEditorDataService.editorSettings.currentSubMenu = 0;
                     PlayFabEditorDataService.SaveEditorSettings();
                 break;
 
                 case EdExStates.OnSubmenuItemClicked:
+                    //Debug.Log(string.Format("State: {0} - SubMenuItem: {1} Clicked", state, status));
                     int parsed;
                     if(Int32.TryParse(json, out parsed))
                     {

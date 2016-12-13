@@ -1,8 +1,12 @@
-﻿namespace PlayFab.Editor
+﻿using System.Linq;
+using NUnit.Framework.Constraints;
+
+namespace PlayFab.Editor
 {
     using System;
     using UnityEngine;
     using UnityEditor;
+    using System.Collections;
     using System.Collections.Generic;
     using EditorModels;
 
@@ -157,6 +161,14 @@
 
             if(dirtyItems.Count > 0)
             {
+                float nextSeconds = 1f;
+                foreach (var di in dirtyItems)
+                {
+                    EditorCoroutine.start( SaveItem(di, nextSeconds) );
+                    nextSeconds += 1f;
+                }
+
+                /*
                 PlayFabEditorApi.SetTitleData(dirtyItems, (result) => 
                 {
                     foreach(var item in items)
@@ -164,10 +176,28 @@
                         item.CleanItem();
                     }
                 }, PlayFabEditorHelper.SharedErrorCallback);
+                */
+
+                foreach (var item in items)
+                {
+                    item.CleanItem();
+                }
+
             } 
         }
 
 
+
+        private IEnumerator SaveItem(KeyValuePair<string,string> dirtyItem, float seconds)
+        {
+            yield return new EditorCoroutine.EditorWaitForSeconds(seconds); 
+            //Debug.LogFormat("{0} - Co-Start: {1}", dirtyItem.Key, seconds);
+            var itemToUpdateDic = new Dictionary<string, string> { { dirtyItem.Key, dirtyItem.Value } };
+            PlayFabEditorApi.SetTitleData(itemToUpdateDic, (result) =>
+            {
+                //Do Nothing with the result.
+            }, PlayFabEditorHelper.SharedErrorCallback);
+        }
 
         public TitleDataViewer(List<KvpItem> i = null)
         {
