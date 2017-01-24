@@ -1,12 +1,11 @@
-﻿namespace PlayFab.Editor
-{
-    using System;
-    using System.IO;
-    using UnityEngine;
-    using UnityEditor;
-    using System.Collections.Generic;
-    using EditorModels;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
 
+namespace PlayFab.PfEditor
+{
     [InitializeOnLoad]
     public class PlayFabEditorPackageManager : Editor {
         //TODO change these vars after we disucss how to organize these moving forward.
