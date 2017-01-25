@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace PlayFab.PfEditor
 {
-    public class PlayFabEditorHeader : Editor
+    public class PlayFabEditorHeader : UnityEditor.Editor
     {
         public static void DrawHeader(float progress = 0f)
         {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
-    public class TitleInternalDataEditor : EditorWindow
+    public class TitleInternalDataEditor : UnityEditor.EditorWindow
     {
         public string key = string.Empty;
         public string Value = string.Empty;

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayFab.PfEditor
 {
     //[InitializeOnLoad]
-    public class SubMenuComponent : Editor
+    public class SubMenuComponent : UnityEditor.Editor
     {
 
         Dictionary<string, MenuItemContainer> items = new Dictionary<string, MenuItemContainer>();

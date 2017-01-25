@@ -7,7 +7,7 @@ using UnityEngine;
 namespace PlayFab.PfEditor
 {
     [InitializeOnLoad]
-    public class PlayFabEditorDataService : Editor
+    public class PlayFabEditorDataService : UnityEditor.Editor
     {
         public static PlayFab_DeveloperAccountDetails accountDetails;
         public static PlayFab_DeveloperEnvironmentDetails envDetails;

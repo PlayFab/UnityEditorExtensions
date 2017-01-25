@@ -6,7 +6,7 @@ using UnityEngine;
 namespace PlayFab.PfEditor
 {
     [InitializeOnLoad]
-    public class PlayFabEditorSettings : Editor
+    public class PlayFabEditorSettings : UnityEditor.Editor
     {
         #region panel variables
         public enum SubMenuStates

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
-    public class PlayFabEditor : EditorWindow
+    public class PlayFabEditor : UnityEditor.EditorWindow
     {
         #region EdEx Variables
         // vars for the plugin-wide event system

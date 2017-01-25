@@ -15,7 +15,7 @@ using UnityEngine.Networking;
 
 namespace PlayFab.PfEditor
 {
-    public class PlayFabEditorHttp : Editor
+    public class PlayFabEditorHttp : UnityEditor.Editor
     {
         internal static void MakeDownloadCall(string url, Action<string> resultCallback)
         {

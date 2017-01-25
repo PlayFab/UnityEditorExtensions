@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
-    public class PlayFabEditorMenu : Editor
+    public class PlayFabEditorMenu : UnityEditor.Editor
     {
         #region panel variables
         internal enum MenuStates

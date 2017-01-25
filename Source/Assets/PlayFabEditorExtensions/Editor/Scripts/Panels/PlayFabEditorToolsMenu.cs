@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
-    public class PlayFabEditorToolsMenu : Editor
+    public class PlayFabEditorToolsMenu : UnityEditor.Editor
     {
         public static float buttonWidth = 200;
         public static Vector2 scrollPos = Vector2.zero;

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
-    public class TitleInternalDataViewer : Editor
+    public class TitleInternalDataViewer : UnityEditor.Editor
     {
         public List<KvpItem> items;
         public static TitleInternalDataEditor tdEditor;

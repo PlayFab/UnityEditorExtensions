@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
-    public class PlayFabEditorSDKTools : Editor
+    public class PlayFabEditorSDKTools : UnityEditor.Editor
     {
         public static bool IsInstalled { get; private set; }
         private static string installedSdkVersion = string.Empty;

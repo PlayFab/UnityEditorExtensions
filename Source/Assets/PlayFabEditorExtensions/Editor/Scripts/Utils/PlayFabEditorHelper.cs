@@ -8,7 +8,7 @@ using PlayFab.PfEditor.Json;
 namespace PlayFab.PfEditor
 {
     [InitializeOnLoad]
-    public class PlayFabEditorHelper : Editor
+    public class PlayFabEditorHelper : UnityEditor.Editor
     {
         #region EDITOR_STRINGS
         public static string EDEX_NAME = "PlayFab_EditorExtensions";

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayFab.PfEditor
 {
     [InitializeOnLoad]
-    public class PlayFabEditorDataMenu : Editor
+    public class PlayFabEditorDataMenu : UnityEditor.Editor
     {
         #region panel variables
         public static TitleDataViewer tdViewer;

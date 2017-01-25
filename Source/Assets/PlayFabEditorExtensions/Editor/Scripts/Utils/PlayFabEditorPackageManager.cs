@@ -7,7 +7,7 @@ using UnityEngine;
 namespace PlayFab.PfEditor
 {
     [InitializeOnLoad]
-    public class PlayFabEditorPackageManager : Editor {
+    public class PlayFabEditorPackageManager : UnityEditor.Editor {
         //TODO change these vars after we disucss how to organize these moving forward.
         public static bool AndroidPushPlugin = false;
 
