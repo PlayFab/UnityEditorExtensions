@@ -1,6 +1,7 @@
 using PlayFab.PfEditor.EditorModels;
-using System;
 using PlayFab.PfEditor.Json;
+using System;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -264,48 +265,40 @@ namespace PlayFab.PfEditor
                     if (type.Name == "PlayFabSettings")
                         playfabSettingsType = type;
 
-            if (playfabSettingsType == null || PlayFabEditorSDKTools.IsInstalled || PlayFabEditorSDKTools.isSdkSupported)
+            if (playfabSettingsType == null || !PlayFabEditorSDKTools.IsInstalled || !PlayFabEditorSDKTools.isSdkSupported)
                 return;
 
             var props = playfabSettingsType.GetProperties();
-
             foreach (var property in props)
             {
-                if (property.Name.ToLower() == "titleid")
+                switch (property.Name.ToLower())
                 {
-                    property.SetValue(null, envDetails.selectedTitleId, null);
-                }
-                if (property.Name.ToLower() == "requesttype")
-                {
-                    property.SetValue(null, (int)envDetails.webRequestType, null);
-                }
-                if (property.Name.ToLower() == "timeout")
-                {
-                    property.SetValue(null, envDetails.timeOut, null);
-                }
-                if (property.Name.ToLower() == "requestkeepalive")
-                {
-                    property.SetValue(null, envDetails.keepAlive, null);
-                }
-                if (property.Name.ToLower() == "compressapidata")
-                {
-                    property.SetValue(null, envDetails.compressApiData, null);
-                }
-
-                //this is a fix for the S.O. getting blanked repeatedly.
-                if (property.Name.ToLower() == "productionenvironmenturl")
-                {
-                    property.SetValue(null, PlayFabEditorHelper.TITLE_ENDPOINT, null);
-                }
-
+                    case "titleid":
+                        property.SetValue(null, envDetails.selectedTitleId, null); break;
+                    case "requesttype":
+                        property.SetValue(null, (int)envDetails.webRequestType, null); break;
+                    case "timeout":
+                        property.SetValue(null, envDetails.timeOut, null); break;
+                    case "requestkeepalive":
+                        property.SetValue(null, envDetails.keepAlive, null); break;
+                    case "compressapidata":
+                        property.SetValue(null, envDetails.compressApiData, null); break;
+                    case "productionenvironmenturl":
+                        property.SetValue(null, PlayFabEditorHelper.TITLE_ENDPOINT, null); break;
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                if (property.Name.ToLower() == "developersecretkey")
-                {
-                    property.SetValue(null, envDetails.developerSecretKey, null);
-                }
+                    case "developersecretkey":
+                        property.SetValue(null, envDetails.developerSecretKey, null); break;
 #endif
+                }
             }
 
+            var getSoMethod = playfabSettingsType.GetMethod("GetSharedSettingsObjectPrivate", BindingFlags.NonPublic | BindingFlags.Static);
+            if (getSoMethod != null)
+            {
+                var so = getSoMethod.Invoke(null, new object[0]) as ScriptableObject;
+                if (so != null)
+                    EditorUtility.SetDirty(so);
+            }
             AssetDatabase.SaveAssets();
         }
 
