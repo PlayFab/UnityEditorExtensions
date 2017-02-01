@@ -98,8 +98,13 @@ namespace PlayFab.PfEditor
         {
             if (uiStyle == null)
             {
-                var relRoot = EDEX_ROOT.Substring(EDEX_ROOT.IndexOf("Assets/"));
-                return (GUISkin)AssetDatabase.LoadAssetAtPath(relRoot + "/UI/PlayFabStyles.guiskin", typeof(GUISkin));
+                var pfGuiPaths = Directory.GetFiles(EDEX_ROOT, "PlayFabStyles.guiskin", SearchOption.AllDirectories);
+                foreach (var eachPath in pfGuiPaths)
+                {
+                    var loadPath = eachPath.Substring(eachPath.IndexOf("Assets/"));
+                    return (GUISkin)AssetDatabase.LoadAssetAtPath(loadPath, typeof(GUISkin));
+                }
+                return null;
             }
             else
             {

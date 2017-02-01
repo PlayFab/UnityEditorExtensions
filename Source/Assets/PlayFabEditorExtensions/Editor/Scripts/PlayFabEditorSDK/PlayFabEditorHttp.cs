@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -39,9 +40,12 @@ namespace PlayFab.PfEditor
                     fileName = PlayFabEditorHelper.EDEX_PACKAGES_PATH;
                 }
 
-
-                string fileSaveLocation = string.Format(PlayFabEditorHelper.EDEX_ROOT + fileName);
-                System.IO.File.WriteAllBytes(fileSaveLocation, response);
+                var fileSaveLocation = PlayFabEditorHelper.EDEX_ROOT + fileName;
+                var fileSaveDirectory = Path.GetDirectoryName(fileSaveLocation);
+                Debug.Log("Saving " + response.Length + " bytes to: " + fileSaveLocation);
+                if (!Directory.Exists(fileSaveDirectory))
+                    Directory.CreateDirectory(fileSaveDirectory);
+                File.WriteAllBytes(fileSaveLocation, response);
                 resultCallback(fileSaveLocation);
 
             }, PlayFabEditorHelper.SharedErrorCallback), www);
