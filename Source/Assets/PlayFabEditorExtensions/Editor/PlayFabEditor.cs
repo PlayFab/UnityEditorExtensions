@@ -22,8 +22,6 @@ namespace PlayFab.PfEditor
         public static string latestEdExVersion = string.Empty;
 
         internal static PlayFabEditor window;
-
-        //private
         #endregion
 
         #region unity lopps & methods
@@ -74,7 +72,6 @@ namespace PlayFab.PfEditor
 
             window = EditorWindow.GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab EdEx");
-
         }
 
         [InitializeOnLoad]
@@ -86,7 +83,6 @@ namespace PlayFab.PfEditor
                 {
                     EditorCoroutine.start(OpenPlayServices());
                 }
-
             }
         }
 
@@ -115,7 +111,6 @@ namespace PlayFab.PfEditor
                 PlayFabEditorSettings.Update();
                 PlayFabEditorPackageManager.Update();
                 PlayFabEditorHeader.DrawHeader();
-
 
                 GUI.enabled = blockingRequests.Count > 0 || EditorApplication.isCompiling ? false : true;
 
@@ -165,7 +160,6 @@ namespace PlayFab.PfEditor
                     GUILayout.FlexibleSpace();
                     GUILayout.EndVertical();
 
-
                     // help tag at the bottom of the help menu.
                     if (PlayFabEditorMenu._menuState == PlayFabEditorMenu.MenuStates.Help)
                     {
@@ -188,7 +182,6 @@ namespace PlayFab.PfEditor
                             GUILayout.FlexibleSpace();
                             GUILayout.EndHorizontal();
                         }
-
 
                         GUILayout.BeginHorizontal();
                         GUILayout.FlexibleSpace();
@@ -235,7 +228,6 @@ namespace PlayFab.PfEditor
                         //RaiseStateUpdate(EdExStates.OnError, ex.Message);
                     }
                 }
-
             }
             catch //(Exception ex)
             {
@@ -299,7 +291,6 @@ namespace PlayFab.PfEditor
 
                 }
             }
-
         }
 
 
@@ -354,12 +345,9 @@ namespace PlayFab.PfEditor
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.off);
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.success);
                     ClearBlockingRequest(status);
-
-
                     break;
 
                 case EdExStates.OnError:
-
                     // deserialize and add json details
                     // clear blocking requests
                     ProgressBar.UpdateState(ProgressBar.ProgressBarStates.error);
@@ -459,7 +447,7 @@ namespace PlayFab.PfEditor
 
             try
             {
-                PlayFabEditor.window.Close();
+                window.Close();
                 var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDEX_ROOT);
 
                 FileUtil.DeleteFileOrDirectory(edExRoot.Parent.FullName);
@@ -468,7 +456,6 @@ namespace PlayFab.PfEditor
                 {
                     PlayFabEditorDataService.RemoveEditorPrefs();
                 }
-
 
                 AssetDatabase.Refresh();
             }
@@ -482,7 +469,7 @@ namespace PlayFab.PfEditor
         {
             if (EditorUtility.DisplayDialog("Confirm EdEx Upgrade", "This action will remove the current PlayFab Editor Extensions and install the lastet version.", "Confirm", "Cancel"))
             {
-                PlayFabEditor.window.Close();
+                window.Close();
                 ImportLatestEdEx();
             }
         }
