@@ -53,7 +53,7 @@ namespace PlayFab.PfEditor
 
                 try
                 {
-                    EDEX_ROOT = PlayFabEditorDataService.envDetails.edexPath ?? EDEX_ROOT;
+                    EDEX_ROOT = PlayFabEditorDataService.EnvDetails.edexPath ?? EDEX_ROOT;
                     rootFiles = Directory.GetDirectories(EDEX_ROOT);
 
                     uiStyle = GetUiStyle();
@@ -72,7 +72,7 @@ namespace PlayFab.PfEditor
                         {
                             relocatedEdEx = true;
                             EDEX_ROOT = movedRootFiles[0].Substring(0, movedRootFiles[0].IndexOf(PLAYFAB_EDEX_MAINFILE) - 1);
-                            PlayFabEditorDataService.envDetails.edexPath = EDEX_ROOT;
+                            PlayFabEditorDataService.EnvDetails.edexPath = EDEX_ROOT;
                             PlayFabEditorDataService.SaveEnvDetails();
 
                             uiStyle = GetUiStyle();

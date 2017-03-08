@@ -10,7 +10,7 @@ namespace PlayFab.PfEditor
         private static string _userEmail = string.Empty;
         private static string _userPass = string.Empty;
         private static string _userPass2 = string.Empty;
-        private static string _2faCode = string.Empty;
+        private static string _2FaCode = string.Empty;
         private static string _studio = string.Empty;
 
         private static bool isInitialized = false;
@@ -31,7 +31,7 @@ namespace PlayFab.PfEditor
 
                 EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
                 GUILayout.FlexibleSpace();
-                _2faCode = EditorGUILayout.TextField(_2faCode, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25), GUILayout.MinWidth(200));
+                _2FaCode = EditorGUILayout.TextField(_2FaCode, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25), GUILayout.MinWidth(200));
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
 
@@ -42,7 +42,7 @@ namespace PlayFab.PfEditor
                 if (GUILayout.Button("CONTINUE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
                 {
                     OnContinueButtonClicked();
-                    _2faCode = string.Empty;
+                    _2FaCode = string.Empty;
 
                 }
                 GUILayout.FlexibleSpace();
@@ -64,9 +64,9 @@ namespace PlayFab.PfEditor
             }
 
 
-            if (!string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.email) && !isInitialized)
+            if (!string.IsNullOrEmpty(PlayFabEditorDataService.AccountDetails.email) && !isInitialized)
             {
-                _userEmail = PlayFabEditorDataService.accountDetails.email;
+                _userEmail = PlayFabEditorDataService.AccountDetails.email;
                 isInitialized = true;
             }
             else if (!isInitialized)
@@ -222,16 +222,16 @@ namespace PlayFab.PfEditor
         #region menu and helper methods
         public static bool IsAuthenticated()
         {
-            return !string.IsNullOrEmpty(PlayFabEditorDataService.accountDetails.devToken);
+            return !string.IsNullOrEmpty(PlayFabEditorDataService.AccountDetails.devToken);
         }
 
         public static void Logout()
         {
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnLogout);
 
-            PlayFabEditorApi.Logout(new LogoutRequest()
+            PlayFabEditorApi.Logout(new LogoutRequest
             {
-                DeveloperClientToken = PlayFabEditorDataService.accountDetails.devToken
+                DeveloperClientToken = PlayFabEditorDataService.AccountDetails.devToken
             }, null, PlayFabEditorHelper.SharedErrorCallback);
 
             _userPass = string.Empty;
@@ -239,12 +239,11 @@ namespace PlayFab.PfEditor
 
             activeState = PanelDisplayStates.Login;
 
-            PlayFabEditorDataService.accountDetails.studios = null;
-            PlayFabEditorDataService.accountDetails.devToken = string.Empty;
-
+            PlayFabEditorDataService.AccountDetails.studios = null;
+            PlayFabEditorDataService.AccountDetails.devToken = string.Empty;
             PlayFabEditorDataService.SaveAccountDetails();
 
-            PlayFabEditorDataService.envDetails.titleData.Clear();
+            PlayFabEditorDataService.EnvDetails.titleData.Clear();
             PlayFabEditorDataService.SaveEnvDetails();
         }
 
@@ -265,8 +264,8 @@ namespace PlayFab.PfEditor
                 StudioName = _studio
             }, (result) =>
             {
-                PlayFabEditorDataService.accountDetails.devToken = result.DeveloperClientToken;
-                PlayFabEditorDataService.accountDetails.email = _userEmail;
+                PlayFabEditorDataService.AccountDetails.devToken = result.DeveloperClientToken;
+                PlayFabEditorDataService.AccountDetails.email = _userEmail;
 
                 PlayFabEditorDataService.GetStudios();
 
@@ -286,8 +285,8 @@ namespace PlayFab.PfEditor
                 Password = _userPass
             }, (result) =>
             {
-                PlayFabEditorDataService.accountDetails.devToken = result.DeveloperClientToken;
-                PlayFabEditorDataService.accountDetails.email = _userEmail;
+                PlayFabEditorDataService.AccountDetails.devToken = result.DeveloperClientToken;
+                PlayFabEditorDataService.AccountDetails.email = _userEmail;
                 PlayFabEditorDataService.GetStudios();
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnLogin);
                 PlayFabEditorDataService.SaveAccountDetails();
@@ -314,13 +313,13 @@ namespace PlayFab.PfEditor
             {
                 DeveloperToolProductName = PlayFabEditorHelper.EDEX_NAME,
                 DeveloperToolProductVersion = PlayFabEditorHelper.EDEX_VERSION,
-                TwoFactorAuth = _2faCode,
+                TwoFactorAuth = _2FaCode,
                 Email = _userEmail,
                 Password = _userPass
             }, (result) =>
             {
-                PlayFabEditorDataService.accountDetails.devToken = result.DeveloperClientToken;
-                PlayFabEditorDataService.accountDetails.email = _userEmail;
+                PlayFabEditorDataService.AccountDetails.devToken = result.DeveloperClientToken;
+                PlayFabEditorDataService.AccountDetails.email = _userEmail;
                 PlayFabEditorDataService.GetStudios();
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnLogin);
                 PlayFabEditorDataService.SaveAccountDetails();

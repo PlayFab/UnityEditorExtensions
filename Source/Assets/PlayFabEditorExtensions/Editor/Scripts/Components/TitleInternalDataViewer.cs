@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
+    // TODO: Clean up the copy paste between this and TitleDataViewer
     public class TitleInternalDataViewer : UnityEditor.Editor
     {
         public List<KvpItem> items;
@@ -25,7 +26,6 @@ namespace PlayFab.PfEditor
             if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
             {
                 RefreshRecords();
-
             }
 
             if (GUILayout.Button("+", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(25)))
@@ -38,12 +38,12 @@ namespace PlayFab.PfEditor
             if (items.Count > 0)
             {
                 scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                float keyInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? 170 : (EditorGUIUtility.currentViewWidth - 100) / 2;
-                float valueInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? EditorGUIUtility.currentViewWidth - 290 : (EditorGUIUtility.currentViewWidth - 100) / 2;
+                var keyInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? 170 : (EditorGUIUtility.currentViewWidth - 100) / 2;
+                var valueInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? EditorGUIUtility.currentViewWidth - 290 : (EditorGUIUtility.currentViewWidth - 100) / 2;
 
-                for (var z = 0; z < this.items.Count; z++)
+                for (var z = 0; z < items.Count; z++)
                 {
-                    this.items[z].DataEditedCheck();
+                    items[z].DataEditedCheck();
                     if (items[z].isDirty)
                     {
                         showSave = true;
@@ -51,15 +51,10 @@ namespace PlayFab.PfEditor
 
                     if (items[z].Value != null)
                     {
-
-                        var keyStyle = this.items[z].isDirty ? PlayFabEditorHelper.uiStyle.GetStyle("listKey_dirty") : PlayFabEditorHelper.uiStyle.GetStyle("listKey");
-                        var valStyle = this.items[z].isDirty ? PlayFabEditorHelper.uiStyle.GetStyle("listValue_dirty") : PlayFabEditorHelper.uiStyle.GetStyle("listValue");
-
+                        var keyStyle = items[z].isDirty ? PlayFabEditorHelper.uiStyle.GetStyle("listKey_dirty") : PlayFabEditorHelper.uiStyle.GetStyle("listKey");
+                        var valStyle = items[z].isDirty ? PlayFabEditorHelper.uiStyle.GetStyle("listValue_dirty") : PlayFabEditorHelper.uiStyle.GetStyle("listValue");
 
                         EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-
-
-
 
                         items[z].Key = GUILayout.TextField(items[z].Key, keyStyle, GUILayout.Width(keyInputBoxWidth));
 
@@ -88,7 +83,6 @@ namespace PlayFab.PfEditor
                     }
                 }
 
-
                 GUILayout.EndScrollView();
 
                 if (showSave)
@@ -105,17 +99,15 @@ namespace PlayFab.PfEditor
             }
         }
 
-
         public void AddRecord()
         {
-            this.items.Add(new KvpItem("", "NewValue") { isDirty = true });
+            items.Add(new KvpItem("", "NewValue") { isDirty = true });
         }
 
         public void RefreshRecords()
         {
             Action<PlayFab.PfEditor.EditorModels.GetTitleDataResult> cb = (result) =>
             {
-
                 items.Clear();
                 showSave = false;
                 foreach (var kvp in result.Data)
@@ -123,9 +115,8 @@ namespace PlayFab.PfEditor
                     items.Add(new KvpItem(kvp.Key, kvp.Value));
                 }
 
-                PlayFabEditorDataService.envDetails.titleInternalData = result.Data;
+                PlayFabEditorDataService.EnvDetails.titleInternalData = result.Data;
                 PlayFabEditorDataService.SaveEnvDetails();
-
             };
 
             PlayFabEditorApi.GetTitleInternalData(cb, PlayFabEditorHelper.SharedErrorCallback);
@@ -137,13 +128,8 @@ namespace PlayFab.PfEditor
             showSave = false;
             Dictionary<string, string> dirtyItems = new Dictionary<string, string>();
             foreach (var item in items)
-            {
                 if (item.isDirty)
-                {
                     dirtyItems.Add(item.Key, item.Value);
-                }
-
-            }
 
             if (dirtyItems.Count > 0)
             {
@@ -156,24 +142,5 @@ namespace PlayFab.PfEditor
                 }, PlayFabEditorHelper.SharedErrorCallback);
             }
         }
-
-
-
-        public TitleInternalDataViewer(List<KvpItem> i = null)
-        {
-            this.items = i ?? new List<KvpItem>();
-        }
-
-        public TitleInternalDataViewer()
-        {
-            this.items = new List<KvpItem>();
-        }
-
-        public void OnDestroy()
-        {
-            tdEditor = null;
-        }
     }
-
 }
-

@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 namespace PlayFab.PfEditor
@@ -22,9 +21,7 @@ namespace PlayFab.PfEditor
         public static void DrawMenu()
         {
             if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
-            {
-                _menuState = (MenuStates)PlayFabEditorDataService.editorSettings.currentMainMenu;
-            }
+                _menuState = (MenuStates)PlayFabEditorDataService.EditorView.currentMainMenu;
 
             var sdksButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             var settingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
@@ -34,58 +31,17 @@ namespace PlayFab.PfEditor
             var toolsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
 
             if (_menuState == MenuStates.Sdks)
-            {
                 sdksButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
-            }
-            else
-            {
-                sdksButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
-            }
-
             if (_menuState == MenuStates.Settings)
-            {
                 settingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
-            }
-            else
-            {
-                settingsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
-            }
-
             if (_menuState == MenuStates.Logout)
-            {
                 logoutButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
-            }
-            else
-            {
-                logoutButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
-            }
-
             if (_menuState == MenuStates.Data)
-            {
                 dataButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
-            }
-            else
-            {
-                dataButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
-            }
-
             if (_menuState == MenuStates.Help)
-            {
                 helpButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
-            }
-            else
-            {
-                helpButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
-            }
-
             if (_menuState == MenuStates.Tools)
-            {
                 toolsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
-            }
-            else
-            {
-                toolsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton");
-            }
 
             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.Height(25), GUILayout.ExpandWidth(true));
 
@@ -100,37 +56,19 @@ namespace PlayFab.PfEditor
             if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
             {
                 if (GUILayout.Button("SETTINGS", settingsButtonStyle, GUILayout.MaxWidth(65)))
-                {
                     OnSettingsClicked();
-                }
-
                 if (GUILayout.Button("DATA", dataButtonStyle, GUILayout.MaxWidth(45)))
-                {
-
                     OnDataClicked();
-                }
-
                 if (GUILayout.Button("TOOLS", toolsButtonStyle, GUILayout.MaxWidth(45)))
-                {
-
                     OnToolsClicked();
-                }
-
             }
 
             if (GUILayout.Button("HELP", helpButtonStyle, GUILayout.MaxWidth(45)))
-            {
-
                 OnHelpClicked();
-
-            }
             GUILayout.FlexibleSpace();
 
             if (GUILayout.Button("LOGOUT", logoutButtonStyle, GUILayout.MaxWidth(55)))
-            {
-
                 OnLogoutClicked();
-            }
 
             GUILayout.EndHorizontal();
         }
@@ -138,70 +76,46 @@ namespace PlayFab.PfEditor
         public static void OnToolsClicked()
         {
             _menuState = MenuStates.Tools;
-
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Tools.ToString());
-
-            PlayFabEditorDataService.editorSettings.currentMainMenu = (int)MenuStates.Tools;
-            PlayFabEditorDataService.SaveEditorSettings();
+            PlayFabEditorDataService.EditorView.currentMainMenu = (int)_menuState;
         }
 
         public static void OnDataClicked()
         {
             _menuState = MenuStates.Data;
-
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Data.ToString());
-
-            PlayFabEditorDataService.editorSettings.currentMainMenu = (int)MenuStates.Data;
-            PlayFabEditorDataService.SaveEditorSettings();
+            PlayFabEditorDataService.EditorView.currentMainMenu = (int)_menuState;
         }
 
         public static void OnHelpClicked()
         {
             _menuState = MenuStates.Help;
-
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Help.ToString());
-            PlayFabEditorDataService.editorSettings.currentMainMenu = (int)MenuStates.Help;
-            PlayFabEditorDataService.SaveEditorSettings();
+            PlayFabEditorDataService.EditorView.currentMainMenu = (int)_menuState;
         }
-
-        //        public static void OnServicesClicked()
-        //        {
-        //            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Services.ToString());
-        //            PlayFabEditorDataService.editorSettings.currentMainMenu = (int)MenuStates.Services;      
-        //            PlayFabEditorDataService.SaveEditorSettings();
-        //        }
 
         public static void OnSdKsClicked()
         {
             _menuState = MenuStates.Sdks;
-
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Sdks.ToString());
-            PlayFabEditorDataService.editorSettings.currentMainMenu = (int)MenuStates.Sdks;
-            PlayFabEditorDataService.SaveEditorSettings();
+            PlayFabEditorDataService.EditorView.currentMainMenu = (int)_menuState;
         }
 
         public static void OnSettingsClicked()
         {
             _menuState = MenuStates.Settings;
-
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Settings.ToString());
-            PlayFabEditorDataService.editorSettings.currentMainMenu = (int)MenuStates.Settings;
-            PlayFabEditorDataService.SaveEditorSettings();
+            PlayFabEditorDataService.EditorView.currentMainMenu = (int)_menuState;
         }
 
         public static void OnLogoutClicked()
         {
             _menuState = MenuStates.Logout;
-
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnMenuItemClicked, MenuStates.Logout.ToString());
-
             PlayFabEditorAuthenticate.Logout();
 
-
             _menuState = MenuStates.Sdks;
-
-            PlayFabEditorDataService.editorSettings.currentMainMenu = (int)MenuStates.Sdks;
-            PlayFabEditorDataService.SaveEditorSettings();
+            PlayFabEditorDataService.EditorView.currentMainMenu = (int)_menuState;
         }
     }
 }
