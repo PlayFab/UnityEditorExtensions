@@ -8,15 +8,8 @@ namespace PlayFab.PfEditor
 {
     public class PlayFabEditorSDKTools : UnityEditor.Editor
     {
-        public static bool IsInstalled
-        {
-            get
-            {
-                if (playFabSettingsType == null)
-                    playFabSettingsType = GetPlayFabSettings();
-                return playFabSettingsType != typeof(object);
-            }
-        }
+        public static bool IsInstalled { get { return GetPlayFabSettings() != null; } }
+
         private static Type playFabSettingsType = null;
         private static string installedSdkVersion = string.Empty;
         private static string latestSdkVersion = string.Empty;
@@ -226,38 +219,41 @@ namespace PlayFab.PfEditor
             });
         }
 
-        private static Type GetPlayFabSettings()
+        public static Type GetPlayFabSettings()
         {
+            if (playFabSettingsType == typeof(object))
+                return null; // Sentinel value to indicate that PlayFabSettings doesn't exist
+            if (playFabSettingsType != null)
+                return playFabSettingsType;
+
+            playFabSettingsType = typeof(object); // Sentinel value to indicate that PlayFabSettings doesn't exist
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                foreach (var type in assembly.GetTypes())
-                    if (type.Name == "PlayFabSettings")
-                        return type;
-            return typeof(object); // Sentinel value to indicate that PlayFabSettings doesn't exist
+                foreach (var eachType in assembly.GetTypes())
+                    if (eachType.Name == PlayFabEditorHelper.PLAYFAB_SETTINGS_TYPENAME)
+                        playFabSettingsType = eachType;
+            return playFabSettingsType == typeof(object) ? null : playFabSettingsType;
         }
 
-        private static string CheckSdkVersion()
+        private static void CheckSdkVersion()
         {
-            if (string.IsNullOrEmpty(installedSdkVersion))
-            {
-                List<Type> types = new List<Type>();
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    foreach (var type in assembly.GetTypes())
-                        if (type.Name == "PlayFabVersion" || type.Name == "PlayFabSettings")
-                            types.Add(type);
+            if (!string.IsNullOrEmpty(installedSdkVersion))
+                return;
 
-                foreach (var type in types)
-                {
-                    foreach (var property in type.GetProperties())
-                        if (property.Name == "SdkVersion" || property.Name == "SdkRevision")
-                            installedSdkVersion += property.GetValue(property, null).ToString();
-                    foreach (var field in type.GetFields())
-                        if (field.Name == "SdkVersion" || field.Name == "SdkRevision")
-                            installedSdkVersion += field.GetValue(field).ToString();
-                }
-                if (!string.IsNullOrEmpty(installedSdkVersion))
-                    return installedSdkVersion;
+            var types = new List<Type>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (var type in assembly.GetTypes())
+                    if (type.Name == "PlayFabVersion" || type.Name == PlayFabEditorHelper.PLAYFAB_SETTINGS_TYPENAME)
+                        types.Add(type);
+
+            foreach (var type in types)
+            {
+                foreach (var property in type.GetProperties())
+                    if (property.Name == "SdkVersion" || property.Name == "SdkRevision")
+                        installedSdkVersion += property.GetValue(property, null).ToString();
+                foreach (var field in type.GetFields())
+                    if (field.Name == "SdkVersion" || field.Name == "SdkRevision")
+                        installedSdkVersion += field.GetValue(field).ToString();
             }
-            return null;
         }
 
         private static UnityEngine.Object FindSdkAsset()

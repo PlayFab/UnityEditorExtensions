@@ -41,11 +41,6 @@ namespace PlayFab.PfEditor
         private static string _DeveloperSecretKey;
 #endif
 
-        private static WebRequestType _requestType;
-        private static int _requestTimeOut;
-        private static bool _keepAlive;
-        private static bool _compressApiData = false;
-
         private static bool _isSettingsSet = false;
         private static bool _foundUnknownTitleId = false;
         private static bool _isFetchingStudios = false;
@@ -57,9 +52,8 @@ namespace PlayFab.PfEditor
 
         #region draw calls
 
-        public static void DrawApiSubPanel()
+        private static void DrawApiSubPanel()
         {
-
             float labelWidth = 160;
 
             GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
@@ -123,7 +117,7 @@ namespace PlayFab.PfEditor
             }
         }
 
-        public static void DrawTitleSettingsSubPanel()
+        private static void DrawTitleSettingsSubPanel()
         {
             float labelWidth = 100;
 
@@ -194,7 +188,7 @@ namespace PlayFab.PfEditor
             GUILayout.EndScrollView();
         }
 
-        public static void DrawStandardSettingsSubPanel()
+        private static void DrawStandardSettingsSubPanel()
         {
             float labelWidth = 160;
 
@@ -288,28 +282,27 @@ namespace PlayFab.PfEditor
             // ------------------------------------------------------------------------------------------------------------------------------------------------
             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
             EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-            _requestType = (WebRequestType)EditorGUILayout.EnumPopup(_requestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
+            PlayFabEditorDataService.SharedSettings.WebRequestType = (WebRequestType)EditorGUILayout.EnumPopup(PlayFabEditorDataService.SharedSettings.WebRequestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
             GUILayout.EndHorizontal();
 
-
-            if (_requestType == WebRequestType.HttpWebRequest)
+            if (PlayFabEditorDataService.SharedSettings.WebRequestType == WebRequestType.HttpWebRequest)
             {
-                using (FixedWidthLabel fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                using (var fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
                 {
                     GUILayout.Space(labelWidth - fwl.fieldWidth);
-                    _requestTimeOut = EditorGUILayout.IntField(_requestTimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    PlayFabEditorDataService.SharedSettings.TimeOut = EditorGUILayout.IntField(PlayFabEditorDataService.SharedSettings.TimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
                 }
 
-                using (FixedWidthLabel fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                using (var fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
                 {
                     GUILayout.Space(labelWidth - fwl.fieldWidth);
-                    _keepAlive = EditorGUILayout.Toggle(_keepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                    PlayFabEditorDataService.SharedSettings.KeepAlive = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.KeepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
                 }
             }
 
             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
             EditorGUILayout.LabelField("COMPRESS API DATA: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-            _compressApiData = EditorGUILayout.Toggle(_compressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+            PlayFabEditorDataService.SharedSettings.CompressApiData = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
@@ -325,7 +318,7 @@ namespace PlayFab.PfEditor
             GUILayout.EndVertical();
         }
 
-        public static void DrawPackagesSubPanel()
+        private static void DrawPackagesSubPanel()
         {
             EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
             GUILayout.Label("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
@@ -335,7 +328,7 @@ namespace PlayFab.PfEditor
             {
                 float labelWidth = 245;
                 _packagesScrollPos = GUILayout.BeginScrollView(_packagesScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                using (FixedWidthLabel fwl = new FixedWidthLabel("Push Notification Plugin (Android): "))
+                using (var fwl = new FixedWidthLabel("Push Notification Plugin (Android): "))
                 {
                     GUILayout.Space(labelWidth - fwl.fieldWidth);
                     PlayFabEditorPackageManager.AndroidPushPlugin = EditorGUILayout.Toggle(PlayFabEditorPackageManager.AndroidPushPlugin, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"));
@@ -423,7 +416,7 @@ namespace PlayFab.PfEditor
         #endregion
 
         #region menu and helper methods
-        public static void SetSettingsProperties()
+        private static void SetSettingsProperties()
         {
             if (PlayFabEditorSDKTools.IsInstalled && !_isSettingsSet)
             {
@@ -457,12 +450,8 @@ namespace PlayFab.PfEditor
                     BuildDropDownLists();
                 }
 
-                _requestTimeOut = PlayFabEditorDataService.EnvDetails.timeOut;
-                _keepAlive = PlayFabEditorDataService.EnvDetails.keepAlive;
-
                 _isSettingsSet = true;
             }
-
         }
 
         private static void BuildDropDownLists()
@@ -552,16 +541,16 @@ namespace PlayFab.PfEditor
             }
         }
 
-        public static void RegisterMenu()
+        private static void RegisterMenu()
         {
-            if (_menu == null)
-            {
-                _menu = ScriptableObject.CreateInstance<SubMenuComponent>();
-                _menu.RegisterMenuItem("PROJECT", OnStandardSetttingsClicked);
-                _menu.RegisterMenuItem("STUDIOS", OnTitleSettingsClicked);
-                _menu.RegisterMenuItem("API", OnApiSettingsClicked);
-                _menu.RegisterMenuItem("PACKAGES", OnPackagesClicked);
-            }
+            if (_menu != null)
+                return;
+
+            _menu = CreateInstance<SubMenuComponent>();
+            _menu.RegisterMenuItem("PROJECT", OnStandardSetttingsClicked);
+            _menu.RegisterMenuItem("STUDIOS", OnTitleSettingsClicked);
+            _menu.RegisterMenuItem("API", OnApiSettingsClicked);
+            _menu.RegisterMenuItem("PACKAGES", OnPackagesClicked);
         }
 
         private static void OnPackagesClicked()
@@ -583,8 +572,7 @@ namespace PlayFab.PfEditor
         {
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, SubMenuStates.TitleSettings.ToString(), "" + (int)SubMenuStates.TitleSettings);
         }
-
-
+        
         private static void OnSaveSettings()
         {
             // make assessments on the override at studio positon 0
@@ -624,11 +612,6 @@ namespace PlayFab.PfEditor
                 PlayFabEditorDataService.EnvDetails.developerSecretKey = _DeveloperSecretKey;
 #endif
 
-                PlayFabEditorDataService.EnvDetails.compressApiData = _compressApiData;
-                PlayFabEditorDataService.EnvDetails.keepAlive = _keepAlive;
-                PlayFabEditorDataService.EnvDetails.webRequestType = _requestType;
-                PlayFabEditorDataService.EnvDetails.timeOut = _requestTimeOut;
-
                 PlayFabEditorDataService.SaveEnvDetails();
 
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSuccess);
@@ -641,13 +624,13 @@ namespace PlayFab.PfEditor
         }
 
 
-        public static string AddToBuildTarget(List<string> targets, string define)
+        private static string AddToBuildTarget(List<string> targets, string define)
         {
             targets.Add(define);
             return string.Join(";", targets.ToArray());
         }
 
-        public static string RemoveToBuildTarget(List<string> targets, string define)
+        private static string RemoveToBuildTarget(List<string> targets, string define)
         {
             targets.Remove(define);
             return string.Join(";", targets.ToArray());
@@ -676,7 +659,7 @@ namespace PlayFab.PfEditor
             }
         }
 
-        public static void RefreshStudiosList()
+        private static void RefreshStudiosList()
         {
             _isFetchingStudios = true;
             PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
@@ -695,7 +678,7 @@ namespace PlayFab.PfEditor
         /// <param name="state">the state that triggered this event.</param>
         /// <param name="status">a generic message about the status.</param>
         /// <param name="json">a generic container for additional JSON encoded info.</param>
-        public static void StateUpdateHandler(PlayFabEditor.EdExStates state, string status, string json)
+        private static void StateUpdateHandler(PlayFabEditor.EdExStates state, string status, string json)
         {
             switch (state)
             {
@@ -712,7 +695,6 @@ namespace PlayFab.PfEditor
                     break;
             }
         }
-
         #endregion
     }
 }

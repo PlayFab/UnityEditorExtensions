@@ -99,87 +99,79 @@ namespace PlayFab.PfEditor
 
         void OnGUI()
         {
-            try
+            GUI.skin = PlayFabEditorHelper.uiStyle;
+
+            GUILayout.BeginVertical();
+
+            //Run all updaters prior to drawing;  
+            PlayFabEditorSettings.Update();
+            PlayFabEditorPackageManager.Update();
+            PlayFabEditorHeader.DrawHeader();
+
+            GUI.enabled = blockingRequests.Count == 0 && !EditorApplication.isCompiling;
+
+            if (!PlayFabEditorDataService.IsDataLoaded)
+                return;
+
+            if (PlayFabEditorAuthenticate.IsAuthenticated())
             {
-                GUI.skin = PlayFabEditorHelper.uiStyle;
+                PlayFabEditorMenu.DrawMenu();
 
-                GUILayout.BeginVertical();
-
-                //Run all updaters prior to drawing;  
-                PlayFabEditorSettings.Update();
-                PlayFabEditorPackageManager.Update();
-                PlayFabEditorHeader.DrawHeader();
-
-                GUI.enabled = blockingRequests.Count == 0 && !EditorApplication.isCompiling;
-
-                if (!PlayFabEditorDataService.IsDataLoaded)
-                    return;
-
-                if (PlayFabEditorAuthenticate.IsAuthenticated())
+                switch (PlayFabEditorMenu._menuState)
                 {
-                    //Try catching to avoid Draw errors that do not actually impact the functionality
-                    try
-                    {
-                        PlayFabEditorMenu.DrawMenu();
-
-                        switch (PlayFabEditorMenu._menuState)
-                        {
-                            case PlayFabEditorMenu.MenuStates.Sdks:
-                                PlayFabEditorSDKTools.DrawSdkPanel();
-                                break;
-                            case PlayFabEditorMenu.MenuStates.Settings:
-                                PlayFabEditorSettings.DrawSettingsPanel();
-                                PlayFabEditorSettings.After();
-                                break;
-                            case PlayFabEditorMenu.MenuStates.Help:
-                                PlayFabEditorHelpMenu.DrawHelpPanel();
-                                break;
-                            case PlayFabEditorMenu.MenuStates.Data:
-                                PlayFabEditorDataMenu.DrawDataPanel();
-                                break;
-                            case PlayFabEditorMenu.MenuStates.Tools:
-                                PlayFabEditorToolsMenu.DrawToolsPanel();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    catch //(Exception ex)
-                    {
-                        //RaiseStateUpdate(EdExStates.OnError, ex.Message);
-                    }
-                }
-                else
-                {
-                    PlayFabEditorAuthenticate.DrawAuthPanels();
-                }
-
-                GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
-                GUILayout.FlexibleSpace();
-                GUILayout.EndVertical();
-
-                // help tag at the bottom of the help menu.
-                if (PlayFabEditorMenu._menuState == PlayFabEditorMenu.MenuStates.Help)
-                {
-                    DisplayHelpMenu();
-                }
-
-                GUILayout.EndVertical();
-
-                PruneBlockingRequests();
-
-                try
-                {
-                    Repaint();
-                }
-                catch //(Exception ex)
-                {
-                    //RaiseStateUpdate(EdExStates.OnError, ex.Message);
+                    case PlayFabEditorMenu.MenuStates.Sdks:
+                        HideRepaintErrors(PlayFabEditorSDKTools.DrawSdkPanel);
+                        break;
+                    case PlayFabEditorMenu.MenuStates.Settings:
+                        HideRepaintErrors(PlayFabEditorSettings.DrawSettingsPanel);
+                        PlayFabEditorSettings.After();
+                        break;
+                    case PlayFabEditorMenu.MenuStates.Help:
+                        HideRepaintErrors(PlayFabEditorHelpMenu.DrawHelpPanel);
+                        break;
+                    case PlayFabEditorMenu.MenuStates.Data:
+                        HideRepaintErrors(PlayFabEditorDataMenu.DrawDataPanel);
+                        break;
+                    case PlayFabEditorMenu.MenuStates.Tools:
+                        HideRepaintErrors(PlayFabEditorToolsMenu.DrawToolsPanel);
+                        break;
+                    default:
+                        break;
                 }
             }
-            catch //(Exception ex)
+            else
             {
-                //RaiseStateUpdate(EdExStates.OnError, ex.Message);
+                PlayFabEditorAuthenticate.DrawAuthPanels();
+            }
+
+            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
+
+            // help tag at the bottom of the help menu.
+            if (PlayFabEditorMenu._menuState == PlayFabEditorMenu.MenuStates.Help)
+            {
+                DisplayHelpMenu();
+            }
+
+            GUILayout.EndVertical();
+
+            PruneBlockingRequests();
+
+            HideRepaintErrors(Repaint);
+        }
+
+        private static void HideRepaintErrors(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                if (!e.Message.ToLower().Contains("repaint"))
+                    throw;
+                // Hide any repaint issues when recompiling
             }
         }
 
@@ -188,8 +180,7 @@ namespace PlayFab.PfEditor
             GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
             GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
             GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField(string.Format("PlayFab Editor Extensions: {0}", PlayFabEditorHelper.EDEX_VERSION),
-                PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
+            EditorGUILayout.LabelField(string.Format("PlayFab Editor Extensions: {0}", PlayFabEditorHelper.EDEX_VERSION), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
@@ -298,7 +289,6 @@ namespace PlayFab.PfEditor
                     if (int.TryParse(json, out parsed))
                         PlayFabEditorDataService.EditorView.currentSubMenu = parsed;
                     break;
-
 
                 case EdExStates.OnHttpReq:
                     object temp;

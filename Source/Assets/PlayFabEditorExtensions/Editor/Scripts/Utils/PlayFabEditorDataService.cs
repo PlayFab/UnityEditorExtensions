@@ -42,15 +42,57 @@ namespace PlayFab.PfEditor
             public string edexPath;
             public string localCloudScriptPath;
 
-            public PlayFabEditorSettings.WebRequestType webRequestType;
-            public bool compressApiData;
-            public bool keepAlive;
-            public int timeOut;
-
             public PlayFab_DeveloperEnvironmentDetails()
             {
                 titleData = new Dictionary<string, string>();
                 titleInternalData = new Dictionary<string, string>();
+            }
+        }
+
+        public class PlayFab_SharedSettingsProxy
+        {
+            private readonly PropertyInfo _webRequestType;
+            private readonly PropertyInfo _compressApiData;
+            private readonly PropertyInfo _keepAlive;
+            private readonly PropertyInfo _timeOut;
+
+            public PlayFabEditorSettings.WebRequestType WebRequestType { get { return (PlayFabEditorSettings.WebRequestType)_webRequestType.GetValue(null, null); } set { _webRequestType.SetValue(null, (int)value, null); } }
+            public bool CompressApiData { get { return (bool)_compressApiData.GetValue(null, null); } set { _compressApiData.SetValue(null, value, null); } }
+            public bool KeepAlive { get { return (bool)_keepAlive.GetValue(null, null); } set { _keepAlive.SetValue(null, value, null); } }
+            public int TimeOut
+            {
+                get
+                {
+                    return (int)_timeOut.GetValue(null, null);
+                }
+                set
+                {
+                    _timeOut.SetValue(null, value, null);
+                }
+            }
+
+            public PlayFab_SharedSettingsProxy()
+            {
+                var playFabSettingsType = PlayFabEditorSDKTools.GetPlayFabSettings();
+                if (playFabSettingsType == null)
+                    return;
+
+                var settingProperties = playFabSettingsType.GetProperties();
+                foreach (var eachProperty in settingProperties)
+                {
+                    var lcName = eachProperty.Name.ToLower();
+                    switch (lcName)
+                    {
+                        case "requesttype":
+                            _webRequestType = eachProperty; break;
+                        case "compressapidata":
+                            _compressApiData = eachProperty; break;
+                        case "requestkeepalive":
+                            _keepAlive = eachProperty; break;
+                        case "requesttimeout":
+                            _timeOut = eachProperty; break;
+                    }
+                }
             }
         }
 
@@ -94,6 +136,7 @@ namespace PlayFab.PfEditor
 
         public static PlayFab_DeveloperAccountDetails AccountDetails;
         public static PlayFab_DeveloperEnvironmentDetails EnvDetails;
+        public static PlayFab_SharedSettingsProxy SharedSettings = new PlayFab_SharedSettingsProxy();
         public static PlayFab_EditorSettings EditorSettings;
         public static PlayFab_EditorView EditorView;
 
@@ -202,12 +245,8 @@ namespace PlayFab.PfEditor
             if (EnvDetails == null)
                 return;
 
-            Type playfabSettingsType = null;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                foreach (var type in assembly.GetTypes())
-                    if (type.Name == "PlayFabSettings")
-                        playfabSettingsType = type;
 
+            var playfabSettingsType = PlayFabEditorSDKTools.GetPlayFabSettings();
             if (playfabSettingsType == null || !PlayFabEditorSDKTools.IsInstalled || !PlayFabEditorSDKTools.isSdkSupported)
                 return;
 
@@ -221,18 +260,6 @@ namespace PlayFab.PfEditor
                         case "TitleId":
                             var propValue = (string)prop.GetValue(null, null);
                             EnvDetails.selectedTitleId = string.IsNullOrEmpty(propValue) ? EnvDetails.selectedTitleId : propValue;
-                            break;
-                        case "RequestType":
-                            EnvDetails.webRequestType = (PlayFabEditorSettings.WebRequestType)prop.GetValue(null, null);
-                            break;
-                        case "RequestTimeout":
-                            EnvDetails.timeOut = (int)prop.GetValue(null, null);
-                            break;
-                        case "RequestKeepAlive":
-                            EnvDetails.keepAlive = (bool)prop.GetValue(null, null);
-                            break;
-                        case "CompressApiData":
-                            EnvDetails.compressApiData = (bool)prop.GetValue(null, null);
                             break;
                         case "DeveloperSecretKey":
                             EnvDetails.developerSecretKey = string.Empty;
@@ -252,13 +279,7 @@ namespace PlayFab.PfEditor
 
         private static void UpdateScriptableObject()
         {
-            //TODO move this logic to the data service
-            Type playfabSettingsType = null;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                foreach (var type in assembly.GetTypes())
-                    if (type.Name == "PlayFabSettings")
-                        playfabSettingsType = type;
-
+            var playfabSettingsType = PlayFabEditorSDKTools.GetPlayFabSettings();
             if (playfabSettingsType == null || !PlayFabEditorSDKTools.IsInstalled || !PlayFabEditorSDKTools.isSdkSupported)
                 return;
 
@@ -269,14 +290,6 @@ namespace PlayFab.PfEditor
                 {
                     case "titleid":
                         property.SetValue(null, EnvDetails.selectedTitleId, null); break;
-                    case "requesttype":
-                        property.SetValue(null, (int)EnvDetails.webRequestType, null); break;
-                    case "timeout":
-                        property.SetValue(null, EnvDetails.timeOut, null); break;
-                    case "requestkeepalive":
-                        property.SetValue(null, EnvDetails.keepAlive, null); break;
-                    case "compressapidata":
-                        property.SetValue(null, EnvDetails.compressApiData, null); break;
                     case "productionenvironmenturl":
                         property.SetValue(null, PlayFabEditorHelper.TITLE_ENDPOINT, null); break;
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
