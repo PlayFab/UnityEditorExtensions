@@ -1,4 +1,4 @@
-﻿using PlayFab.PfEditor.EditorModels;
+using PlayFab.PfEditor.EditorModels;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,42 +24,41 @@ namespace PlayFab.PfEditor
         {
             if (activeState == PanelDisplayStates.TwoFactorPrompt)
             {
-                GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                GUILayout.Label("Enter your 2-factor authorization code.", PlayFabEditorHelper.uiStyle.GetStyle("cGenTxt"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                GUILayout.FlexibleSpace();
-                _2FaCode = EditorGUILayout.TextField(_2FaCode, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25), GUILayout.MinWidth(200));
-                GUILayout.FlexibleSpace();
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"));
-
-                var buttonWidth = 100;
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("CONTINUE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+                using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
                 {
-                    OnContinueButtonClicked();
-                    _2FaCode = string.Empty;
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                        GUILayout.Label("Enter your 2-factor authorization code.", PlayFabEditorHelper.uiStyle.GetStyle("cGenTxt"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
 
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
+                    {
+                        GUILayout.FlexibleSpace();
+                        _2FaCode = EditorGUILayout.TextField(_2FaCode, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25), GUILayout.MinWidth(200));
+                        GUILayout.FlexibleSpace();
+                    }
+
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                    {
+                        var buttonWidth = 100;
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("CONTINUE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+                        {
+                            OnContinueButtonClicked();
+                            _2FaCode = string.Empty;
+
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
+
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                    {
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("CANCEL", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                        {
+                            activeState = PanelDisplayStates.Login;
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
                 }
-                GUILayout.FlexibleSpace();
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"));
-
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("CANCEL", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
-                {
-                    activeState = PanelDisplayStates.Login;
-
-                }
-                GUILayout.FlexibleSpace();
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.EndVertical();
                 return;
             }
 
@@ -75,9 +74,8 @@ namespace PlayFab.PfEditor
                 isInitialized = true;
             }
 
-            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-            GUILayout.Label("Welcome to PlayFab!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
-            EditorGUILayout.EndHorizontal();
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
+                GUILayout.Label("Welcome to PlayFab!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
 
             if (activeState == PanelDisplayStates.Login)
             {
@@ -95,21 +93,21 @@ namespace PlayFab.PfEditor
                 DrawRegister();
             }
 
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-
-            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("VIEW README", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+            using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
             {
-                Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions#setup");
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                {
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("VIEW README", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                    {
+                        Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions#setup");
+                    }
+                    GUILayout.FlexibleSpace();
+                }
             }
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.EndVertical();
 
             //capture enter input for login
-            Event e = Event.current;
+            var e = Event.current;
             if (e.type == EventType.KeyUp && e.keyCode == KeyCode.Return)
             {
                 switch (activeState)
@@ -127,95 +125,88 @@ namespace PlayFab.PfEditor
             }
         }
 
-        public static void DrawLogin()
+        private static void DrawLogin()
         {
-
             float labelWidth = 120;
 
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("EMAIL: "))
+            using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
             {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _userEmail = EditorGUILayout.TextField(_userEmail, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                using (var fwl = new FixedWidthLabel("EMAIL: "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _userEmail = EditorGUILayout.TextField(_userEmail, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                }
+
+                using (var fwl = new FixedWidthLabel("PASSWORD: "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _userPass = EditorGUILayout.PasswordField(_userPass, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                }
+
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                {
+                    if (GUILayout.Button("CREATE AN ACCOUNT", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MaxWidth(100)))
+                    {
+                        activeState = PanelDisplayStates.Register;
+                    }
+
+                    var buttonWidth = 100;
+                    GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth * 2);
+
+                    if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+                    {
+                        OnLoginButtonClicked();
+                    }
+                }
             }
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("PASSWORD: "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _userPass = EditorGUILayout.PasswordField(_userPass, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-            }
-
-            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")); //var buttonRect = 
-
-
-            if (GUILayout.Button("CREATE AN ACCOUNT", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MaxWidth(100)))
-            {
-                activeState = PanelDisplayStates.Register;
-            }
-
-            var buttonWidth = 100;
-            GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth * 2);
-
-            if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
-            {
-
-                OnLoginButtonClicked();
-            }
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndVertical();
         }
 
-        public static void DrawRegister()
+        private static void DrawRegister()
         {
             float labelWidth = 150;
 
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("EMAIL:"))
+            using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
             {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _userEmail = EditorGUILayout.TextField(_userEmail, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                using (var fwl = new FixedWidthLabel("EMAIL:"))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _userEmail = EditorGUILayout.TextField(_userEmail, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                }
+
+                using (var fwl = new FixedWidthLabel("PASSWORD:"))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _userPass = EditorGUILayout.PasswordField(_userPass, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                }
+
+                using (var fwl = new FixedWidthLabel("CONFIRM PASSWORD:  "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _userPass2 = EditorGUILayout.PasswordField(_userPass2, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                }
+
+                using (var fwl = new FixedWidthLabel("STUDIO NAME:  "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    _studio = EditorGUILayout.TextField(_studio, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                }
+
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                {
+                    if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(32)))
+                    {
+                        activeState = PanelDisplayStates.Login;
+                    }
+
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button("  CREATE AN ACCOUNT  ", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32)))
+                    {
+                        OnRegisterClicked();
+                    }
+                }
+
             }
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("PASSWORD:"))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _userPass = EditorGUILayout.PasswordField(_userPass, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-            }
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("CONFIRM PASSWORD:  "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _userPass2 = EditorGUILayout.PasswordField(_userPass2, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-            }
-
-            using (FixedWidthLabel fwl = new FixedWidthLabel("STUDIO NAME:  "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                _studio = EditorGUILayout.TextField(_studio, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-            }
-
-            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")); //var buttonRect = 
-
-            if (GUILayout.Button("LOG IN", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(32)))
-            {
-                activeState = PanelDisplayStates.Login;
-            }
-
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button("  CREATE AN ACCOUNT  ", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32)))
-            {
-                OnRegisterClicked();
-            }
-
-            GUILayout.EndHorizontal();
-
-
-            GUILayout.EndVertical();
         }
         #endregion
 

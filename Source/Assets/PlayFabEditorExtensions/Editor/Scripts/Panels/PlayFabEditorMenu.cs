@@ -43,34 +43,32 @@ namespace PlayFab.PfEditor
             if (_menuState == MenuStates.Tools)
                 toolsButtonStyle = PlayFabEditorHelper.uiStyle.GetStyle("textButton_selected");
 
-            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.Height(25), GUILayout.ExpandWidth(true));
-
-            GUILayout.Space(5);
-
-            if (GUILayout.Button("SDK", sdksButtonStyle, GUILayout.MaxWidth(35)))
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.Height(25), GUILayout.ExpandWidth(true)))
             {
-                OnSdKsClicked();
+                GUILayout.Space(5);
+
+                if (GUILayout.Button("SDK", sdksButtonStyle, GUILayout.MaxWidth(35)))
+                {
+                    OnSdKsClicked();
+                }
+
+                if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
+                {
+                    if (GUILayout.Button("SETTINGS", settingsButtonStyle, GUILayout.MaxWidth(65)))
+                        OnSettingsClicked();
+                    if (GUILayout.Button("DATA", dataButtonStyle, GUILayout.MaxWidth(45)))
+                        OnDataClicked();
+                    if (GUILayout.Button("TOOLS", toolsButtonStyle, GUILayout.MaxWidth(45)))
+                        OnToolsClicked();
+                }
+
+                if (GUILayout.Button("HELP", helpButtonStyle, GUILayout.MaxWidth(45)))
+                    OnHelpClicked();
+                GUILayout.FlexibleSpace();
+
+                if (GUILayout.Button("LOGOUT", logoutButtonStyle, GUILayout.MaxWidth(55)))
+                    OnLogoutClicked();
             }
-
-
-            if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
-            {
-                if (GUILayout.Button("SETTINGS", settingsButtonStyle, GUILayout.MaxWidth(65)))
-                    OnSettingsClicked();
-                if (GUILayout.Button("DATA", dataButtonStyle, GUILayout.MaxWidth(45)))
-                    OnDataClicked();
-                if (GUILayout.Button("TOOLS", toolsButtonStyle, GUILayout.MaxWidth(45)))
-                    OnToolsClicked();
-            }
-
-            if (GUILayout.Button("HELP", helpButtonStyle, GUILayout.MaxWidth(45)))
-                OnHelpClicked();
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button("LOGOUT", logoutButtonStyle, GUILayout.MaxWidth(55)))
-                OnLogoutClicked();
-
-            GUILayout.EndHorizontal();
         }
 
         public static void OnToolsClicked()

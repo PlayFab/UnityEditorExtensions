@@ -56,33 +56,32 @@ namespace PlayFab.PfEditor
         {
             float labelWidth = 160;
 
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-
-            using (var fwl = new FixedWidthLabel("ENABLE CLIENT API: "))
+            using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
             {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                PlayFabEditorDataService.EnvDetails.isClientApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isClientApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            }
+                using (var fwl = new FixedWidthLabel("ENABLE CLIENT API: "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    PlayFabEditorDataService.EnvDetails.isClientApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isClientApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                }
 
-            using (var fwl = new FixedWidthLabel("ENABLE ADMIN API:  "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                PlayFabEditorDataService.EnvDetails.isAdminApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isAdminApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            }
+                using (var fwl = new FixedWidthLabel("ENABLE ADMIN API:  "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    PlayFabEditorDataService.EnvDetails.isAdminApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isAdminApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                }
 
-            using (var fwl = new FixedWidthLabel("ENABLE SERVER API: "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                PlayFabEditorDataService.EnvDetails.isServerApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isServerApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            }
+                using (var fwl = new FixedWidthLabel("ENABLE SERVER API: "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    PlayFabEditorDataService.EnvDetails.isServerApiEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isServerApiEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                }
 
-            using (var fwl = new FixedWidthLabel("ENABLE REQUEST TIMES: "))
-            {
-                GUILayout.Space(labelWidth - fwl.fieldWidth);
-                PlayFabEditorDataService.EnvDetails.isDebugRequestTimesEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isDebugRequestTimesEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                using (var fwl = new FixedWidthLabel("ENABLE REQUEST TIMES: "))
+                {
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    PlayFabEditorDataService.EnvDetails.isDebugRequestTimesEnabled = EditorGUILayout.Toggle(PlayFabEditorDataService.EnvDetails.isDebugRequestTimesEnabled, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                }
             }
-
-            GUILayout.EndVertical();
         }
 
         public static void DrawSettingsPanel()
@@ -136,12 +135,13 @@ namespace PlayFab.PfEditor
 
             _titleScrollPos = GUILayout.BeginScrollView(_titleScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
 
-            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-            EditorGUILayout.LabelField("STUDIOS:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
-                RefreshStudiosList();
-            GUILayout.EndHorizontal();
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+            {
+                EditorGUILayout.LabelField("STUDIOS:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+                    RefreshStudiosList();
+            }
 
             foreach (var studio in studioFoldOutStates)
             {
@@ -155,9 +155,10 @@ namespace PlayFab.PfEditor
 
                 EditorGUI.indentLevel = 2;
 
-                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                EditorGUILayout.LabelField("TITLES:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                GUILayout.EndHorizontal();
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                {
+                    EditorGUILayout.LabelField("TITLES:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                }
                 GUILayout.Space(5);
 
                 // draw title foldouts
@@ -168,18 +169,20 @@ namespace PlayFab.PfEditor
                         continue;
 
                     EditorGUI.indentLevel = 3;
-                    GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                    EditorGUILayout.LabelField("SECRET KEY:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                    EditorGUILayout.TextField("" + title.Value.Title.SecretKey);
-                    GUILayout.EndHorizontal();
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                    {
+                        EditorGUILayout.LabelField("SECRET KEY:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                        EditorGUILayout.TextField("" + title.Value.Title.SecretKey);
+                    }
 
-                    GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                    EditorGUILayout.LabelField("URL:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("VIEW IN GAME MANAGER", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
-                        Application.OpenURL(title.Value.Title.GameManagerUrl);
-                    GUILayout.FlexibleSpace();
-                    GUILayout.EndHorizontal();
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                    {
+                        EditorGUILayout.LabelField("URL:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("VIEW IN GAME MANAGER", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                            Application.OpenURL(title.Value.Title.GameManagerUrl);
+                        GUILayout.FlexibleSpace();
+                    }
                     EditorGUI.indentLevel = 2;
                 }
 
@@ -231,98 +234,108 @@ namespace PlayFab.PfEditor
 #endif
             }
 
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true));
-            if (_foundUnknownTitleId)
+            using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true)))
             {
-                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                GUILayout.Label("You are using a TitleId to which you are not a memeber. A title administrator can approve access for your account.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
-                GUILayout.EndHorizontal();
-            }
+                if (_foundUnknownTitleId)
+                {
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                    {
+                        GUILayout.Label("You are using a TitleId to which you are not a memeber. A title administrator can approve access for your account.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
+                    }
+                }
 
-            if (_studioOptions != null && _studioOptions.Length > 0)
-            {
-                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                EditorGUILayout.LabelField("STUDIO: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                _selectedStudioIndex = EditorGUILayout.Popup(_selectedStudioIndex, _studioOptions, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                GUILayout.EndHorizontal();
-            }
+                if (_studioOptions != null && _studioOptions.Length > 0)
+                {
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                    {
+                        EditorGUILayout.LabelField("STUDIO: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                        _selectedStudioIndex = EditorGUILayout.Popup(_selectedStudioIndex, _studioOptions, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    }
+                }
 
-            // SPECIAL HANDLING FOR THESE FIELDS -- How we show the following depends on the data state  (TitleId, DevKey & Studio)
-            if (_foundUnknownTitleId || _selectedStudioIndex == 0)
-            {
-                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                _titleId = EditorGUILayout.TextField(_titleId, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                GUILayout.EndHorizontal();
+                // SPECIAL HANDLING FOR THESE FIELDS -- How we show the following depends on the data state  (TitleId, DevKey & Studio)
+                if (_foundUnknownTitleId || _selectedStudioIndex == 0)
+                {
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                    {
+                        EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                        _titleId = EditorGUILayout.TextField(_titleId, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    }
 
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                GUILayout.EndHorizontal();
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                    {
+                        EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                        _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    }
 #endif
-            }
-            else
-            {
-                if (_titleOptions != null && _titleOptions.Length > 0)
-                {
-                    GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                    EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                    _selectedTitleIdIndex = EditorGUILayout.Popup(_selectedTitleIdIndex, _titleOptions, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                    GUILayout.EndHorizontal();
                 }
+                else
+                {
+                    if (_titleOptions != null && _titleOptions.Length > 0)
+                    {
+                        using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                        {
+                            EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                            _selectedTitleIdIndex = EditorGUILayout.Popup(_selectedTitleIdIndex, _titleOptions, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                        }
+                    }
 
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                GUILayout.EndHorizontal();
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                    {
+                        EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                        _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    }
 #endif
-            }
-            // ------------------------------------------------------------------------------------------------------------------------------------------------
-            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-            EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-            PlayFabEditorDataService.SharedSettings.WebRequestType = (WebRequestType)EditorGUILayout.EnumPopup(PlayFabEditorDataService.SharedSettings.WebRequestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
-            GUILayout.EndHorizontal();
-
-            if (PlayFabEditorDataService.SharedSettings.WebRequestType == WebRequestType.HttpWebRequest)
-            {
-                using (var fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                }
+                // ------------------------------------------------------------------------------------------------------------------------------------------------
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                 {
-                    GUILayout.Space(labelWidth - fwl.fieldWidth);
-                    PlayFabEditorDataService.SharedSettings.TimeOut = EditorGUILayout.IntField(PlayFabEditorDataService.SharedSettings.TimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
+                    PlayFabEditorDataService.SharedSettings.WebRequestType = (WebRequestType)EditorGUILayout.EnumPopup(PlayFabEditorDataService.SharedSettings.WebRequestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
                 }
 
-                using (var fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                if (PlayFabEditorDataService.SharedSettings.WebRequestType == WebRequestType.HttpWebRequest)
                 {
-                    GUILayout.Space(labelWidth - fwl.fieldWidth);
-                    PlayFabEditorDataService.SharedSettings.KeepAlive = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.KeepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                    using (var fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                    {
+                        GUILayout.Space(labelWidth - fwl.fieldWidth);
+                        PlayFabEditorDataService.SharedSettings.TimeOut = EditorGUILayout.IntField(PlayFabEditorDataService.SharedSettings.TimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                    }
+
+                    using (var fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
+                    {
+                        GUILayout.Space(labelWidth - fwl.fieldWidth);
+                        PlayFabEditorDataService.SharedSettings.KeepAlive = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.KeepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                    }
+                }
+
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                {
+                    EditorGUILayout.LabelField("COMPRESS API DATA: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
+                    PlayFabEditorDataService.SharedSettings.CompressApiData = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
+                }
+
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+                {
+                    var buttonWidth = 100;
+                    GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth);
+
+                    if (GUILayout.Button("SAVE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
+                    {
+                        OnSaveSettings();
+                    }
                 }
             }
-
-            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-            EditorGUILayout.LabelField("COMPRESS API DATA: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-            PlayFabEditorDataService.SharedSettings.CompressApiData = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-            var buttonWidth = 100;
-            GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth);
-
-            if (GUILayout.Button("SAVE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
-            {
-                OnSaveSettings();
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndVertical();
         }
 
         private static void DrawPackagesSubPanel()
         {
-            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-            GUILayout.Label("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
-            GUILayout.EndHorizontal();
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
+            {
+                GUILayout.Label("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
+            }
 
             if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
             {
@@ -334,12 +347,13 @@ namespace PlayFab.PfEditor
                     PlayFabEditorPackageManager.AndroidPushPlugin = EditorGUILayout.Toggle(PlayFabEditorPackageManager.AndroidPushPlugin, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"));
                 }
                 GUILayout.Space(5);
-                GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-                if (GUILayout.Button("VIEW GUIDE", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                 {
-                    Application.OpenURL("https://github.com/PlayFab/UnitySDK/tree/master/PluginsSource/UnityAndroidPluginSource#playfab-push-notification-plugin");
+                    if (GUILayout.Button("VIEW GUIDE", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+                    {
+                        Application.OpenURL("https://github.com/PlayFab/UnitySDK/tree/master/PluginsSource/UnityAndroidPluginSource#playfab-push-notification-plugin");
+                    }
                 }
-                GUILayout.EndHorizontal();
                 GUILayout.EndScrollView();
             }
         }
@@ -572,7 +586,7 @@ namespace PlayFab.PfEditor
         {
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, SubMenuStates.TitleSettings.ToString(), "" + (int)SubMenuStates.TitleSettings);
         }
-        
+
         private static void OnSaveSettings()
         {
             // make assessments on the override at studio positon 0

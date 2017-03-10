@@ -18,20 +18,20 @@ namespace PlayFab.PfEditor
             defaultStyle = defaultStyle ?? PlayFabEditorHelper.uiStyle.GetStyle("textButton");
             bgStyle = bgStyle ?? PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1");
 
-            GUILayout.BeginHorizontal(bgStyle, GUILayout.ExpandWidth(true));
-
-            foreach (var item in items)
+            using (new UnityHorizontal(bgStyle, GUILayout.ExpandWidth(true)))
             {
-                var styleToUse = item.Value.isSelected ? selectedStyle : defaultStyle;
-                var content = new GUIContent(item.Value.displayName);
-                var size = styleToUse.CalcSize(content);
-
-                if (GUILayout.Button(item.Value.displayName, styleToUse, GUILayout.Width(size.x + 1)))
+                foreach (var item in items)
                 {
-                    OnMenuItemClicked(item.Key);
+                    var styleToUse = item.Value.isSelected ? selectedStyle : defaultStyle;
+                    var content = new GUIContent(item.Value.displayName);
+                    var size = styleToUse.CalcSize(content);
+
+                    if (GUILayout.Button(item.Value.displayName, styleToUse, GUILayout.Width(size.x + 1)))
+                    {
+                        OnMenuItemClicked(item.Key);
+                    }
                 }
             }
-            GUILayout.EndHorizontal();
         }
 
         public void RegisterMenuItem(string n, System.Action m)

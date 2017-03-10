@@ -97,68 +97,73 @@ namespace PlayFab.PfEditor
             }
         }
 
-        void OnGUI()
+        private void OnGUI()
+        {
+            HideRepaintErrors(OnGuiInternal);
+        }
+
+        private void OnGuiInternal()
         {
             GUI.skin = PlayFabEditorHelper.uiStyle;
 
-            GUILayout.BeginVertical();
-
-            //Run all updaters prior to drawing;  
-            PlayFabEditorSettings.Update();
-            PlayFabEditorPackageManager.Update();
-            PlayFabEditorHeader.DrawHeader();
-
-            GUI.enabled = blockingRequests.Count == 0 && !EditorApplication.isCompiling;
-
-            if (!PlayFabEditorDataService.IsDataLoaded)
-                return;
-
-            if (PlayFabEditorAuthenticate.IsAuthenticated())
+            using (new UnityVertical())
             {
-                PlayFabEditorMenu.DrawMenu();
+                //Run all updaters prior to drawing;  
+                PlayFabEditorSettings.Update();
+                PlayFabEditorPackageManager.Update();
+                PlayFabEditorHeader.DrawHeader();
 
-                switch (PlayFabEditorMenu._menuState)
+                GUI.enabled = blockingRequests.Count == 0 && !EditorApplication.isCompiling;
+
+                if (!PlayFabEditorDataService.IsDataLoaded)
+                    return;
+
+                if (PlayFabEditorAuthenticate.IsAuthenticated())
                 {
-                    case PlayFabEditorMenu.MenuStates.Sdks:
-                        HideRepaintErrors(PlayFabEditorSDKTools.DrawSdkPanel);
-                        break;
-                    case PlayFabEditorMenu.MenuStates.Settings:
-                        HideRepaintErrors(PlayFabEditorSettings.DrawSettingsPanel);
-                        PlayFabEditorSettings.After();
-                        break;
-                    case PlayFabEditorMenu.MenuStates.Help:
-                        HideRepaintErrors(PlayFabEditorHelpMenu.DrawHelpPanel);
-                        break;
-                    case PlayFabEditorMenu.MenuStates.Data:
-                        HideRepaintErrors(PlayFabEditorDataMenu.DrawDataPanel);
-                        break;
-                    case PlayFabEditorMenu.MenuStates.Tools:
-                        HideRepaintErrors(PlayFabEditorToolsMenu.DrawToolsPanel);
-                        break;
-                    default:
-                        break;
+                    PlayFabEditorMenu.DrawMenu();
+
+                    switch (PlayFabEditorMenu._menuState)
+                    {
+                        case PlayFabEditorMenu.MenuStates.Sdks:
+                            PlayFabEditorSDKTools.DrawSdkPanel();
+                            break;
+                        case PlayFabEditorMenu.MenuStates.Settings:
+                            PlayFabEditorSettings.DrawSettingsPanel();
+                            PlayFabEditorSettings.After();
+                            break;
+                        case PlayFabEditorMenu.MenuStates.Help:
+                            PlayFabEditorHelpMenu.DrawHelpPanel();
+                            break;
+                        case PlayFabEditorMenu.MenuStates.Data:
+                            PlayFabEditorDataMenu.DrawDataPanel();
+                            break;
+                        case PlayFabEditorMenu.MenuStates.Tools:
+                            PlayFabEditorToolsMenu.DrawToolsPanel();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    PlayFabEditorAuthenticate.DrawAuthPanels();
+                }
+
+                using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true)))
+                {
+                    GUILayout.FlexibleSpace();
+                }
+
+                // help tag at the bottom of the help menu.
+                if (PlayFabEditorMenu._menuState == PlayFabEditorMenu.MenuStates.Help)
+                {
+                    DisplayHelpMenu();
                 }
             }
-            else
-            {
-                PlayFabEditorAuthenticate.DrawAuthPanels();
-            }
-
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
-            GUILayout.FlexibleSpace();
-            GUILayout.EndVertical();
-
-            // help tag at the bottom of the help menu.
-            if (PlayFabEditorMenu._menuState == PlayFabEditorMenu.MenuStates.Help)
-            {
-                DisplayHelpMenu();
-            }
-
-            GUILayout.EndVertical();
 
             PruneBlockingRequests();
 
-            HideRepaintErrors(Repaint);
+            Repaint();
         }
 
         private static void HideRepaintErrors(Action action)
@@ -177,55 +182,61 @@ namespace PlayFab.PfEditor
 
         private static void DisplayHelpMenu()
         {
-            GUILayout.BeginVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-            GUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField(string.Format("PlayFab Editor Extensions: {0}", PlayFabEditorHelper.EDEX_VERSION), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-
-            //TODO Add plugin upgrade option here (if available);
-            if (ShowEdExUpgrade())
+            using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("UPGRADE EDEX", PlayFabEditorHelper.uiStyle.GetStyle("textButtonOr")))
+                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                 {
-                    UpgradeEdEx();
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.LabelField(string.Format("PlayFab Editor Extensions: {0}", PlayFabEditorHelper.EDEX_VERSION), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
+                    GUILayout.FlexibleSpace();
                 }
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-            }
 
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("VIEW DOCUMENTATION", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
-            {
-                Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions");
-            }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("REPORT ISSUES", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
-            {
-                Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions/issues");
-            }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-
-            if (!string.IsNullOrEmpty(PlayFabEditorHelper.EDEX_ROOT))
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("UNINSTALL ", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                //TODO Add plugin upgrade option here (if available);
+                if (ShowEdExUpgrade())
                 {
-                    RemoveEdEx();
+                    using (new UnityHorizontal())
+                    {
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("UPGRADE EDEX", PlayFabEditorHelper.uiStyle.GetStyle("textButtonOr")))
+                        {
+                            UpgradeEdEx();
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
                 }
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-                GUILayout.EndVertical();
+
+                using (new UnityHorizontal())
+                {
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("VIEW DOCUMENTATION", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                    {
+                        Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions");
+                    }
+                    GUILayout.FlexibleSpace();
+                }
+
+                using (new UnityHorizontal())
+                {
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("REPORT ISSUES", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                    {
+                        Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions/issues");
+                    }
+                    GUILayout.FlexibleSpace();
+                }
+
+                if (!string.IsNullOrEmpty(PlayFabEditorHelper.EDEX_ROOT))
+                {
+                    using (new UnityHorizontal())
+                    {
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("UNINSTALL ", PlayFabEditorHelper.uiStyle.GetStyle("textButton")))
+                        {
+                            RemoveEdEx();
+                        }
+                        GUILayout.FlexibleSpace();
+                    }
+                }
             }
         }
         #endregion

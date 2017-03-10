@@ -17,23 +17,22 @@ namespace PlayFab.PfEditor
         // this gets called after the Base draw loop
         public void Draw()
         {
-            EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-            GUILayout.Label("Internal TitleData provides Key-Value storage available only to Admin & Server API sets. This is useful for storing configuration data that should be hidden from players.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
-            GUILayout.EndHorizontal();
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
+                GUILayout.Label("Internal TitleData provides Key-Value storage available only to Admin & Server API sets. This is useful for storing configuration data that should be hidden from players.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
 
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+            using (new UnityHorizontal())
             {
-                RefreshRecords();
-            }
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
+                {
+                    RefreshRecords();
+                }
 
-            if (GUILayout.Button("+", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(25)))
-            {
-                AddRecord();
+                if (GUILayout.Button("+", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(25)))
+                {
+                    AddRecord();
+                }
             }
-
-            EditorGUILayout.EndHorizontal();
 
             if (items.Count > 0)
             {
@@ -54,32 +53,31 @@ namespace PlayFab.PfEditor
                         var keyStyle = items[z].isDirty ? PlayFabEditorHelper.uiStyle.GetStyle("listKey_dirty") : PlayFabEditorHelper.uiStyle.GetStyle("listKey");
                         var valStyle = items[z].isDirty ? PlayFabEditorHelper.uiStyle.GetStyle("listValue_dirty") : PlayFabEditorHelper.uiStyle.GetStyle("listValue");
 
-                        EditorGUILayout.BeginHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
-
-                        items[z].Key = GUILayout.TextField(items[z].Key, keyStyle, GUILayout.Width(keyInputBoxWidth));
-
-                        EditorGUILayout.LabelField(":", GUILayout.MaxWidth(10));
-                        GUILayout.Label("" + items[z].Value, valStyle, GUILayout.MaxWidth(valueInputBoxWidth), GUILayout.MaxHeight(25));
-
-                        if (GUILayout.Button("EDIT", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(35)))
+                        using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                         {
-                            if (tdEditor == null)
+                            items[z].Key = GUILayout.TextField(items[z].Key, keyStyle, GUILayout.Width(keyInputBoxWidth));
+
+                            EditorGUILayout.LabelField(":", GUILayout.MaxWidth(10));
+                            GUILayout.Label("" + items[z].Value, valStyle, GUILayout.MaxWidth(valueInputBoxWidth), GUILayout.MaxHeight(25));
+
+                            if (GUILayout.Button("EDIT", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(35)))
                             {
-                                tdEditor = EditorWindow.GetWindow<TitleInternalDataEditor>();
-                                tdEditor.titleContent = new GUIContent("Internal Title Data");
-                                tdEditor.minSize = new Vector2(300, 400);
+                                if (tdEditor == null)
+                                {
+                                    tdEditor = EditorWindow.GetWindow<TitleInternalDataEditor>();
+                                    tdEditor.titleContent = new GUIContent("Internal Title Data");
+                                    tdEditor.minSize = new Vector2(300, 400);
+                                }
+
+                                tdEditor.LoadData(items[z].Key, items[z].Value);
+                                tdEditor.Show();
                             }
-
-                            tdEditor.LoadData(items[z].Key, items[z].Value);
-                            tdEditor.Show();
+                            if (GUILayout.Button("X", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(20)))
+                            {
+                                items[z].isDirty = true;
+                                items[z].Value = null;
+                            }
                         }
-                        if (GUILayout.Button("X", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxHeight(19), GUILayout.MinWidth(20)))
-                        {
-                            items[z].isDirty = true;
-                            items[z].Value = null;
-                        }
-
-                        EditorGUILayout.EndHorizontal();
                     }
                 }
 
@@ -87,14 +85,15 @@ namespace PlayFab.PfEditor
 
                 if (showSave)
                 {
-                    EditorGUILayout.BeginHorizontal();
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("SAVE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(200)))
+                    using (new UnityHorizontal())
                     {
-                        SaveRecords();
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("SAVE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(200)))
+                        {
+                            SaveRecords();
+                        }
+                        GUILayout.FlexibleSpace();
                     }
-                    GUILayout.FlexibleSpace();
-                    EditorGUILayout.EndHorizontal();
                 }
             }
         }
