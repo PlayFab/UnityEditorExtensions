@@ -258,7 +258,7 @@ namespace PlayFab.PfEditor
                 PlayFabEditorDataService.AccountDetails.devToken = result.DeveloperClientToken;
                 PlayFabEditorDataService.AccountDetails.email = _userEmail;
 
-                PlayFabEditorDataService.GetStudios();
+                PlayFabEditorDataService.RefreshStudiosList();
 
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnLogin);
                 PlayFabEditorDataService.SaveAccountDetails();
@@ -278,7 +278,7 @@ namespace PlayFab.PfEditor
             {
                 PlayFabEditorDataService.AccountDetails.devToken = result.DeveloperClientToken;
                 PlayFabEditorDataService.AccountDetails.email = _userEmail;
-                PlayFabEditorDataService.GetStudios();
+                PlayFabEditorDataService.RefreshStudiosList();
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnLogin);
                 PlayFabEditorDataService.SaveAccountDetails();
                 PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;
@@ -311,7 +311,7 @@ namespace PlayFab.PfEditor
             {
                 PlayFabEditorDataService.AccountDetails.devToken = result.DeveloperClientToken;
                 PlayFabEditorDataService.AccountDetails.email = _userEmail;
-                PlayFabEditorDataService.GetStudios();
+                PlayFabEditorDataService.RefreshStudiosList();
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnLogin);
                 PlayFabEditorDataService.SaveAccountDetails();
                 PlayFabEditorMenu._menuState = PlayFabEditorMenu.MenuStates.Sdks;

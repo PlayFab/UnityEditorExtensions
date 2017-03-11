@@ -45,7 +45,7 @@ namespace PlayFab.PfEditor
             resultCallback(fileSaveLocation);
         }
 
-        internal static void MakeApiCall<TRequestType, TResultType>(string api, string apiEndpoint, TRequestType request, Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback)
+        internal static void MakeApiCall<TRequestType, TResultType>(string api, string apiEndpoint, TRequestType request, Action<TResultType> resultCallback, Action<EditorModels.PlayFabError> errorCallback) where TResultType: class
         {
             var url = apiEndpoint + api;
             var req = JsonWrapper.SerializeObject(request, PlayFabEditorUtil.ApiSerializerStrategy);
@@ -76,7 +76,7 @@ namespace PlayFab.PfEditor
             EditorCoroutine.Start(Post(www, (response) => { OnWwwSuccess(api, resultCallback, errorCallback, response); }, (error) => { OnWwwError(errorCallback, error); }), www);
         }
 
-        private static void OnWwwSuccess<TResultType>(string api, Action<TResultType> resultCallback, Action<PlayFab.PfEditor.EditorModels.PlayFabError> errorCallback, string response)
+        private static void OnWwwSuccess<TResultType>(string api, Action<TResultType> resultCallback, Action<PlayFab.PfEditor.EditorModels.PlayFabError> errorCallback, string response) where TResultType : class
         {
             var httpResult = JsonWrapper.DeserializeObject<HttpResponseObject>(response, PlayFabEditorUtil.ApiSerializerStrategy);
             if (httpResult.code != 200)
@@ -85,20 +85,24 @@ namespace PlayFab.PfEditor
                 return;
             }
 
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnHttpRes, api);
+            if (resultCallback == null)
+                return;
+
+            TResultType result = null;
+            var resultAssigned = false;
             try
             {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnHttpRes, api);
-                if (resultCallback == null)
-                    return;
-
                 var dataJson = JsonWrapper.SerializeObject(httpResult.data, PlayFabEditorUtil.ApiSerializerStrategy);
-                var result = JsonWrapper.DeserializeObject<TResultType>(dataJson, PlayFabEditorUtil.ApiSerializerStrategy);
-                resultCallback(result);
+                result = JsonWrapper.DeserializeObject<TResultType>(dataJson, PlayFabEditorUtil.ApiSerializerStrategy);
+                resultAssigned = true;
             }
             catch (Exception e)
             {
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, e.Message);
             }
+            if (resultAssigned)
+                resultCallback(result);
         }
 
         private static void OnWwwError(Action<PlayFab.PfEditor.EditorModels.PlayFabError> errorCallback, string error)

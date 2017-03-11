@@ -27,24 +27,6 @@ namespace PlayFab.PfEditor
 
         private static SubMenuComponent _menu = null;
 
-        private static string[] _titleOptions;
-        private static string[] _studioOptions;
-
-        private static int _selectedTitleIdIndex = 0;
-        private static int _selectedStudioIndex = -1;
-        private static int _prevSelectedTitleIdIndex = 0;
-        private static int _prevSelectedStudioIndex = -1;
-
-        private static string _titleId;
-        private static string _prevTitleId;
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-        private static string _DeveloperSecretKey;
-#endif
-
-        private static bool _isSettingsSet = false;
-        private static bool _foundUnknownTitleId = false;
-        private static bool _isFetchingStudios = false;
-
         private static Dictionary<string, StudioDisplaySet> studioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
         private static Vector2 _titleScrollPos = Vector2.zero;
         private static Vector2 _packagesScrollPos = Vector2.zero;
@@ -86,8 +68,6 @@ namespace PlayFab.PfEditor
 
         public static void DrawSettingsPanel()
         {
-            SetSettingsProperties();
-
             if (PlayFabEditorDataService.IsDataLoaded)
             {
                 if (_menu != null)
@@ -120,13 +100,15 @@ namespace PlayFab.PfEditor
         {
             float labelWidth = 100;
 
-            if (PlayFabEditorDataService.AccountDetails.studios != null && PlayFabEditorDataService.AccountDetails.studios.Length != studioFoldOutStates.Count)
+            if (PlayFabEditorDataService.AccountDetails.studios != null && PlayFabEditorDataService.AccountDetails.studios.Count != studioFoldOutStates.Count + 1)
             {
                 studioFoldOutStates.Clear();
                 foreach (var studio in PlayFabEditorDataService.AccountDetails.studios)
                 {
+                    if (string.IsNullOrEmpty(studio.Id))
+                        continue;
                     if (!studioFoldOutStates.ContainsKey(studio.Id))
-                        studioFoldOutStates.Add(studio.Id, new StudioDisplaySet() { Studio = studio });
+                        studioFoldOutStates.Add(studio.Id, new StudioDisplaySet { Studio = studio });
                     foreach (var title in studio.Titles)
                         if (!studioFoldOutStates[studio.Id].titleFoldOutStates.ContainsKey(title.Id))
                             studioFoldOutStates[studio.Id].titleFoldOutStates.Add(title.Id, new TitleDisplaySet { Title = title });
@@ -140,7 +122,7 @@ namespace PlayFab.PfEditor
                 EditorGUILayout.LabelField("STUDIOS:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
-                    RefreshStudiosList();
+                    PlayFabEditorDataService.RefreshStudiosList();
             }
 
             foreach (var studio in studioFoldOutStates)
@@ -191,142 +173,100 @@ namespace PlayFab.PfEditor
             GUILayout.EndScrollView();
         }
 
+        private static Studio GetStudioForTitleId(string titleId)
+        {
+            if (PlayFabEditorDataService.AccountDetails.studios == null)
+                return Studio.OVERRIDE;
+            foreach (var eachStudio in PlayFabEditorDataService.AccountDetails.studios)
+                if (eachStudio.Titles != null)
+                    foreach (var eachTitle in eachStudio.Titles)
+                        if (eachTitle.Id == titleId)
+                            return eachStudio;
+            return Studio.OVERRIDE;
+        }
+
         private static void DrawStandardSettingsSubPanel()
         {
             float labelWidth = 160;
 
-            if (_foundUnknownTitleId && (_titleId != _prevTitleId))
-            {
-                _prevTitleId = _titleId;
-            }
-
-            if (_selectedStudioIndex != _prevSelectedStudioIndex)
-            {
-                // handle our _OVERRIDE_ STATE FIRST
-                if (_selectedStudioIndex == 0)
-                {
-                    _prevSelectedStudioIndex = 0;
-                    _selectedTitleIdIndex = 0;
-                    _foundUnknownTitleId = true;
-                    _titleId = string.Empty;
-
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                    _DeveloperSecretKey = string.Empty;
-#endif
-
-                }
-                else
-                {
-                    _foundUnknownTitleId = false;
-                    _selectedTitleIdIndex = _selectedTitleIdIndex > PlayFabEditorDataService.AccountDetails.studios[_selectedStudioIndex - 1].Titles.Length ? 0 : _selectedTitleIdIndex; // reset our titles index
-                    CompoundTitlesList();
-                    _prevSelectedStudioIndex = _selectedStudioIndex;
-                }
-            }
-
-            if (_selectedTitleIdIndex != _prevSelectedTitleIdIndex)
-            {
-                // this changed since the last loop
-                _prevSelectedTitleIdIndex = _selectedStudioIndex;
-
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                _DeveloperSecretKey = PlayFabEditorDataService.AccountDetails.studios[_selectedStudioIndex - 1].Titles[_selectedTitleIdIndex].SecretKey;
-#endif
-            }
-
             using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"), GUILayout.ExpandWidth(true)))
             {
-                if (_foundUnknownTitleId)
-                {
+                var studio = GetStudioForTitleId(PlayFabEditorDataService.SharedSettings.TitleId);
+                if (string.IsNullOrEmpty(studio.Id))
                     using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                    {
                         GUILayout.Label("You are using a TitleId to which you are not a memeber. A title administrator can approve access for your account.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
-                    }
-                }
 
-                if (_studioOptions != null && _studioOptions.Length > 0)
-                {
-                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                    {
-                        EditorGUILayout.LabelField("STUDIO: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                        _selectedStudioIndex = EditorGUILayout.Popup(_selectedStudioIndex, _studioOptions, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                    }
-                }
+                PlayFabGuiFieldHelper.SuperFancyDropdown(labelWidth, "STUDIO: ", studio, PlayFabEditorDataService.AccountDetails.studios, eachStudio => eachStudio.Name, OnStudioChange, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                studio = GetStudioForTitleId(PlayFabEditorDataService.SharedSettings.TitleId); // This might have changed above, so refresh it
 
-                // SPECIAL HANDLING FOR THESE FIELDS -- How we show the following depends on the data state  (TitleId, DevKey & Studio)
-                if (_foundUnknownTitleId || _selectedStudioIndex == 0)
+                if (string.IsNullOrEmpty(studio.Id))
                 {
+                    // Override studio lets you set your own titleId
                     using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                     {
                         EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                        _titleId = EditorGUILayout.TextField(_titleId, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                    }
 
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                    {
-                        EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                        _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                        var newTitleId = EditorGUILayout.TextField(PlayFabEditorDataService.SharedSettings.TitleId, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+                        if (newTitleId != PlayFabEditorDataService.SharedSettings.TitleId)
+                            OnTitleIdChange(newTitleId);
                     }
-#endif
                 }
                 else
                 {
-                    if (_titleOptions != null && _titleOptions.Length > 0)
-                    {
-                        using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                        {
-                            EditorGUILayout.LabelField("TITLE ID: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                            _selectedTitleIdIndex = EditorGUILayout.Popup(_selectedTitleIdIndex, _titleOptions, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                        }
-                    }
+                    PlayFabGuiFieldHelper.SuperFancyDropdown(labelWidth, "TITLE ID: ", studio.GetTitle(PlayFabEditorDataService.SharedSettings.TitleId), studio.Titles, GetTitleDisplayString, OnTitleChange, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                }
 
+                DrawPfSharedSettingsOptions(labelWidth);
+            }
+        }
+
+        private static string GetTitleDisplayString(Title title)
+        {
+            return string.Format("[{0}] {1}", title.Id, title.Name);
+        }
+
+        private static void DrawPfSharedSettingsOptions(float labelWidth)
+        {
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                    {
-                        EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
-                        _DeveloperSecretKey = EditorGUILayout.TextField(_DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                    }
+            // Set the title secret key, if we're using the dropdown
+            var studio = GetStudioForTitleId(PlayFabEditorDataService.SharedSettings.TitleId);
+            var correctKey = studio.GetTitleSecretKey(PlayFabEditorDataService.SharedSettings.TitleId);
+            var setKey = !string.IsNullOrEmpty(studio.Id) && !string.IsNullOrEmpty(correctKey);
+            if (setKey)
+                PlayFabEditorDataService.SharedSettings.DeveloperSecretKey = correctKey;
+
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+            {
+                EditorGUILayout.LabelField("DEVELOPER SECRET KEY: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.Width(labelWidth));
+                using (new UnityGuiToggler(!setKey))
+                    PlayFabEditorDataService.SharedSettings.DeveloperSecretKey = EditorGUILayout.TextField(PlayFabEditorDataService.SharedSettings.DeveloperSecretKey, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
+            }
 #endif
-                }
-                // ------------------------------------------------------------------------------------------------------------------------------------------------
-                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+            {
+                EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
+                PlayFabEditorDataService.SharedSettings.WebRequestType = (WebRequestType)EditorGUILayout.EnumPopup(PlayFabEditorDataService.SharedSettings.WebRequestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
+            }
+
+            if (PlayFabEditorDataService.SharedSettings.WebRequestType == WebRequestType.HttpWebRequest)
+            {
+                using (var fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
                 {
-                    EditorGUILayout.LabelField("REQUEST TYPE: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-                    PlayFabEditorDataService.SharedSettings.WebRequestType = (WebRequestType)EditorGUILayout.EnumPopup(PlayFabEditorDataService.SharedSettings.WebRequestType, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.Height(25));
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    PlayFabEditorDataService.SharedSettings.TimeOut = EditorGUILayout.IntField(PlayFabEditorDataService.SharedSettings.TimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
                 }
 
-                if (PlayFabEditorDataService.SharedSettings.WebRequestType == WebRequestType.HttpWebRequest)
+                using (var fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
                 {
-                    using (var fwl = new FixedWidthLabel(new GUIContent("REQUEST TIMEOUT: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
-                    {
-                        GUILayout.Space(labelWidth - fwl.fieldWidth);
-                        PlayFabEditorDataService.SharedSettings.TimeOut = EditorGUILayout.IntField(PlayFabEditorDataService.SharedSettings.TimeOut, PlayFabEditorHelper.uiStyle.GetStyle("TextField"), GUILayout.MinHeight(25));
-                    }
-
-                    using (var fwl = new FixedWidthLabel(new GUIContent("KEEP ALIVE: "), PlayFabEditorHelper.uiStyle.GetStyle("labelStyle")))
-                    {
-                        GUILayout.Space(labelWidth - fwl.fieldWidth);
-                        PlayFabEditorDataService.SharedSettings.KeepAlive = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.KeepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-                    }
+                    GUILayout.Space(labelWidth - fwl.fieldWidth);
+                    PlayFabEditorDataService.SharedSettings.KeepAlive = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.KeepAlive, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
                 }
+            }
 
-                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                {
-                    EditorGUILayout.LabelField("COMPRESS API DATA: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
-                    PlayFabEditorDataService.SharedSettings.CompressApiData = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
-                }
-
-                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                {
-                    var buttonWidth = 100;
-                    GUILayout.Space(EditorGUIUtility.currentViewWidth - buttonWidth);
-
-                    if (GUILayout.Button("SAVE", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.MaxWidth(buttonWidth)))
-                    {
-                        OnSaveSettings();
-                    }
-                }
+            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
+            {
+                EditorGUILayout.LabelField("COMPRESS API DATA: ", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"), GUILayout.MaxWidth(labelWidth));
+                PlayFabEditorDataService.SharedSettings.CompressApiData = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             }
         }
 
@@ -430,131 +370,6 @@ namespace PlayFab.PfEditor
         #endregion
 
         #region menu and helper methods
-        private static void SetSettingsProperties()
-        {
-            if (PlayFabEditorSDKTools.IsInstalled && !_isSettingsSet)
-            {
-
-                if (!string.IsNullOrEmpty(PlayFabEditorDataService.EnvDetails.selectedTitleId))
-                {
-                    // exists in user's titles?
-                    if (!PlayFabEditorDataService.DoesTitleExistInStudios(PlayFabEditorDataService.EnvDetails.selectedTitleId))
-                    {
-                        string msg = string.Format("A title id ({0}) that does not belong to one of your studios has been selected. You can update this value on the PROJECT SETTINGS tab within the PlayFab Editor Extensions.", PlayFabEditorDataService.EnvDetails.selectedTitleId);
-                        PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnWarning, msg);
-                        _foundUnknownTitleId = true;
-                        _prevSelectedStudioIndex = 0;
-                        _selectedStudioIndex = 0;
-
-                        _titleId = PlayFabEditorDataService.EnvDetails.selectedTitleId;
-
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                        _DeveloperSecretKey = PlayFabEditorDataService.EnvDetails.developerSecretKey;
-#endif
-                    }
-                    else
-                    {
-                        _foundUnknownTitleId = false;
-                    }
-
-                }
-
-                if (_studioOptions == null || (_studioOptions.Length == 0 && PlayFabEditorDataService.AccountDetails.studios != null && PlayFabEditorDataService.AccountDetails.studios.Length > 0))
-                {
-                    BuildDropDownLists();
-                }
-
-                _isSettingsSet = true;
-            }
-        }
-
-        private static void BuildDropDownLists()
-        {
-            if (PlayFabEditorDataService.AccountDetails.studios == null && _isFetchingStudios == false)
-            {
-                RefreshStudiosList();
-                return;
-            }
-            var studioCount = PlayFabEditorDataService.AccountDetails.studios == null ? 0 : PlayFabEditorDataService.AccountDetails.studios.Length;
-            if (studioCount == 0)
-                return;
-
-            _studioOptions = new string[studioCount + 1];
-
-            for (var studioIdx = 0; studioIdx < studioCount + 1; studioIdx++)
-            {
-                // set up a manual override
-                if (studioIdx == 0)
-                {
-                    _studioOptions[studioIdx] = PlayFabEditorHelper.STUDIO_OVERRIDE;
-                    continue;
-                }
-
-                _studioOptions[studioIdx] = PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Name;
-
-                if (PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Name == PlayFabEditorDataService.EnvDetails.selectedStudio)
-                {
-                    _prevSelectedStudioIndex = studioIdx;
-                    _selectedStudioIndex = studioIdx;
-                }
-
-                bool foundTitle = false;
-                for (var titleIdx = 0; titleIdx < PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Titles.Length; titleIdx++)
-                {
-                    if (foundTitle)
-                    {
-                        // then we know this is the correct studio
-                        _titleOptions[titleIdx] = string.Format("[{0}] {1}", PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Titles[titleIdx].Id, PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Titles[titleIdx].Name);
-                    }
-
-                    string comp1 = PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Titles[titleIdx].Id.ToLower();
-                    string comp2 = (PlayFabEditorDataService.EnvDetails.selectedTitleId ?? "").ToLower();
-
-                    if (comp1 == comp2 && foundTitle == false)
-                    {
-                        foundTitle = true;
-                        _titleOptions = new string[PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Titles.Length];
-
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                        _DeveloperSecretKey = PlayFabEditorDataService.AccountDetails.studios[studioIdx - 1].Titles[titleIdx].SecretKey;
-#endif
-
-                        _selectedTitleIdIndex = titleIdx;
-                        _prevSelectedTitleIdIndex = titleIdx;
-
-                        _selectedStudioIndex = studioIdx;
-                        _prevSelectedStudioIndex = studioIdx;
-
-                        // restart this inner loop to add titles to dropdown
-                        titleIdx = -1;
-                    }
-                }
-            }
-
-            if (PlayFabEditorDataService.AccountDetails.studios == null || PlayFabEditorDataService.AccountDetails.studios.Length == 0)
-            {
-                // this should not happen. But it seems to be happening...
-                _selectedStudioIndex = 0;
-                _prevSelectedStudioIndex = 0;
-                _selectedTitleIdIndex = 0;
-                _prevSelectedTitleIdIndex = 0;
-                _foundUnknownTitleId = true;
-            }
-            else if ((_titleOptions == null || _titleOptions.Length == 0) && _prevSelectedStudioIndex == -1)
-            {
-                // could not find our title, but lets build a list anyways 
-                _titleOptions = new string[PlayFabEditorDataService.AccountDetails.studios[0].Titles.Length];
-                for (var x = 0; x < _titleOptions.Length; x++)
-                {
-                    _titleOptions[x] = string.Format("[{0}] {1}", PlayFabEditorDataService.AccountDetails.studios[0].Titles[x].Id, PlayFabEditorDataService.AccountDetails.studios[0].Titles[x].Name);
-                }
-                _selectedStudioIndex = 1;
-                _prevSelectedStudioIndex = 1;
-                _selectedTitleIdIndex = 0;
-                _prevSelectedTitleIdIndex = 0;
-            }
-        }
-
         private static void RegisterMenu()
         {
             if (_menu != null)
@@ -587,56 +402,31 @@ namespace PlayFab.PfEditor
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, SubMenuStates.TitleSettings.ToString(), "" + (int)SubMenuStates.TitleSettings);
         }
 
-        private static void OnSaveSettings()
+        private static void OnStudioChange(Studio newStudio)
         {
-            // make assessments on the override at studio positon 0
-            if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
-            {
-                if (_foundUnknownTitleId || _selectedStudioIndex == 0)
-                {
-                    if (PlayFabEditorDataService.EnvDetails.selectedTitleId != _titleId)
-                    {
-                        PlayFabEditorDataService.EnvDetails.titleData.Clear();
-                        if (PlayFabEditorDataMenu.tdViewer != null)
-                        {
-                            PlayFabEditorDataMenu.tdViewer.items.Clear();
-                        }
-                    }
-
-                    PlayFabEditorDataService.EnvDetails.selectedTitleId = _titleId;
-                }
-                else
-                {
-                    // if we switched titles clear titledata 
-                    if (PlayFabEditorDataService.EnvDetails.selectedTitleId != GetSelectedTitleIdFromOptions())
-                    {
-                        PlayFabEditorDataService.EnvDetails.titleData.Clear();
-                        if (PlayFabEditorDataMenu.tdViewer != null)
-                        {
-                            PlayFabEditorDataMenu.tdViewer.items.Clear();
-                        }
-                    }
-
-                    PlayFabEditorDataService.EnvDetails.selectedTitleId = GetSelectedTitleIdFromOptions();
-                }
-
-                PlayFabEditorDataService.EnvDetails.selectedStudio = _studioOptions[_selectedStudioIndex];
-
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                PlayFabEditorDataService.EnvDetails.developerSecretKey = _DeveloperSecretKey;
-#endif
-
-                PlayFabEditorDataService.SaveEnvDetails();
-
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSuccess);
-
-            }
-            else
-            {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, "SDK is unsupported or not installed");
-            }
+            var newTitleId = newStudio.Titles == null ? "" : newStudio.Titles[0].Id;
+            OnTitleIdChange(newTitleId);
         }
 
+        private static void OnTitleChange(Title newTitle)
+        {
+            OnTitleIdChange(newTitle.Id);
+        }
+
+        private static void OnTitleIdChange(string newTitleId)
+        {
+            var studio = GetStudioForTitleId(newTitleId);
+            PlayFabEditorDataService.EnvDetails.selectedStudio = studio.Name;
+            PlayFabEditorDataService.SharedSettings.TitleId = newTitleId;
+#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
+            PlayFabEditorDataService.SharedSettings.DeveloperSecretKey = studio.GetTitleSecretKey(newTitleId);
+#endif
+            PlayFabEditorDataService.EnvDetails.titleData.Clear();
+            if (PlayFabEditorDataMenu.tdViewer != null)
+                PlayFabEditorDataMenu.tdViewer.items.Clear();
+            PlayFabEditorDataService.SaveEnvDetails();
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSuccess);
+        }
 
         private static string AddToBuildTarget(List<string> targets, string define)
         {
@@ -650,64 +440,9 @@ namespace PlayFab.PfEditor
             return string.Join(";", targets.ToArray());
         }
 
-        //CTOR
-        static PlayFabEditorSettings()
+        private static string GetSelectedTitleIdFromOptions(string titleEntry)
         {
-            if (!PlayFabEditor.IsEventHandlerRegistered(StateUpdateHandler))
-                PlayFabEditor.EdExStateUpdate += StateUpdateHandler;
-        }
-
-        private static string GetSelectedTitleIdFromOptions()
-        {
-            if (_titleOptions != null && _titleOptions.Length > 0)
-                return _titleOptions[_selectedTitleIdIndex].Substring(1, _titleOptions[_selectedTitleIdIndex].IndexOf(']') - 1);
-            return string.Empty;
-        }
-
-        private static void CompoundTitlesList()
-        {
-            _titleOptions = new string[PlayFabEditorDataService.AccountDetails.studios[_selectedStudioIndex - 1].Titles.Length];
-            for (var z = 0; z < PlayFabEditorDataService.AccountDetails.studios[_selectedStudioIndex - 1].Titles.Length; z++)
-            {
-                _titleOptions[z] = string.Format("[{0}] {1}", PlayFabEditorDataService.AccountDetails.studios[_selectedStudioIndex - 1].Titles[z].Id, PlayFabEditorDataService.AccountDetails.studios[_selectedStudioIndex - 1].Titles[z].Name);
-            }
-        }
-
-        private static void RefreshStudiosList()
-        {
-            _isFetchingStudios = true;
-            PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
-            {
-                _isFetchingStudios = false;
-                _isSettingsSet = false;
-                _studioOptions = null;
-                PlayFabEditorDataService.AccountDetails.studios = getStudioResult.Studios;
-                PlayFabEditorDataService.SaveAccountDetails();
-            }, PlayFabEditorHelper.SharedErrorCallback);
-        }
-
-        /// <summary>
-        /// Handles state updates within the editor extension.
-        /// </summary>
-        /// <param name="state">the state that triggered this event.</param>
-        /// <param name="status">a generic message about the status.</param>
-        /// <param name="json">a generic container for additional JSON encoded info.</param>
-        private static void StateUpdateHandler(PlayFabEditor.EdExStates state, string status, string json)
-        {
-            switch (state)
-            {
-                case PlayFabEditor.EdExStates.OnMenuItemClicked:
-                    if (status == "Settings")
-                    {
-                        _isSettingsSet = false;
-                        _studioOptions = null;
-                        SetSettingsProperties();
-                    }
-                    break;
-                case PlayFabEditor.EdExStates.OnLogin:
-                    _studioOptions = null;
-                    break;
-            }
+            return titleEntry.Substring(1, titleEntry.IndexOf(']') - 1);
         }
         #endregion
     }

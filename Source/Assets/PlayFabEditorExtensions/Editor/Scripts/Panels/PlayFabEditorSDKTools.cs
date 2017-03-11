@@ -158,7 +158,7 @@ namespace PlayFab.PfEditor
                 }
             }
 
-            if (isSdkSupported && string.IsNullOrEmpty(PlayFabEditorDataService.EnvDetails.selectedTitleId))
+            if (isSdkSupported && string.IsNullOrEmpty(PlayFabEditorDataService.SharedSettings.TitleId))
             {
                 using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
                 {

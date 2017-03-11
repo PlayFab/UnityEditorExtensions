@@ -18,7 +18,8 @@ namespace PlayFab.PfEditor
 
             public string email;
             public string devToken;
-            public Studio[] studios;
+            public List<Studio> studios;
+
             public PlayFab_DeveloperAccountDetails()
             {
                 studios = null; // Null means not fetched, empty is a possible return result from GetStudios
@@ -34,8 +35,6 @@ namespace PlayFab.PfEditor
             public bool isServerApiEnabled;
             public bool isDebugRequestTimesEnabled;
             public string selectedStudio;
-            public string selectedTitleId;
-            public string developerSecretKey;
             public Dictionary<string, string> titleData;
             public Dictionary<string, string> titleInternalData;
             public string sdkPath;
@@ -51,11 +50,15 @@ namespace PlayFab.PfEditor
 
         public class PlayFab_SharedSettingsProxy
         {
+            private readonly PropertyInfo _titleId;
+            private readonly PropertyInfo _developerSecretKey;
             private readonly PropertyInfo _webRequestType;
             private readonly PropertyInfo _compressApiData;
             private readonly PropertyInfo _keepAlive;
             private readonly PropertyInfo _timeOut;
 
+            public string TitleId { get { return (string)_titleId.GetValue(null, null); } set { _titleId.SetValue(null, value, null); } }
+            public string DeveloperSecretKey { get { return (string)_developerSecretKey.GetValue(null, null); } set { _developerSecretKey.SetValue(null, value, null); } }
             public PlayFabEditorSettings.WebRequestType WebRequestType { get { return (PlayFabEditorSettings.WebRequestType)_webRequestType.GetValue(null, null); } set { _webRequestType.SetValue(null, (int)value, null); } }
             public bool CompressApiData { get { return (bool)_compressApiData.GetValue(null, null); } set { _compressApiData.SetValue(null, value, null); } }
             public bool KeepAlive { get { return (bool)_keepAlive.GetValue(null, null); } set { _keepAlive.SetValue(null, value, null); } }
@@ -83,6 +86,10 @@ namespace PlayFab.PfEditor
                     var lcName = eachProperty.Name.ToLower();
                     switch (lcName)
                     {
+                        case "titleid":
+                            _titleId = eachProperty; break;
+                        case "developersecretkey":
+                            _developerSecretKey = eachProperty; break;
                         case "requesttype":
                             _webRequestType = eachProperty; break;
                         case "compressapidata":
@@ -158,18 +165,18 @@ namespace PlayFab.PfEditor
         {
             get
             {
-                if (AccountDetails != null && AccountDetails.studios != null && AccountDetails.studios.Length > 0 && EnvDetails != null)
+                if (AccountDetails != null && AccountDetails.studios != null && AccountDetails.studios.Count > 0 && EnvDetails != null)
                 {
                     if (string.IsNullOrEmpty(EnvDetails.selectedStudio) || EnvDetails.selectedStudio == PlayFabEditorHelper.STUDIO_OVERRIDE)
-                        return new Title { Id = EnvDetails.selectedTitleId, SecretKey = EnvDetails.developerSecretKey, GameManagerUrl = PlayFabEditorHelper.GAMEMANAGER_URL };
+                        return new Title { Id = SharedSettings.TitleId, SecretKey = SharedSettings.DeveloperSecretKey, GameManagerUrl = PlayFabEditorHelper.GAMEMANAGER_URL };
 
-                    if (string.IsNullOrEmpty(EnvDetails.selectedStudio) || string.IsNullOrEmpty(EnvDetails.selectedTitleId))
+                    if (string.IsNullOrEmpty(EnvDetails.selectedStudio) || string.IsNullOrEmpty(SharedSettings.TitleId))
                         return null;
 
                     try
                     {
                         int studioIndex; int titleIndex;
-                        if (DoesTitleExistInStudios(EnvDetails.selectedTitleId, out studioIndex, out titleIndex))
+                        if (DoesTitleExistInStudios(SharedSettings.TitleId, out studioIndex, out titleIndex))
                             return AccountDetails.studios[studioIndex].Titles[titleIndex];
                     }
                     catch (Exception ex)
@@ -234,47 +241,9 @@ namespace PlayFab.PfEditor
             EnvDetails = LoadFromEditorPrefs<PlayFab_DeveloperEnvironmentDetails>(PlayFab_DeveloperEnvironmentDetails.Name);
             EditorSettings = LoadFromEditorPrefs<PlayFab_EditorSettings>(PlayFab_EditorSettings.Name);
             EditorView = LoadFromEditorPrefs<PlayFab_EditorView>(PlayFab_EditorView.Name);
-            LoadFromScriptableObject();
 
             _IsDataLoaded = true;
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnDataLoaded, "Complete");
-        }
-
-        private static void LoadFromScriptableObject()
-        {
-            if (EnvDetails == null)
-                return;
-
-
-            var playfabSettingsType = PlayFabEditorSDKTools.GetPlayFabSettings();
-            if (playfabSettingsType == null || !PlayFabEditorSDKTools.IsInstalled || !PlayFabEditorSDKTools.isSdkSupported)
-                return;
-
-            var props = playfabSettingsType.GetProperties();
-            try
-            {
-                foreach (var prop in props)
-                {
-                    switch (prop.Name)
-                    {
-                        case "TitleId":
-                            var propValue = (string)prop.GetValue(null, null);
-                            EnvDetails.selectedTitleId = string.IsNullOrEmpty(propValue) ? EnvDetails.selectedTitleId : propValue;
-                            break;
-                        case "DeveloperSecretKey":
-                            EnvDetails.developerSecretKey = string.Empty;
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                            EnvDetails.developerSecretKey = (string)prop.GetValue(null, null) ?? EnvDetails.developerSecretKey;
-#endif
-                            break;
-                    }
-                }
-            }
-            catch
-            {
-                // do nothing, this cathes issues in really old sdks; clearly there is something wrong here.
-                PlayFabEditorSDKTools.isSdkSupported = false;
-            }
         }
 
         private static void UpdateScriptableObject()
@@ -288,14 +257,8 @@ namespace PlayFab.PfEditor
             {
                 switch (property.Name.ToLower())
                 {
-                    case "titleid":
-                        property.SetValue(null, EnvDetails.selectedTitleId, null); break;
                     case "productionenvironmenturl":
                         property.SetValue(null, PlayFabEditorHelper.TITLE_ENDPOINT, null); break;
-#if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API
-                    case "developersecretkey":
-                        property.SetValue(null, EnvDetails.developerSecretKey, null); break;
-#endif
                 }
             }
 
@@ -321,12 +284,12 @@ namespace PlayFab.PfEditor
         {
             if (AccountDetails.studios == null)
                 return false;
-
             searchFor = searchFor.ToLower();
             foreach (var studio in AccountDetails.studios)
-                foreach (var title in studio.Titles)
-                    if (title.Id.ToLower() == searchFor)
-                        return true;
+                if (studio.Titles != null)
+                    foreach (var title in studio.Titles)
+                        if (title.Id.ToLower() == searchFor)
+                            return true;
             return false;
         }
 
@@ -338,7 +301,7 @@ namespace PlayFab.PfEditor
             if (AccountDetails.studios == null)
                 return false;
 
-            for (var studioIdx = 0; studioIdx < AccountDetails.studios.Length; studioIdx++)
+            for (var studioIdx = 0; studioIdx < AccountDetails.studios.Count; studioIdx++)
             {
                 for (var titleIdx = 0; titleIdx < AccountDetails.studios[studioIdx].Titles.Length; titleIdx++)
                 {
@@ -354,11 +317,17 @@ namespace PlayFab.PfEditor
             return false;
         }
 
-        public static void GetStudios()
+        public static void RefreshStudiosList()
         {
+            if (AccountDetails.studios != null)
+                AccountDetails.studios.Clear();
             PlayFabEditorApi.GetStudios(new GetStudiosRequest(), (getStudioResult) =>
             {
-                AccountDetails.studios = getStudioResult.Studios;
+                if (AccountDetails.studios == null)
+                    AccountDetails.studios = new List<Studio>();
+                foreach (var eachStudio in getStudioResult.Studios)
+                    AccountDetails.studios.Add(eachStudio);
+                AccountDetails.studios.Add(Studio.OVERRIDE);
                 SaveAccountDetails();
             }, PlayFabEditorHelper.SharedErrorCallback);
         }

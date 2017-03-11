@@ -36,40 +36,25 @@ namespace PlayFab.PfEditor
             switch ((DataMenuStates)PlayFabEditorDataService.EditorView.currentSubMenu)
             {
                 case DataMenuStates.TitleData:
-                    if (tdViewer == null && !string.IsNullOrEmpty(PlayFabEditorDataService.EnvDetails.selectedTitleId)) //&& !string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.developerSecretKey)
+                    if (tdViewer == null)
                     {
-                        tdViewer = ScriptableObject.CreateInstance<TitleDataViewer>();
-                        foreach (var item in PlayFabEditorDataService.EnvDetails.titleData)
-                            tdViewer.items.Add(new KvpItem(item.Key, item.Value));
+                        tdViewer = CreateInstance<TitleDataViewer>();
+                        tdViewer.RefreshTitleData();
                     }
-                    else if (!string.IsNullOrEmpty(PlayFabEditorDataService.EnvDetails.selectedTitleId)) //&& !string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.developerSecretKey))
-                    {
-                        if (tdViewer.items.Count == 0)
-                            foreach (var item in PlayFabEditorDataService.EnvDetails.titleData)
-                                tdViewer.items.Add(new KvpItem(item.Key, item.Value));
-                        scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                        tdViewer.Draw();
-                        GUILayout.EndScrollView();
-                    }
-
+                    scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                    tdViewer.Draw();
+                    GUILayout.EndScrollView();
                     break;
 
                 case DataMenuStates.TitleDataInternal:
-                    if (tdInternalViewer == null && !string.IsNullOrEmpty(PlayFabEditorDataService.EnvDetails.selectedTitleId)) //&& !string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.developerSecretKey)
+                    if (tdInternalViewer == null)
                     {
-                        tdInternalViewer = ScriptableObject.CreateInstance<TitleInternalDataViewer>();
-                        foreach (var item in PlayFabEditorDataService.EnvDetails.titleInternalData)
-                            tdInternalViewer.items.Add(new KvpItem(item.Key, item.Value));
+                        tdInternalViewer = CreateInstance<TitleInternalDataViewer>();
+                        tdInternalViewer.RefreshInternalTitleData();
                     }
-                    else if (!string.IsNullOrEmpty(PlayFabEditorDataService.EnvDetails.selectedTitleId)) //&& !string.IsNullOrEmpty(PlayFabEditorDataService.envDetails.developerSecretKey))
-                    {
-                        if (tdInternalViewer.items.Count == 0)
-                            foreach (var item in PlayFabEditorDataService.EnvDetails.titleInternalData)
-                                tdInternalViewer.items.Add(new KvpItem(item.Key, item.Value));
-                        scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                        tdInternalViewer.Draw();
-                        GUILayout.EndScrollView();
-                    }
+                    scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+                    tdInternalViewer.Draw();
+                    GUILayout.EndScrollView();
                     break;
 
                 default:

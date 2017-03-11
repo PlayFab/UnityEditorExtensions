@@ -10,7 +10,7 @@ namespace PlayFab.PfEditor
     // TODO: Clean up the copy paste between this and TitleInternalDataViewer
     public class TitleDataViewer : UnityEditor.Editor
     {
-        public List<KvpItem> items;
+        public readonly List<KvpItem> items = new List<KvpItem>();
         public static TitleDataEditor tdEditor;
         public Vector2 scrollPos = Vector2.zero;
         private bool showSave = false;
@@ -26,7 +26,7 @@ namespace PlayFab.PfEditor
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                 {
-                    RefreshRecords();
+                    RefreshTitleData();
                 }
 
                 if (GUILayout.Button("+", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(25)))
@@ -35,7 +35,7 @@ namespace PlayFab.PfEditor
                 }
             }
 
-            if (items.Count > 0)
+            if (items != null && items.Count > 0)
             {
                 scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
                 var keyInputBoxWidth = EditorGUIUtility.currentViewWidth > 200 ? 170 : (EditorGUIUtility.currentViewWidth - 100) / 2;
@@ -104,22 +104,20 @@ namespace PlayFab.PfEditor
             items.Add(new KvpItem("", "NewValue") { isDirty = true });
         }
 
-        private void RefreshRecords()
+        public void RefreshTitleData()
         {
-            Action<PlayFab.PfEditor.EditorModels.GetTitleDataResult> cb = (result) =>
+            Action<PlayFab.PfEditor.EditorModels.GetTitleDataResult> dataRequest = (result) =>
             {
                 items.Clear();
                 showSave = false;
                 foreach (var kvp in result.Data)
-                {
                     items.Add(new KvpItem(kvp.Key, kvp.Value));
-                }
 
                 PlayFabEditorDataService.EnvDetails.titleData = result.Data;
                 PlayFabEditorDataService.SaveEnvDetails();
             };
 
-            PlayFabEditorApi.GetTitleData(cb, PlayFabEditorHelper.SharedErrorCallback);
+            PlayFabEditorApi.GetTitleData(dataRequest, PlayFabEditorHelper.SharedErrorCallback);
         }
 
         private void SaveRecords()

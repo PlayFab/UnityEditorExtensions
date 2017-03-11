@@ -47,6 +47,5 @@ namespace PlayFab.PfEditor
             key = k;
             Value = v;
         }
-
     }
 }

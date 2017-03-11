@@ -41,7 +41,7 @@ namespace PlayFab.PfEditor
         #region FROM ADMIN / SERVER API SETS ----------------------------------------------------------------------------------------------------------------------------------------
         public static void GetTitleData(Action<GetTitleDataResult> resultCb, Action<EditorModels.PlayFabError> errorCb)
         {
-            var titleId = PlayFabEditorDataService.EnvDetails.selectedTitleId;
+            var titleId = PlayFabEditorDataService.SharedSettings.TitleId;
             var apiEndpoint = "https://" + titleId + PlayFabEditorHelper.TITLE_ENDPOINT;
             PlayFabEditorHttp.MakeApiCall("/Admin/GetTitleData", apiEndpoint, new GetTitleDataRequest(), resultCb, errorCb);
         }
@@ -52,14 +52,14 @@ namespace PlayFab.PfEditor
             {
                 var req = new SetTitleDataRequest { Key = pair.Key, Value = pair.Value };
 
-                var titleId = PlayFabEditorDataService.EnvDetails.selectedTitleId;
+                var titleId = PlayFabEditorDataService.SharedSettings.TitleId;
                 var apiEndpoint = "https://" + titleId + PlayFabEditorHelper.TITLE_ENDPOINT;
                 PlayFabEditorHttp.MakeApiCall("/Admin/SetTitleData", apiEndpoint, req, resultCb, errorCb);
             }
         }
         public static void GetTitleInternalData(Action<GetTitleDataResult> resultCb, Action<EditorModels.PlayFabError> errorCb)
         {
-            var titleId = PlayFabEditorDataService.EnvDetails.selectedTitleId;
+            var titleId = PlayFabEditorDataService.SharedSettings.TitleId;
             var apiEndpoint = "https://" + titleId + PlayFabEditorHelper.TITLE_ENDPOINT;
             PlayFabEditorHttp.MakeApiCall("/Admin/GetTitleInternalData", apiEndpoint, new GetTitleDataRequest(), resultCb, errorCb);
         }
@@ -70,7 +70,7 @@ namespace PlayFab.PfEditor
             {
                 var req = new SetTitleDataRequest { Key = pair.Key, Value = pair.Value };
 
-                var titleId = PlayFabEditorDataService.EnvDetails.selectedTitleId;
+                var titleId = PlayFabEditorDataService.SharedSettings.TitleId;
                 var apiEndpoint = "https://" + titleId + PlayFabEditorHelper.TITLE_ENDPOINT;
                 PlayFabEditorHttp.MakeApiCall("/Admin/SetTitleInternalData", apiEndpoint, req, resultCb, errorCb);
             }
@@ -78,14 +78,14 @@ namespace PlayFab.PfEditor
 
         public static void UpdateCloudScript(UpdateCloudScriptRequest request, Action<UpdateCloudScriptResult> resultCb, Action<EditorModels.PlayFabError> errorCb)
         {
-            var titleId = PlayFabEditorDataService.EnvDetails.selectedTitleId;
+            var titleId = PlayFabEditorDataService.SharedSettings.TitleId;
             var apiEndpoint = "https://" + titleId + PlayFabEditorHelper.TITLE_ENDPOINT;
             PlayFabEditorHttp.MakeApiCall("/Admin/UpdateCloudScript", apiEndpoint, request, resultCb, errorCb);
         }
 
         public static void GetCloudScriptRevision(GetCloudScriptRevisionRequest request, Action<GetCloudScriptRevisionResult> resultCb, Action<EditorModels.PlayFabError> errorCb)
         {
-            var titleId = PlayFabEditorDataService.EnvDetails.selectedTitleId;
+            var titleId = PlayFabEditorDataService.SharedSettings.TitleId;
             var apiEndpoint = "https://" + titleId + PlayFabEditorHelper.TITLE_ENDPOINT;
             PlayFabEditorHttp.MakeApiCall("/Admin/GetCloudScriptRevision", apiEndpoint, request, resultCb, errorCb);
         }

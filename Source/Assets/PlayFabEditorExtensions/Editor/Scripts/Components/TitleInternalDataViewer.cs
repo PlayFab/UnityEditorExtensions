@@ -9,7 +9,7 @@ namespace PlayFab.PfEditor
     // TODO: Clean up the copy paste between this and TitleDataViewer
     public class TitleInternalDataViewer : UnityEditor.Editor
     {
-        public List<KvpItem> items;
+        public readonly List<KvpItem> items = new List<KvpItem>();
         public static TitleInternalDataEditor tdEditor;
         public Vector2 scrollPos = Vector2.zero;
         private bool showSave = false;
@@ -25,7 +25,7 @@ namespace PlayFab.PfEditor
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("REFRESH", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
                 {
-                    RefreshRecords();
+                    RefreshInternalTitleData();
                 }
 
                 if (GUILayout.Button("+", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(25)))
@@ -103,7 +103,7 @@ namespace PlayFab.PfEditor
             items.Add(new KvpItem("", "NewValue") { isDirty = true });
         }
 
-        public void RefreshRecords()
+        public void RefreshInternalTitleData()
         {
             Action<PlayFab.PfEditor.EditorModels.GetTitleDataResult> cb = (result) =>
             {

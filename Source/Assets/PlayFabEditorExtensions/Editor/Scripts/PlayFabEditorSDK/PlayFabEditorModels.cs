@@ -32,7 +32,6 @@ namespace PlayFab.PfEditor.EditorModels
 
     public class LogoutRequest
     {
-
         public string DeveloperClientToken;
     }
 
@@ -53,9 +52,7 @@ namespace PlayFab.PfEditor.EditorModels
     public class CreateTitleRequest
     {
         public string DeveloperClientToken;
-
         public string Name;
-
         public string StudioId;
     }
 
@@ -67,134 +64,88 @@ namespace PlayFab.PfEditor.EditorModels
     public class Title
     {
         public string Id;
-
         public string Name;
-
         public string SecretKey;
-
         public string GameManagerUrl;
     }
 
     public class Studio
     {
-        public string Id;
+        public static Studio OVERRIDE = new Studio { Id = "", Name = PlayFabEditorHelper.STUDIO_OVERRIDE, Titles = null };
 
+        public string Id;
         public string Name;
 
         public Title[] Titles;
+
+        public Title GetTitle(string titleId)
+        {
+            if (Titles == null)
+                return null;
+            for (var i = 0; i < Titles.Length; i++)
+                if (Titles[i].Id == titleId)
+                    return Titles[i];
+            return null;
+        }
+
+        public string GetTitleSecretKey(string titleId)
+        {
+            var title = GetTitle(titleId);
+            return title == null ? "" : title.SecretKey;
+        }
     }
 
-
-    //[Serializable]
-    public class GetTitleDataRequest //: PlayFabResultCommon
+    public class GetTitleDataRequest
     {
-        /// <summary>
-        /// Specific keys to search for in the title data (leave null to get all keys)
-        /// </summary>
         public List<string> Keys;
     }
 
-    //[Serializable]
-    public class GetTitleDataResult //: PlayFabResultCommon
+    public class GetTitleDataResult
     {
-        /// <summary>
-        /// a dictionary object of key / value pairs
-        /// </summary>
         public Dictionary<string, string> Data;
     }
 
-
-    //[Serializable]
-    public class SetTitleDataRequest //: PlayFabRequestCommon
+    public class SetTitleDataRequest
     {
-        /// <summary>
-        /// key we want to set a value on (note, this is additive - will only replace an existing key's value if they are the same name.) Keys are trimmed of whitespace. Keys may not begin with the '!' character.
-        /// </summary>
         public string Key;
-        /// <summary>
-        /// new value to set. Set to null to remove a value
-        /// </summary>
         public string Value;
     }
 
-    //[Serializable]
-    public class SetTitleDataResult //: PlayFabResultCommon
+    public class SetTitleDataResult
     {
     }
 
     public class CloudScriptFile
     {
-        /// <summary>
-        /// Name of the javascript file. These names are not used internally by the server, they are only for developer organizational purposes.
-        /// </summary>
         public string Filename;
-        /// <summary>
-        /// Contents of the Cloud Script javascript. Must be string-escaped javascript.
-        /// </summary>
         public string FileContents;
     }
 
     public class UpdateCloudScriptRequest
     {
-        /// <summary>
-        /// List of Cloud Script files to upload to create the new revision. Must have at least one file.
-        /// </summary>
         public List<CloudScriptFile> Files;
-        /// <summary>
-        /// Immediately publish the new revision
-        /// </summary>
         public bool Publish;
-        /// <summary>
-        /// PlayFab user ID of the developer initiating the request.
-        /// </summary>
         public string DeveloperPlayFabId;
     }
 
     public class UpdateCloudScriptResult
     {
-        /// <summary>
-        /// Cloud Script version updated
-        /// </summary>
         public int Version;
-        /// <summary>
-        /// New revision number created
-        /// </summary>
         public int Revision;
     }
 
     public class GetCloudScriptRevisionRequest
     {
-        /// <summary>
-        /// Version number. If left null, defaults to the latest version
-        /// </summary>
         public int? Version;
-        /// <summary>
-        /// Revision number. If left null, defaults to the latest revision
-        /// </summary>
         public int? Revision;
     }
 
     public class GetCloudScriptRevisionResult
     {
-        /// <summary>
-        /// Version number.
-        /// </summary>
         public int Version;
-        /// <summary>
-        /// Revision number.
-        /// </summary>
         public int Revision;
-        /// <summary>
-        /// Time this revision was created
-        /// </summary>
         public System.DateTime CreatedAt;
-        /// <summary>
-        /// List of Cloud Script files in this revision.
-        /// </summary>
         public List<CloudScriptFile> Files;
-        /// <summary>
-        /// True if this is the currently published revision
-        /// </summary>
         public bool IsPublished;
     }
 
