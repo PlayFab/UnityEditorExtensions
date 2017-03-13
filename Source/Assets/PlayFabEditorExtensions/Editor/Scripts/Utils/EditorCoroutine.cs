@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace PlayFab.PfEditor
 {
-
     public class EditorCoroutine
     {
         public string Id;
@@ -23,20 +22,20 @@ namespace PlayFab.PfEditor
         private SortedList<float, IEnumerator> shouldRunAfterTimes = new SortedList<float, IEnumerator>();
         private const float _tick = .02f;
 
-        public static EditorCoroutine start(IEnumerator _routine)
+        public static EditorCoroutine Start(IEnumerator _routine)
         {
-            EditorCoroutine coroutine = new EditorCoroutine(_routine);
+            var coroutine = new EditorCoroutine(_routine);
             coroutine.Id = Guid.NewGuid().ToString();
-            coroutine.start();
+            coroutine.Start();
             return coroutine;
         }
 
-        public static EditorCoroutine start(IEnumerator _routine, WWW www)
+        public static EditorCoroutine Start(IEnumerator _routine, WWW www)
         {
-            EditorCoroutine coroutine = new EditorCoroutine(_routine);
+            var coroutine = new EditorCoroutine(_routine);
             coroutine.Id = Guid.NewGuid().ToString();
             coroutine._www = www;
-            coroutine.start();
+            coroutine.Start();
             return coroutine;
         }
 
@@ -49,17 +48,17 @@ namespace PlayFab.PfEditor
             routine = _routine;
         }
 
-        void start()
+        void Start()
         {
-            EditorApplication.update += update;
+            EditorApplication.update += Update;
         }
-        public void stop()
+        private void Stop()
         {
-            EditorApplication.update -= update;
+            EditorApplication.update -= Update;
         }
 
         private float _timeCounter = 0;
-        void update()
+        void Update()
         {
             _timeCounter += _tick;
             //Debug.LogFormat("ID:{0}  TimeCounter:{1}", this.Id, _timeCounter);
@@ -70,7 +69,7 @@ namespace PlayFab.PfEditor
                 {
                     if (_www.isDone && !routine.MoveNext())
                     {
-                        stop();
+                        Stop();
                     }
                 }
                 else
@@ -83,7 +82,7 @@ namespace PlayFab.PfEditor
                     }
                     else if (!routine.MoveNext())
                     {
-                        stop();
+                        Stop();
                     }
                 }
 
@@ -97,7 +96,7 @@ namespace PlayFab.PfEditor
                         shouldRunAfterTimes.RemoveAt(index);
                         if (!runAfterSeconds.Value.MoveNext())
                         {
-                            stop();
+                            Stop();
                         }
                     }
                     index++;
