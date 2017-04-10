@@ -33,3 +33,8 @@ sysinfo.txt
 
 # Builds
 *.apk
+
+# PlayFab UnitySdk
+Resources.meta
+Plugins.meta
+Testing.meta

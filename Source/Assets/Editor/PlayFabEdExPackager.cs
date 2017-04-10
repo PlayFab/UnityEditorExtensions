@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PlayFab.Internal
 {
-    public static class PlayFabPackager
+    public static class PlayFabEdExPackager
     {
         private static readonly string[] SdkAssets = {
         "Assets/PlayFabEditorExtensions"
