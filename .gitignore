@@ -38,3 +38,5 @@ sysinfo.txt
 Resources.meta
 Plugins.meta
 Testing.meta
+/Source/Assets/Plugins
+/Source/Assets/Testing
