@@ -9,7 +9,7 @@ namespace PlayFab.Internal
         "Assets/PlayFabEditorExtensions"
     };
 
-        [MenuItem("PlayFab/Build PlayFab UnityPackage")]
+        [MenuItem("PlayFab/Build PlayFab EdEx UnityPackage")]
         public static void BuildUnityPackage()
         {
             var packagePath = "C:/depot/sdks/UnityEditorExtensions/Packages/PlayFabEditorExtensions.unitypackage";
