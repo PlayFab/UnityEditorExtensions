@@ -1,4 +1,5 @@
 # PlayFab Unity Editor Extensions
+
 Welcome to the home of PlayFab's official Unity plugin, the best interface for viewing and configuring our Unity SDK. Our plugin (currently in beta) houses a new custom inspector serving as the remodeled "front door" for our Unity Developers. 
 
 We will be adding to this platform as PlayFab's features grow.
@@ -66,7 +67,7 @@ Editor Extension details can be found under the **HELP** tab. Here you will find
 ### Ongoing Development:
 Editor Extensions is our attempt to make a first class PlayFab development experience within the Unity Editor. We consider this project a sandbox and are always open to feedback from our community developers. 
 
-###Proposed Features (to be added in upcoming releases):
+### Proposed Features (to be added in upcoming releases):
 
   * Download and install recipes and examples
   * Enable and disable additional add-on modules
@@ -85,15 +86,15 @@ Let us know what we are missing and we will do our best to accommodate.
   3. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
     *  This can be manually set via under  **Build Settings > Player Settings**. [More Information](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
 
-#####A word of caution:
+##### A word of caution:
 You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
 
 A complete list of issues can be found [here](https://github.com/PlayFab/UnityEditorExtensions/issues)
    
-#####Unsupported Build-Targets:
+##### Unsupported Build-Targets:
   * **Unity Web Player** - The editor Extensions will not work properly when Unity is set to output Web Player builds. Web player was removed in Unity 5.4, and is no longer a supported build target. 
 
-##Copyright and Licensing Information:
+## Copyright and Licensing Information:
 
   Apache License -- Version 2.0, January 2004 [http://www.apache.org/licenses/](http://www.apache.org/licenses/)
 
