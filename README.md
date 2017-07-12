@@ -6,7 +6,7 @@ We will be adding to this platform as PlayFab's features grow.
 
 ![PlayFab Developer Login](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_CreateAccount.png "Users new to PlayFab can create an account.")
 
-##Features:
+## Features:
 
   * **Automated SDK installation, upgrading & removal** - Now pain free!
   * **Toggle Admin, Server & Client APIs ON and OFF** - 100% less file-fiddling
@@ -17,7 +17,7 @@ We will be adding to this platform as PlayFab's features grow.
   * **Easy to follow help links** - Links to *Documentation*, *Ask Questions* and *View Service Availability*
   * **View, Edit & Save TitleData** - Edit your title data keys and values with a simple text editor within the inspector.
 
-##Setup:
+## Setup:
   
   1. Download [this Asset Package](https://api.playfab.com/sdks/download/unity-edex "PlayFabEditorExtensions.unitypackage") and import into a new or existing project.
   2. Open the Editor Extensions via the Unity menu: **Window > PlayFab > Editor Extensions** 
@@ -57,7 +57,7 @@ Did you find an issue or is Editor Extensions giving you a bad experience?
 
 [**Tell us all about it**](https://github.com/PlayFab/UnityEditorExtensions/issues).
 
-###Version History:
+### Version History:
 See [GitHub Releases](https://github.com/PlayFab/UnityEditorExtensions/releases "GitHub Versions") for the latest stable build and patch notes.  
 
 Editor Extension details can be found under the **HELP** tab. Here you will find useful links for learning more about PlayFab, troubleshooting as well as EdEx **UPGRADE** and **UNINSTALL** options.
@@ -80,11 +80,16 @@ Let us know what we are missing and we will do our best to accommodate.
 
 ### Known Issues:
 
-  1. The EditorExtensions Tab is open and nothing is being drawn. 
-    * This typically is caused when the PlayFabEditorExtensions directory has been renamed.
-  2. Legacy plugins and other packages must be installed / removed / upgraded separately 
-  3. When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.
-    *  This can be manually set via under  **Build Settings > Player Settings**. [More Information](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html).
+<dl>
+  <dt>The EditorExtensions Tab is open and nothing is being drawn.</dt>
+  <dd>This typically is caused when the PlayFabEditorExtensions directory has been renamed.</dd>
+  
+  <dt>Legacy plugins and other packages must be installed / removed / upgraded separately</dt>
+  <dd></dd>
+  
+  <dt>When toggling the API sets (Client, Server, Admin), sometimes the editor does not recompile and apply the updated definitions.</dt>
+  <dd>This can be manually set via under  **Build Settings > Player Settings**. [Unity &raquo; Platform dependent compilation](https://docs.unity3d.com/Manual/PlatformDependentCompilation.html)</dd>
+</dl>
 
 ##### A word of caution:
 You may move our plugin folder around; however, we discourage renaming the root(*PlayFabEditorExtensions*) folder. This may cause the relative links within the plugin to break.
@@ -99,6 +104,3 @@ A complete list of issues can be found [here](https://github.com/PlayFab/UnityEd
   Apache License -- Version 2.0, January 2004 [http://www.apache.org/licenses/](http://www.apache.org/licenses/)
 
   License Details available in [LICENSE.txt](https://github.com/PlayFab/UnityEditorExtensions/blob/master/LICENSE "Apache 2.0 License")
-  
-
-  
