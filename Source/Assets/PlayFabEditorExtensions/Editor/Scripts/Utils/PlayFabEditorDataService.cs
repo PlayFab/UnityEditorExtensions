@@ -79,7 +79,7 @@ namespace PlayFab.PfEditor
                 var settingProperties = playFabSettingsType.GetProperties();
                 foreach (var eachProperty in settingProperties)
                 {
-                    var lcName = eachProperty.Name.ToLower();
+                    var lcName = eachProperty.Name.ToLowerInvariant();
                     switch (lcName)
                     {
                         case "titleid":
@@ -251,7 +251,7 @@ namespace PlayFab.PfEditor
             var props = playfabSettingsType.GetProperties();
             foreach (var property in props)
             {
-                switch (property.Name.ToLower())
+                switch (property.Name.ToLowerInvariant())
                 {
                     case "productionenvironmenturl":
                         property.SetValue(null, PlayFabEditorHelper.TITLE_ENDPOINT, null); break;
