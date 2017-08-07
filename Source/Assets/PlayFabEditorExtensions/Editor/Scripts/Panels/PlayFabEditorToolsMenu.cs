@@ -113,19 +113,25 @@ namespace PlayFab.PfEditor
             PlayFabEditorApi.GetCloudScriptRevision(new EditorModels.GetCloudScriptRevisionRequest(), (GetCloudScriptRevisionResult result) =>
             {
                 var csPath = PlayFabEditorHelper.CLOUDSCRIPT_PATH;
+                var location = Path.GetDirectoryName(csPath);
                 try
                 {
+                    if (!Directory.Exists(location))
+                        Directory.CreateDirectory(location);
+                    if (!File.Exists(csPath))
+                        using (var newfile = File.Create(csPath)) { }
                     File.WriteAllText(csPath, result.Files[0].FileContents);
                     Debug.Log("CloudScript uploaded successfully!");
                     PlayFabEditorDataService.EnvDetails.localCloudScriptPath = csPath;
                     PlayFabEditorDataService.SaveEnvDetails();
+                    AssetDatabase.Refresh();
                 }
                 catch (Exception ex)
                 {
-                    PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
+                    Debug.LogException(ex);
+                    // PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
                     return;
                 }
-
             }, PlayFabEditorHelper.SharedErrorCallback);
         }
 
