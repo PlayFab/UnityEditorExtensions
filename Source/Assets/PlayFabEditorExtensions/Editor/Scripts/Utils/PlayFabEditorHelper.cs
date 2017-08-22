@@ -91,7 +91,7 @@ namespace PlayFab.PfEditor
                         if (movedRootFiles.Length > 0)
                         {
                             relocatedEdEx = true;
-                            EDEX_ROOT = movedRootFiles[0].Substring(0, movedRootFiles[0].IndexOf(PLAYFAB_EDEX_MAINFILE) - 1);
+                            EDEX_ROOT = movedRootFiles[0].Substring(0, movedRootFiles[0].LastIndexOf(PLAYFAB_EDEX_MAINFILE) - 1);
                             PlayFabEditorDataService.EnvDetails.edexPath = EDEX_ROOT;
                             PlayFabEditorDataService.SaveEnvDetails();
                         }
@@ -118,7 +118,7 @@ namespace PlayFab.PfEditor
             var pfGuiPaths = Directory.GetFiles(searchRoot, "PlayFabStyles.guiskin", SearchOption.AllDirectories);
             foreach (var eachPath in pfGuiPaths)
             {
-                var loadPath = eachPath.Substring(eachPath.IndexOf("Assets/"));
+                var loadPath = eachPath.Substring(eachPath.LastIndexOf("Assets/"));
                 return (GUISkin)AssetDatabase.LoadAssetAtPath(loadPath, typeof(GUISkin));
             }
             return null;

@@ -282,7 +282,7 @@ namespace PlayFab.PfEditor
             if (fileList.Length == 0)
                 return null;
 
-            var relPath = fileList[0].Substring(fileList[0].IndexOf("Assets/"));
+            var relPath = fileList[0].Substring(fileList[0].LastIndexOf("Assets/"));
             return AssetDatabase.LoadAssetAtPath(relPath, typeof(UnityEngine.Object));
         }
 
