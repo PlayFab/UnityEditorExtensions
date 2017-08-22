@@ -230,7 +230,7 @@ namespace PlayFab.PfEditor
                 var studio = GetStudioForTitleId(PlayFabEditorDataService.SharedSettings.TitleId);
                 if (string.IsNullOrEmpty(studio.Id))
                     using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                        GUILayout.Label("You are using a TitleId to which you are not a member. A title administrator can approve access for your account.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
+                        EditorGUILayout.LabelField("You are using a TitleId to which you are not a member. A title administrator can approve access for your account.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
 
                 PlayFabGuiFieldHelper.SuperFancyDropdown(labelWidth, "STUDIO: ", studio, PlayFabEditorDataService.AccountDetails.studios, eachStudio => eachStudio.Name, OnStudioChange, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                 studio = GetStudioForTitleId(PlayFabEditorDataService.SharedSettings.TitleId); // This might have changed above, so refresh it
@@ -310,7 +310,7 @@ namespace PlayFab.PfEditor
         {
             using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
             {
-                GUILayout.Label("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
+                EditorGUILayout.LabelField("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
             }
 
             if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)

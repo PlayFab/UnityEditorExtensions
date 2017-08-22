@@ -60,7 +60,7 @@ namespace PlayFab.PfEditor
             var labelStyle = new GUIStyle(PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"));
             using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
             {
-                GUILayout.Label(string.Format("SDK {0} is installed", string.IsNullOrEmpty(installedSdkVersion) ? "Unknown" : installedSdkVersion),
+                EditorGUILayout.LabelField(string.Format("SDK {0} is installed", string.IsNullOrEmpty(installedSdkVersion) ? "Unknown" : installedSdkVersion),
                     labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
 
                 if (!isObjectFieldActive)
@@ -69,7 +69,7 @@ namespace PlayFab.PfEditor
                 }
                 else
                 {
-                    GUILayout.Label(
+                    EditorGUILayout.LabelField(
                         "An SDK was detected, but we were unable to find the directory. Drag-and-drop the top-level PlayFab SDK folder below.",
                         PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
                 }
@@ -119,7 +119,7 @@ namespace PlayFab.PfEditor
                         //older version of the SDK
                         using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                         {
-                            GUILayout.Label("Most of the Editor Extensions depend on SDK versions >2.0. Consider upgrading to the get most features.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
+                            EditorGUILayout.LabelField("Most of the Editor Extensions depend on SDK versions >2.0. Consider upgrading to the get most features.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
                         }
 
                         using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
@@ -151,7 +151,7 @@ namespace PlayFab.PfEditor
                         else if (isSdkSupported)
                         {
                             GUILayout.FlexibleSpace();
-                            GUILayout.Label("You have the latest SDK!", labelStyle, GUILayout.MinHeight(32));
+                            EditorGUILayout.LabelField("You have the latest SDK!", labelStyle, GUILayout.MinHeight(32));
                             GUILayout.FlexibleSpace();
                         }
                     }
@@ -162,7 +162,7 @@ namespace PlayFab.PfEditor
             {
                 using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
                 {
-                    GUILayout.Label("Before making PlayFab API calls, the SDK must be configured to your PlayFab Title.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
+                    EditorGUILayout.LabelField("Before making PlayFab API calls, the SDK must be configured to your PlayFab Title.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
                     using (new UnityHorizontal())
                     {
                         GUILayout.FlexibleSpace();
@@ -194,7 +194,7 @@ namespace PlayFab.PfEditor
             {
                 var labelStyle = new GUIStyle(PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"));
 
-                GUILayout.Label("No SDK is installed.", labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                EditorGUILayout.LabelField("No SDK is installed.", labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
                 GUILayout.Space(20);
 
                 using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))

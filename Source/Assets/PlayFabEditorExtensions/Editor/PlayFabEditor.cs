@@ -108,7 +108,7 @@ namespace PlayFab.PfEditor
 
             using (new UnityVertical())
             {
-                //Run all updaters prior to drawing;  
+                //Run all updaters prior to drawing;
                 PlayFabEditorPackageManager.Update();
                 PlayFabEditorHeader.DrawHeader();
 

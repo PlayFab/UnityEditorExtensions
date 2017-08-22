@@ -30,7 +30,7 @@ namespace PlayFab.PfEditor
                 using (new UnityVertical(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
                 {
                     using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                        GUILayout.Label("Enter your 2-factor authorization code.", PlayFabEditorHelper.uiStyle.GetStyle("cGenTxt"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                        EditorGUILayout.LabelField("Enter your 2-factor authorization code.", PlayFabEditorHelper.uiStyle.GetStyle("cGenTxt"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
 
                     using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
                     {
@@ -78,7 +78,7 @@ namespace PlayFab.PfEditor
             }
 
             using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
-                GUILayout.Label("Welcome to PlayFab!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                EditorGUILayout.LabelField("Welcome to PlayFab!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
 
             if (activeState == PanelDisplayStates.Login)
             {
@@ -88,7 +88,7 @@ namespace PlayFab.PfEditor
             }
             else if (activeState == PanelDisplayStates.Register)
             {
-                // register mode 
+                // register mode
                 DrawRegister();
             }
             else
