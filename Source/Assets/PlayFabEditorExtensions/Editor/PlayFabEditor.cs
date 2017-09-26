@@ -185,7 +185,7 @@ namespace PlayFab.PfEditor
                 using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                 {
                     GUILayout.FlexibleSpace();
-                    EditorGUILayout.LabelField(string.Format("PlayFab Editor Extensions: {0}", PlayFabEditorHelper.EDEX_VERSION), PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
+                    EditorGUILayout.LabelField("PlayFab Editor Extensions: " + PlayFabEditorHelper.EDEX_VERSION, PlayFabEditorHelper.uiStyle.GetStyle("versionText"));
                     GUILayout.FlexibleSpace();
                 }
 
@@ -378,19 +378,18 @@ namespace PlayFab.PfEditor
         private static bool ShowEdExUpgrade()
         {
             if (string.IsNullOrEmpty(latestEdExVersion) || latestEdExVersion == "Unknown")
-            {
                 return false;
-            }
 
             if (string.IsNullOrEmpty(PlayFabEditorHelper.EDEX_VERSION) || PlayFabEditorHelper.EDEX_VERSION == "Unknown")
-            {
                 return true;
-            }
 
             string[] currrent = PlayFabEditorHelper.EDEX_VERSION.Split('.');
-            string[] latest = latestEdExVersion.Split('.');
+            if (currrent.Length != 3)
+                return true;
 
-            return int.Parse(latest[0]) > int.Parse(currrent[0])
+            string[] latest = latestEdExVersion.Split('.');
+            return latest.Length != 3
+                || int.Parse(latest[0]) > int.Parse(currrent[0])
                 || int.Parse(latest[1]) > int.Parse(currrent[1])
                 || int.Parse(latest[2]) > int.Parse(currrent[2]);
         }

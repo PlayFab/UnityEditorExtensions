@@ -54,7 +54,7 @@ namespace PlayFab.PfEditor
             {
                 {"Content-Type", "application/json"},
                 {"X-ReportErrorAsSuccess", "true"},
-                {"X-PlayFabSDK", string.Format("{0}_{1}", PlayFabEditorHelper.EDEX_NAME, PlayFabEditorHelper.EDEX_VERSION)}
+                {"X-PlayFabSDK", PlayFabEditorHelper.EDEX_NAME + "_" + PlayFabEditorHelper.EDEX_VERSION}
             };
 
             if (api.Contains("/Server/") || api.Contains("/Admin/"))

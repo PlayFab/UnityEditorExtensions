@@ -8,11 +8,11 @@ using PlayFab.PfEditor.Json;
 namespace PlayFab.PfEditor
 {
     [InitializeOnLoad]
-    public class PlayFabEditorHelper : UnityEditor.Editor
+    public static partial class PlayFabEditorHelper
     {
         #region EDITOR_STRINGS
+        public static string EDEX_VERSION_TEMPLATE = "namespace PlayFab.PfEditor { public static partial class PlayFabEditorHelper { public static string EDEX_VERSION = \"{sdkVersion}\"; } }\n";
         public static string EDEX_NAME = "PlayFab_EditorExtensions";
-        public static string EDEX_VERSION = "0.0.994";
         public static string EDEX_ROOT = Application.dataPath + "/PlayFabEditorExtensions/Editor";
         public static string DEV_API_ENDPOINT = "https://editor.playfabapi.com";
         public static string TITLE_ENDPOINT = ".playfabapi.com";
@@ -134,7 +134,7 @@ namespace PlayFab.PfEditor
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error);
         }
 
-        protected internal static EditorModels.PlayFabError GeneratePlayFabError(string json, object customData = null)
+        public static EditorModels.PlayFabError GeneratePlayFabError(string json, object customData = null)
         {
             JsonObject errorDict = null;
             Dictionary<string, List<string>> errorDetails = null;
