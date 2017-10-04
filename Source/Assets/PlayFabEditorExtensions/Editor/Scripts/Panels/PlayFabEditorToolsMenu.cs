@@ -139,15 +139,7 @@ namespace PlayFab.PfEditor
         {
             var starterPath = File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath) ? Application.dataPath : PlayFabEditorDataService.EnvDetails.localCloudScriptPath;
             var cloudScriptPath = string.Empty;
-
-            try
-            {
-                cloudScriptPath = EditorUtility.OpenFilePanel("Select your Cloud Script file", starterPath, "js");
-            }
-            catch (Exception ex)
-            {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
-            }
+            cloudScriptPath = EditorUtility.OpenFilePanel("Select your Cloud Script file", starterPath, "js");
 
             if (!string.IsNullOrEmpty(cloudScriptPath))
             {

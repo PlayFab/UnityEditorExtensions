@@ -126,7 +126,7 @@ namespace PlayFab.PfEditor
 
         public static void SharedErrorCallback(EditorModels.PlayFabError error)
         {
-            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.ErrorMessage);
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.GenerateErrorReport());
         }
 
         public static void SharedErrorCallback(string error)

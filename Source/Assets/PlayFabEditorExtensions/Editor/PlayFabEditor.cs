@@ -109,7 +109,6 @@ namespace PlayFab.PfEditor
             using (new UnityVertical())
             {
                 //Run all updaters prior to drawing;
-                PlayFabEditorPackageManager.Update();
                 PlayFabEditorHeader.DrawHeader();
 
                 GUI.enabled = blockingRequests.Count == 0 && !EditorApplication.isCompiling;
@@ -403,14 +402,9 @@ namespace PlayFab.PfEditor
             {
                 window.Close();
                 var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDEX_ROOT);
-
                 FileUtil.DeleteFileOrDirectory(edExRoot.Parent.FullName);
-
                 if (clearPrefs)
-                {
                     PlayFabEditorDataService.RemoveEditorPrefs();
-                }
-
                 AssetDatabase.Refresh();
             }
             catch (Exception ex)

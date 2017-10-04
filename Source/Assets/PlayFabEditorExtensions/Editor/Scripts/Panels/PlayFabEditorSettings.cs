@@ -15,7 +15,6 @@ namespace PlayFab.PfEditor
             StandardSettings,
             TitleSettings,
             ApiSettings,
-            Packages
         }
 
         public enum WebRequestType
@@ -32,7 +31,6 @@ namespace PlayFab.PfEditor
 
         private static readonly Dictionary<string, StudioDisplaySet> StudioFoldOutStates = new Dictionary<string, StudioDisplaySet>();
         private static Vector2 _titleScrollPos = Vector2.zero;
-        private static Vector2 _packagesScrollPos = Vector2.zero;
         #endregion
 
         #region draw calls
@@ -120,9 +118,6 @@ namespace PlayFab.PfEditor
                         break;
                     case SubMenuStates.TitleSettings:
                         DrawTitleSettingsSubPanel();
-                        break;
-                    case SubMenuStates.Packages:
-                        DrawPackagesSubPanel();
                         break;
                 }
             }
@@ -305,34 +300,6 @@ namespace PlayFab.PfEditor
                 PlayFabEditorDataService.SharedSettings.CompressApiData = EditorGUILayout.Toggle(PlayFabEditorDataService.SharedSettings.CompressApiData, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"), GUILayout.MinHeight(25));
             }
         }
-
-        private static void DrawPackagesSubPanel()
-        {
-            using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
-            {
-                EditorGUILayout.LabelField("Packages are additional PlayFab features that can be installed. Enabling a package will install the AsssetPackage; disabling will remove the package.", PlayFabEditorHelper.uiStyle.GetStyle("genTxt"));
-            }
-
-            if (PlayFabEditorSDKTools.IsInstalled && PlayFabEditorSDKTools.isSdkSupported)
-            {
-                float labelWidth = 245;
-                _packagesScrollPos = GUILayout.BeginScrollView(_packagesScrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
-                using (var fwl = new FixedWidthLabel("Push Notification Plugin (Android): "))
-                {
-                    GUILayout.Space(labelWidth - fwl.fieldWidth);
-                    PlayFabEditorPackageManager.AndroidPushPlugin = EditorGUILayout.Toggle(PlayFabEditorPackageManager.AndroidPushPlugin, PlayFabEditorHelper.uiStyle.GetStyle("Toggle"));
-                }
-                GUILayout.Space(5);
-                using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
-                {
-                    if (GUILayout.Button("VIEW GUIDE", PlayFabEditorHelper.uiStyle.GetStyle("Button")))
-                    {
-                        Application.OpenURL("https://github.com/PlayFab/UnitySDK/tree/master/PluginsSource/UnityAndroidPluginSource#playfab-push-notification-plugin");
-                    }
-                }
-                GUILayout.EndScrollView();
-            }
-        }
         #endregion
 
         #region menu and helper methods
@@ -345,12 +312,6 @@ namespace PlayFab.PfEditor
             _menu.RegisterMenuItem("PROJECT", OnStandardSetttingsClicked);
             _menu.RegisterMenuItem("STUDIOS", OnTitleSettingsClicked);
             _menu.RegisterMenuItem("API", OnApiSettingsClicked);
-            _menu.RegisterMenuItem("PACKAGES", OnPackagesClicked);
-        }
-
-        private static void OnPackagesClicked()
-        {
-            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, SubMenuStates.Packages.ToString(), "" + (int)SubMenuStates.Packages);
         }
 
         private static void OnApiSettingsClicked()

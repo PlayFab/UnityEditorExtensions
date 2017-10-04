@@ -91,16 +91,11 @@ namespace PlayFab.PfEditor
 
             TResultType result = null;
             var resultAssigned = false;
-            try
-            {
-                var dataJson = JsonWrapper.SerializeObject(httpResult.data, PlayFabEditorUtil.ApiSerializerStrategy);
-                result = JsonWrapper.DeserializeObject<TResultType>(dataJson, PlayFabEditorUtil.ApiSerializerStrategy);
-                resultAssigned = true;
-            }
-            catch (Exception e)
-            {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, e.Message);
-            }
+
+            var dataJson = JsonWrapper.SerializeObject(httpResult.data, PlayFabEditorUtil.ApiSerializerStrategy);
+            result = JsonWrapper.DeserializeObject<TResultType>(dataJson, PlayFabEditorUtil.ApiSerializerStrategy);
+            resultAssigned = true;
+
             if (resultAssigned)
                 resultCallback(result);
         }
