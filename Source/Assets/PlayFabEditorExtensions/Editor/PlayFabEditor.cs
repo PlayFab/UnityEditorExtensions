@@ -9,6 +9,10 @@ namespace PlayFab.PfEditor
 {
     public class PlayFabEditor : UnityEditor.EditorWindow
     {
+#if !UNITY_5_3_OR_NEWER
+        public GUIContent titleContent;
+#endif
+
         #region EdEx Variables
         // vars for the plugin-wide event system
         public enum EdExStates { OnEnable, OnDisable, OnLogin, OnLogout, OnMenuItemClicked, OnSubmenuItemClicked, OnHttpReq, OnHttpRes, OnError, OnSuccess, OnWarning, OnDataLoaded } //OnWaitBegin, OnWaitEnd,

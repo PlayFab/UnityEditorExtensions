@@ -5,6 +5,10 @@ namespace PlayFab.PfEditor
 {
     public class TitleDataEditor : UnityEditor.EditorWindow
     {
+#if !UNITY_5_3_OR_NEWER
+        public GUIContent titleContent;
+#endif
+
         public string key = string.Empty;
         public string Value = string.Empty;
         public Vector2 scrollPos = Vector2.zero;

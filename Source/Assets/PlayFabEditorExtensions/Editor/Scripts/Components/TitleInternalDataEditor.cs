@@ -7,6 +7,9 @@ namespace PlayFab.PfEditor
     {
         public string key = string.Empty;
         public string Value = string.Empty;
+#if !UNITY_5_3_OR_NEWER
+        public GUIContent titleContent;
+#endif
 
         public Vector2 scrollPos = Vector2.zero;
 
