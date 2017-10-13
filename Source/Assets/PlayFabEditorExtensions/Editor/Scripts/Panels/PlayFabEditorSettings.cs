@@ -331,7 +331,7 @@ namespace PlayFab.PfEditor
 
         private static void OnStudioChange(Studio newStudio)
         {
-            var newTitleId = newStudio.Titles == null ? "" : newStudio.Titles[0].Id;
+            var newTitleId = (newStudio.Titles == null || newStudio.Titles.Length == 0) ? "" : newStudio.Titles[0].Id;
             OnTitleIdChange(newTitleId);
         }
 
