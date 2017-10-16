@@ -8,11 +8,11 @@ using PlayFab.PfEditor.Json;
 namespace PlayFab.PfEditor
 {
     [InitializeOnLoad]
-    public class PlayFabEditorHelper : UnityEditor.Editor
+    public static partial class PlayFabEditorHelper
     {
         #region EDITOR_STRINGS
+        public static string EDEX_VERSION_TEMPLATE = "namespace PlayFab.PfEditor { public static partial class PlayFabEditorHelper { public static string EDEX_VERSION = \"{sdkVersion}\"; } }\n";
         public static string EDEX_NAME = "PlayFab_EditorExtensions";
-        public static string EDEX_VERSION = "0.0.994";
         public static string EDEX_ROOT = Application.dataPath + "/PlayFabEditorExtensions/Editor";
         public static string DEV_API_ENDPOINT = "https://editor.playfabapi.com";
         public static string TITLE_ENDPOINT = ".playfabapi.com";
@@ -91,7 +91,7 @@ namespace PlayFab.PfEditor
                         if (movedRootFiles.Length > 0)
                         {
                             relocatedEdEx = true;
-                            EDEX_ROOT = movedRootFiles[0].Substring(0, movedRootFiles[0].IndexOf(PLAYFAB_EDEX_MAINFILE) - 1);
+                            EDEX_ROOT = movedRootFiles[0].Substring(0, movedRootFiles[0].LastIndexOf(PLAYFAB_EDEX_MAINFILE) - 1);
                             PlayFabEditorDataService.EnvDetails.edexPath = EDEX_ROOT;
                             PlayFabEditorDataService.SaveEnvDetails();
                         }
@@ -118,7 +118,7 @@ namespace PlayFab.PfEditor
             var pfGuiPaths = Directory.GetFiles(searchRoot, "PlayFabStyles.guiskin", SearchOption.AllDirectories);
             foreach (var eachPath in pfGuiPaths)
             {
-                var loadPath = eachPath.Substring(eachPath.IndexOf("Assets/"));
+                var loadPath = eachPath.Substring(eachPath.LastIndexOf("Assets/"));
                 return (GUISkin)AssetDatabase.LoadAssetAtPath(loadPath, typeof(GUISkin));
             }
             return null;
@@ -126,7 +126,7 @@ namespace PlayFab.PfEditor
 
         public static void SharedErrorCallback(EditorModels.PlayFabError error)
         {
-            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.ErrorMessage);
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error.GenerateErrorReport());
         }
 
         public static void SharedErrorCallback(string error)
@@ -134,7 +134,7 @@ namespace PlayFab.PfEditor
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error);
         }
 
-        protected internal static EditorModels.PlayFabError GeneratePlayFabError(string json, object customData = null)
+        public static EditorModels.PlayFabError GeneratePlayFabError(string json, object customData = null)
         {
             JsonObject errorDict = null;
             Dictionary<string, List<string>> errorDetails = null;

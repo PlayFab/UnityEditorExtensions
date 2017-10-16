@@ -169,16 +169,9 @@ namespace PlayFab.PfEditor
                     if (string.IsNullOrEmpty(EnvDetails.selectedStudio) || string.IsNullOrEmpty(SharedSettings.TitleId))
                         return null;
 
-                    try
-                    {
-                        int studioIndex; int titleIndex;
-                        if (DoesTitleExistInStudios(SharedSettings.TitleId, out studioIndex, out titleIndex))
-                            return AccountDetails.studios[studioIndex].Titles[titleIndex];
-                    }
-                    catch (Exception ex)
-                    {
-                        PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
-                    }
+                    int studioIndex; int titleIndex;
+                    if (DoesTitleExistInStudios(SharedSettings.TitleId, out studioIndex, out titleIndex))
+                        return AccountDetails.studios[studioIndex].Titles[titleIndex];
                 }
                 return null;
             }
@@ -186,15 +179,8 @@ namespace PlayFab.PfEditor
 
         private static void SaveToEditorPrefs(object obj, string key)
         {
-            try
-            {
-                var json = JsonWrapper.SerializeObject(obj);
-                EditorPrefs.SetString(KeyPrefix + key, json);
-            }
-            catch (Exception ex)
-            {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
-            }
+            var json = JsonWrapper.SerializeObject(obj);
+            EditorPrefs.SetString(KeyPrefix + key, json);
         }
 
         public static void SaveAccountDetails()
@@ -215,16 +201,9 @@ namespace PlayFab.PfEditor
                 return new TResult();
 
             var serialized = EditorPrefs.GetString(KeyPrefix + key);
-            try
-            {
-                var result = JsonWrapper.DeserializeObject<TResult>(serialized);
-                if (result != null)
-                    return JsonWrapper.DeserializeObject<TResult>(serialized);
-            }
-            catch (Exception ex)
-            {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
-            }
+            var result = JsonWrapper.DeserializeObject<TResult>(serialized);
+            if (result != null)
+                return JsonWrapper.DeserializeObject<TResult>(serialized);
             return new TResult();
         }
 

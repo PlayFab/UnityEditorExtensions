@@ -24,7 +24,7 @@ We will be adding to this platform as PlayFab's features grow.
   3. Log in using an existing PlayFab developer account (or create a new account) to continue.
   4. Editor Extensions will automatically detect if you have a PlayFab SDK installed. 
     * If your SDK is a supported version(2.0+), you may use this plugin stay up-to-date with the latest SDK
-    * If you have an older SDK, we recommend reading [this upgrade guide](https://github.com/PlayFab/UnitySDK/blob/master/UPGRADE.md) prior to upgrading.
+    * If you are using a Push Plugin released by PlayFab, please delete it, and convert to FCM. See our [Blog Post](https://blog.playfab.com/blog/push-sep-17) for more details.
     * If no SDK was detected, this plugin can download and install the latest SDK version from gitHub.
   5. After a supported SDK is installed, you will need to select a studio and title id.
   6. After a studio and title ID are selected, you can call APIs and use the Editor Extensions to configure the SDK settings from within the IDE.   

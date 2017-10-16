@@ -3,15 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 using PlayFab.PfEditor.Json;
 using PlayFab.PfEditor.EditorModels;
-
-#if UNITY_5_4_OR_NEWER
-using UnityEngine.Networking;
-#else
-using UnityEngine.Experimental.Networking;
-#endif
 
 namespace PlayFab.PfEditor
 {
@@ -54,7 +47,7 @@ namespace PlayFab.PfEditor
             {
                 {"Content-Type", "application/json"},
                 {"X-ReportErrorAsSuccess", "true"},
-                {"X-PlayFabSDK", string.Format("{0}_{1}", PlayFabEditorHelper.EDEX_NAME, PlayFabEditorHelper.EDEX_VERSION)}
+                {"X-PlayFabSDK", PlayFabEditorHelper.EDEX_NAME + "_" + PlayFabEditorHelper.EDEX_VERSION}
             };
 
             if (api.Contains("/Server/") || api.Contains("/Admin/"))
@@ -91,16 +84,11 @@ namespace PlayFab.PfEditor
 
             TResultType result = null;
             var resultAssigned = false;
-            try
-            {
-                var dataJson = JsonWrapper.SerializeObject(httpResult.data, PlayFabEditorUtil.ApiSerializerStrategy);
-                result = JsonWrapper.DeserializeObject<TResultType>(dataJson, PlayFabEditorUtil.ApiSerializerStrategy);
-                resultAssigned = true;
-            }
-            catch (Exception e)
-            {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, e.Message);
-            }
+
+            var dataJson = JsonWrapper.SerializeObject(httpResult.data, PlayFabEditorUtil.ApiSerializerStrategy);
+            result = JsonWrapper.DeserializeObject<TResultType>(dataJson, PlayFabEditorUtil.ApiSerializerStrategy);
+            resultAssigned = true;
+
             if (resultAssigned)
                 resultCallback(result);
         }

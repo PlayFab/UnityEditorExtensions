@@ -19,7 +19,7 @@ namespace PlayFab.PfEditor
 
             using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
             {
-                GUILayout.Label("CLOUD SCRIPT:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"));
+                EditorGUILayout.LabelField("CLOUD SCRIPT:", PlayFabEditorHelper.uiStyle.GetStyle("labelStyle"));
                 GUILayout.Space(10);
                 if (GUILayout.Button("IMPORT", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(30)))
                 {
@@ -80,7 +80,7 @@ namespace PlayFab.PfEditor
                 using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                 {
                     GUILayout.FlexibleSpace();
-                    GUILayout.Label("No Cloud Script files added. Import your file to get started.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
+                    EditorGUILayout.LabelField("No Cloud Script files added. Import your file to get started.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
                     GUILayout.FlexibleSpace();
                 }
             }
@@ -139,15 +139,7 @@ namespace PlayFab.PfEditor
         {
             var starterPath = File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath) ? Application.dataPath : PlayFabEditorDataService.EnvDetails.localCloudScriptPath;
             var cloudScriptPath = string.Empty;
-
-            try
-            {
-                cloudScriptPath = EditorUtility.OpenFilePanel("Select your Cloud Script file", starterPath, "js");
-            }
-            catch (Exception ex)
-            {
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, ex.Message);
-            }
+            cloudScriptPath = EditorUtility.OpenFilePanel("Select your Cloud Script file", starterPath, "js");
 
             if (!string.IsNullOrEmpty(cloudScriptPath))
             {
