@@ -36,7 +36,7 @@ namespace PlayFab.PfEditor
             { SERVER_API, "ENABLE SERVER API" },
             { ADMIN_API, "ENABLE ADMIN API" },
             { DEBUG_REQUEST_TIMING, "ENABLE REQUEST TIMES" },
-            { DISABLE_IDFA, "ENABLE IDFA" },
+            { DISABLE_IDFA, "DISABLE IDFA" },
         };
         public static Dictionary<string, bool> FLAG_INVERSION = new Dictionary<string, bool> {
             { CLIENT_API, true },
