@@ -52,11 +52,11 @@ namespace PlayFab.PfEditor
 
             if (api.Contains("/Server/") || api.Contains("/Admin/"))
             {
-                if (PlayFabEditorDataService.ActiveTitle == null || string.IsNullOrEmpty(PlayFabEditorDataService.ActiveTitle.SecretKey))
-                {
-                    PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, "Must have PlayFabSettings.DeveloperSecretKey set to call this method");
-                    return;
-                }
+                if (PlayFabEditorDataService.ActiveTitle == null)
+                    throw new Exception("Title not found, please select your title in the PlayFab EdEx Panel, Setting Tabs");
+
+                if (string.IsNullOrEmpty(PlayFabEditorDataService.ActiveTitle.SecretKey))
+                    throw new Exception("Title Secret key not found, please clear and re-select your title in the PlayFab EdEx Panel, Setting Tabs");
 
                 headers.Add("X-SecretKey", PlayFabEditorDataService.ActiveTitle.SecretKey);
             }
