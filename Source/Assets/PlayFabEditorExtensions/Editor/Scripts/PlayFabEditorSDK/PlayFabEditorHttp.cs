@@ -98,7 +98,7 @@ namespace PlayFab.PfEditor
             if (errorCallback != null)
                 errorCallback(PlayFabEditorHelper.GeneratePlayFabError(error));
             else
-                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error);
+                PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, "OnWwwError" + error);
         }
 
         internal static void MakeGitHubApiCall(string url, Action<string> resultCallback)
