@@ -131,7 +131,7 @@ namespace PlayFab.PfEditor
 
         public static void SharedErrorCallback(string error)
         {
-            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, error);
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, "SharedErrorCallback" + error);
         }
 
         public static EditorModels.PlayFabError GeneratePlayFabError(string json, object customData = null)
