@@ -27,21 +27,24 @@ namespace PlayFab.PfEditor
         public static string CLOUDSCRIPT_PATH = EDEX_ROOT + "/Resources/" + CLOUDSCRIPT_FILENAME;
 
         public static string ADMIN_API = "ENABLE_PLAYFABADMIN_API";
-        public static string SERVER_API = "ENABLE_PLAYFABSERVER_API";
         public static string CLIENT_API = "DISABLE_PLAYFABCLIENT_API";
+        public static string ENTITY_API = "ENABLE_PLAYFABENTITY_API";
+        public static string SERVER_API = "ENABLE_PLAYFABSERVER_API";
         public static string DEBUG_REQUEST_TIMING = "PLAYFAB_REQUEST_TIMING";
         public static string DISABLE_IDFA = "DISABLE_IDFA";
         public static Dictionary<string, string> FLAG_LABELS = new Dictionary<string, string> {
-            { CLIENT_API, "ENABLE CLIENT API" },
-            { SERVER_API, "ENABLE SERVER API" },
             { ADMIN_API, "ENABLE ADMIN API" },
+            { CLIENT_API, "ENABLE CLIENT API" },
+            { ENTITY_API, "ENABLE ENTITY API" },
+            { SERVER_API, "ENABLE SERVER API" },
             { DEBUG_REQUEST_TIMING, "ENABLE REQUEST TIMES" },
             { DISABLE_IDFA, "DISABLE IDFA" },
         };
         public static Dictionary<string, bool> FLAG_INVERSION = new Dictionary<string, bool> {
-            { CLIENT_API, true },
-            { SERVER_API, false },
             { ADMIN_API, false },
+            { CLIENT_API, true },
+            { ENTITY_API, false },
+            { SERVER_API, false },
             { DEBUG_REQUEST_TIMING, false },
             { DISABLE_IDFA, false },
         };
