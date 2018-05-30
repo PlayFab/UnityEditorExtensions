@@ -46,56 +46,59 @@ namespace PlayFab.PfEditor
 
         public class PlayFab_SharedSettingsProxy
         {
-            private readonly PropertyInfo _titleId;
-            private readonly PropertyInfo _developerSecretKey;
-            private readonly PropertyInfo _webRequestType;
-            private readonly PropertyInfo _compressApiData;
-            private readonly PropertyInfo _keepAlive;
-            private readonly PropertyInfo _timeOut;
+            private readonly Dictionary<string, PropertyInfo> _settingProps = new Dictionary<string, PropertyInfo>();
+            private readonly string[] expectedProps = new[] { "titleid", "developersecretkey", "requesttype", "compressapidata", "requestkeepalive", "requesttimeout" };
 
-            public string TitleId { get { return (string)_titleId.GetValue(null, null); } set { _titleId.SetValue(null, value, null); } }
-            public string DeveloperSecretKey { get { return (string)_developerSecretKey.GetValue(null, null); } set { _developerSecretKey.SetValue(null, value, null); } }
-            public PlayFabEditorSettings.WebRequestType WebRequestType { get { return (PlayFabEditorSettings.WebRequestType)_webRequestType.GetValue(null, null); } set { _webRequestType.SetValue(null, (int)value, null); } }
-            public bool CompressApiData { get { return (bool)_compressApiData.GetValue(null, null); } set { _compressApiData.SetValue(null, value, null); } }
-            public bool KeepAlive { get { return (bool)_keepAlive.GetValue(null, null); } set { _keepAlive.SetValue(null, value, null); } }
-            public int TimeOut
-            {
-                get
-                {
-                    return (int)_timeOut.GetValue(null, null);
-                }
-                set
-                {
-                    _timeOut.SetValue(null, value, null);
-                }
-            }
+            public string TitleId { get { return Get<string>("titleid"); } set { Set("titleid", value); } }
+            public string DeveloperSecretKey { get { return Get<string>("developersecretkey"); } set { Set("developersecretkey", value); } }
+            public PlayFabEditorSettings.WebRequestType WebRequestType { get { return Get<PlayFabEditorSettings.WebRequestType>("requesttype"); } set { Set("requesttype", (int)value); } }
+            public bool CompressApiData { get { return Get<bool>("compressapidata"); } set { Set("compressapidata", value); } }
+            public bool KeepAlive { get { return Get<bool>("requestkeepalive"); } set { Set("requestkeepalive", value); } }
+            public int TimeOut { get { return Get<int>("requesttimeout"); } set { Set("requesttimeout", value); } }
 
             public PlayFab_SharedSettingsProxy()
             {
+                LoadProps();
+            }
+
+            private PropertyInfo LoadProps(string name = null)
+            {
                 var playFabSettingsType = PlayFabEditorSDKTools.GetPlayFabSettings();
                 if (playFabSettingsType == null)
-                    return;
+                    return null;
 
-                var settingProperties = playFabSettingsType.GetProperties();
-                foreach (var eachProperty in settingProperties)
+                if (string.IsNullOrEmpty(name))
                 {
-                    var lcName = eachProperty.Name.ToLowerInvariant();
-                    switch (lcName)
-                    {
-                        case "titleid":
-                            _titleId = eachProperty; break;
-                        case "developersecretkey":
-                            _developerSecretKey = eachProperty; break;
-                        case "requesttype":
-                            _webRequestType = eachProperty; break;
-                        case "compressapidata":
-                            _compressApiData = eachProperty; break;
-                        case "requestkeepalive":
-                            _keepAlive = eachProperty; break;
-                        case "requesttimeout":
-                            _timeOut = eachProperty; break;
-                    }
+                    for (var i = 0; i < expectedProps.Length; i++)
+                        LoadProps(expectedProps[i]);
+                    return null;
                 }
+                else
+                {
+                    var eachProperty = playFabSettingsType.GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
+                    if (eachProperty != null)
+                        _settingProps[name.ToLowerInvariant()] = eachProperty;
+                    return eachProperty;
+                }
+            }
+
+            private T Get<T>(string name)
+            {
+                PropertyInfo propInfo;
+                var success = _settingProps.TryGetValue(name.ToLowerInvariant(), out propInfo);
+                T output = !success ? default(T) : (T)propInfo.GetValue(null, null);
+                return output;
+            }
+
+            private void Set<T>(string name, T value)
+            {
+                PropertyInfo propInfo;
+                if (!_settingProps.TryGetValue(name.ToLowerInvariant(), out propInfo))
+                    propInfo = LoadProps(name);
+                if (propInfo != null)
+                    propInfo.SetValue(null, value, null);
+                else
+                    Debug.LogWarning("Could not save " + name + " because PlayFabSettings could not be found.");
             }
         }
 
