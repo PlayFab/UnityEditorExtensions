@@ -202,11 +202,11 @@ namespace PlayFab.PfEditor
                     var buttonWidth = 150;
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("Install PlayFab SDK", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(buttonWidth),
-                        GUILayout.MinHeight(32)))
-                    {
+                    if (GUILayout.Button("Refresh", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(buttonWidth), GUILayout.MinHeight(32)))
+                        playFabSettingsType = null;
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("Install PlayFab SDK", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(buttonWidth), GUILayout.MinHeight(32)))
                         ImportLatestSDK();
-                    }
                     GUILayout.FlexibleSpace();
                 }
             }
@@ -233,10 +233,15 @@ namespace PlayFab.PfEditor
                 return playFabSettingsType;
 
             playFabSettingsType = typeof(object); // Sentinel value to indicate that PlayFabSettings doesn't exist
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in allAssemblies)
                 foreach (var eachType in assembly.GetTypes())
                     if (eachType.Name == PlayFabEditorHelper.PLAYFAB_SETTINGS_TYPENAME)
                         playFabSettingsType = eachType;
+            //if (playFabSettingsType == typeof(object))
+            //    Debug.LogWarning("Should not have gotten here: "  + allAssemblies.Length);
+            //else
+            //    Debug.Log("Found Settings: " + allAssemblies.Length + ", " + playFabSettingsType.Assembly.FullName);
             return playFabSettingsType == typeof(object) ? null : playFabSettingsType;
         }
 
