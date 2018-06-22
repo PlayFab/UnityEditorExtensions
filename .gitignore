@@ -23,7 +23,8 @@ ExportedObj/
 *.svd
 PlayFabUnitySdk.unitypackage
 PlayFabUnitySdk.unitypackage.meta
-
+PlayFabEditorPrefsSO.asset
+PlayFabEditorPrefsSO.asset.meta
 
 
 # Unity3D generated meta files

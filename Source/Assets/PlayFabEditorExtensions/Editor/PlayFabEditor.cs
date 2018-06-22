@@ -15,7 +15,7 @@ namespace PlayFab.PfEditor
 
         #region EdEx Variables
         // vars for the plugin-wide event system
-        public enum EdExStates { OnEnable, OnDisable, OnLogin, OnLogout, OnMenuItemClicked, OnSubmenuItemClicked, OnHttpReq, OnHttpRes, OnError, OnSuccess, OnWarning, OnDataLoaded } //OnWaitBegin, OnWaitEnd,
+        public enum EdExStates { OnLogin, OnLogout, OnMenuItemClicked, OnSubmenuItemClicked, OnHttpReq, OnHttpRes, OnError, OnSuccess, OnWarning }
 
         public delegate void PlayFabEdExStateHandler(EdExStates state, string status, string misc);
         public static event PlayFabEdExStateHandler EdExStateUpdate;
@@ -42,15 +42,14 @@ namespace PlayFab.PfEditor
                 EdExStateUpdate += StateUpdateHandler;
             }
 
-            RaiseStateUpdate(EdExStates.OnEnable);
-            PlayFabEditorDataService.LoadAllData();
+            PlayFabEditorDataService.RefreshStudiosList(true);
             GetLatestEdExVersion();
         }
 
         void OnDisable()
         {
             // clean up objects:
-            PlayFabEditorDataService.EditorSettings.isEdExShown = false;
+            PlayFabEditorPrefsSO.Instance.PanelIsShown = false;
 
             if (IsEventHandlerRegistered(StateUpdateHandler))
             {
@@ -76,7 +75,7 @@ namespace PlayFab.PfEditor
 
             window = GetWindow<PlayFabEditor>(inspWndType);
             window.titleContent = new GUIContent("PlayFab EdEx");
-            PlayFabEditorDataService.EditorSettings.isEdExShown = true;
+            PlayFabEditorPrefsSO.Instance.PanelIsShown = true;
         }
 
         [InitializeOnLoad]
@@ -84,8 +83,7 @@ namespace PlayFab.PfEditor
         {
             static Startup()
             {
-                PlayFabEditorDataService.LoadAllData();
-                if (PlayFabEditorDataService.EditorSettings.isEdExShown || !PlayFabEditorSDKTools.IsInstalled)
+                if (PlayFabEditorPrefsSO.Instance.PanelIsShown || !PlayFabEditorSDKTools.IsInstalled)
                 {
                     EditorCoroutine.Start(OpenPlayServices());
                 }
@@ -116,9 +114,6 @@ namespace PlayFab.PfEditor
                 PlayFabEditorHeader.DrawHeader();
 
                 GUI.enabled = blockingRequests.Count == 0 && !EditorApplication.isCompiling;
-
-                if (!PlayFabEditorDataService.IsDataLoaded)
-                    return;
 
                 if (PlayFabEditorAuthenticate.IsAuthenticated())
                 {
@@ -291,15 +286,13 @@ namespace PlayFab.PfEditor
             switch (state)
             {
                 case EdExStates.OnMenuItemClicked:
-                    //Debug.Log(string.Format("State: {0} - MenuItem: {1} Clicked", state, status));
-                    PlayFabEditorDataService.EditorView.currentSubMenu = 0;
+                    PlayFabEditorPrefsSO.Instance.curSubMenuIdx = 0;
                     break;
 
                 case EdExStates.OnSubmenuItemClicked:
-                    //Debug.Log(string.Format("State: {0} - SubMenuItem: {1} Clicked", state, status));
                     int parsed;
                     if (int.TryParse(json, out parsed))
-                        PlayFabEditorDataService.EditorView.currentSubMenu = parsed;
+                        PlayFabEditorPrefsSO.Instance.curSubMenuIdx = parsed;
                     break;
 
                 case EdExStates.OnHttpReq:
@@ -362,19 +355,19 @@ namespace PlayFab.PfEditor
 
         private static void GetLatestEdExVersion()
         {
-            var threshold = PlayFabEditorDataService.EditorSettings.lastEdExVersionCheck != DateTime.MinValue ? PlayFabEditorDataService.EditorSettings.lastEdExVersionCheck.AddHours(1) : DateTime.MinValue;
+            var threshold = PlayFabEditorPrefsSO.Instance.EdSet_lastEdExVersionCheck != DateTime.MinValue ? PlayFabEditorPrefsSO.Instance.EdSet_lastEdExVersionCheck.AddHours(1) : DateTime.MinValue;
 
             if (DateTime.Today > threshold)
             {
                 PlayFabEditorHttp.MakeGitHubApiCall("https://api.github.com/repos/PlayFab/UnityEditorExtensions/git/refs/tags", (version) =>
                 {
                     latestEdExVersion = version ?? "Unknown";
-                    PlayFabEditorDataService.EditorSettings.latestEdExVersion = latestEdExVersion;
+                    PlayFabEditorPrefsSO.Instance.EdSet_latestEdExVersion = latestEdExVersion;
                 });
             }
             else
             {
-                latestEdExVersion = PlayFabEditorDataService.EditorSettings.latestEdExVersion;
+                latestEdExVersion = PlayFabEditorPrefsSO.Instance.EdSet_latestEdExVersion;
             }
         }
 
@@ -397,7 +390,7 @@ namespace PlayFab.PfEditor
                 || int.Parse(latest[2]) > int.Parse(currrent[2]);
         }
 
-        private static void RemoveEdEx(bool clearPrefs = true, bool prompt = true)
+        private static void RemoveEdEx(bool prompt = true)
         {
             if (prompt && !EditorUtility.DisplayDialog("Confirm Editor Extensions Removal", "This action will remove PlayFab Editor Extensions from the current project.", "Confirm", "Cancel"))
                 return;
@@ -407,8 +400,6 @@ namespace PlayFab.PfEditor
                 window.Close();
                 var edExRoot = new DirectoryInfo(PlayFabEditorHelper.EDEX_ROOT);
                 FileUtil.DeleteFileOrDirectory(edExRoot.Parent.FullName);
-                if (clearPrefs)
-                    PlayFabEditorDataService.RemoveEditorPrefs();
                 AssetDatabase.Refresh();
             }
             catch (Exception ex)

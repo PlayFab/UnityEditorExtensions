@@ -78,8 +78,8 @@ namespace PlayFab.PfEditor
 
                 try
                 {
-                    if (PlayFabEditorDataService.EnvDetails != null && !string.IsNullOrEmpty(PlayFabEditorDataService.EnvDetails.edexPath))
-                        EDEX_ROOT = PlayFabEditorDataService.EnvDetails.edexPath;
+                    if (!string.IsNullOrEmpty(PlayFabEditorPrefsSO.Instance.EdExPath))
+                        EDEX_ROOT = PlayFabEditorPrefsSO.Instance.EdExPath;
                     rootFiles = Directory.GetDirectories(EDEX_ROOT);
                 }
                 catch
@@ -95,7 +95,7 @@ namespace PlayFab.PfEditor
                         {
                             relocatedEdEx = true;
                             EDEX_ROOT = movedRootFiles[0].Substring(0, movedRootFiles[0].LastIndexOf(PLAYFAB_EDEX_MAINFILE) - 1);
-                            PlayFabEditorDataService.EnvDetails.edexPath = EDEX_ROOT;
+                            PlayFabEditorPrefsSO.Instance.EdExPath = EDEX_ROOT;
                             PlayFabEditorDataService.SaveEnvDetails();
                         }
                     }

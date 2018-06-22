@@ -23,9 +23,6 @@ namespace PlayFab.PfEditor
         #region draw calls
         public static void DrawDataPanel()
         {
-            if (!PlayFabEditorDataService.IsDataLoaded)
-                return;
-
             if (menu == null)
             {
                 RegisterMenu();
@@ -33,7 +30,7 @@ namespace PlayFab.PfEditor
             }
 
             menu.DrawMenu();
-            switch ((DataMenuStates)PlayFabEditorDataService.EditorView.currentSubMenu)
+            switch ((DataMenuStates)PlayFabEditorPrefsSO.Instance.curSubMenuIdx)
             {
                 case DataMenuStates.TitleData:
                     if (tdViewer == null)
