@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -252,9 +253,21 @@ namespace PlayFab.PfEditor
 
             var types = new List<Type>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                foreach (var type in assembly.GetTypes())
-                    if (type.Name == "PlayFabVersion" || type.Name == PlayFabEditorHelper.PLAYFAB_SETTINGS_TYPENAME)
-                        types.Add(type);
+            {
+                try
+                {
+                    foreach (var type in assembly.GetTypes())
+                        if (type.Name == "PlayFabVersion" || type.Name == PlayFabEditorHelper.PLAYFAB_SETTINGS_TYPENAME)
+                            types.Add(type);
+                }
+                catch (ReflectionTypeLoadException)
+                {
+                    // For this failure, silently skip this assembly unless we have some expectation that it contains PlayFab
+                    if (assembly.FullName.StartsWith("Assembly-CSharp")) // The standard "source-code in unity proj" assembly name
+                        Debug.LogWarning("PlayFab EdEx Error, failed to access the main CSharp assembly that probably contains PlayFab. Please report this on the PlayFab Forums");
+                    continue;
+                }
+            }
 
             foreach (var type in types)
             {
