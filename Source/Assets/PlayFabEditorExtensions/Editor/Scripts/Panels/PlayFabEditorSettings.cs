@@ -26,7 +26,7 @@ namespace PlayFab.PfEditor
 #endif
         }
 
-        private static float LABEL_WIDTH = 160;
+        private static float LABEL_WIDTH = 180;
 
         private static readonly StringBuilder Sb = new StringBuilder();
 
@@ -56,8 +56,7 @@ namespace PlayFab.PfEditor
                     string flagLabel;
                     if (!PlayFabEditorHelper.FLAG_LABELS.TryGetValue(eachDefine, out flagLabel))
                         flagLabel = eachDefine;
-                    bool flagInverted;
-                    PlayFabEditorHelper.FLAG_INVERSION.TryGetValue(eachDefine, out flagInverted);
+                    bool flagInverted = PlayFabEditorHelper.INVERTED_FLAGS.Contains(eachDefine);
                     DisplayDefineToggle(flagLabel + ": ", flagInverted, eachDefine, ref curDefines, ref changedFlags);
                 }
 

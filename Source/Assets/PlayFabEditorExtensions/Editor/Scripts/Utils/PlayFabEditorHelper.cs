@@ -31,22 +31,17 @@ namespace PlayFab.PfEditor
         public static string ENTITY_API = "ENABLE_PLAYFABENTITY_API";
         public static string SERVER_API = "ENABLE_PLAYFABSERVER_API";
         public static string DEBUG_REQUEST_TIMING = "PLAYFAB_REQUEST_TIMING";
-        public static string DISABLE_IDFA = "DISABLE_IDFA";
+        public static string ENABLE_BETA_FETURES = "ENABLE_PLAYFAB_BETA";
         public static Dictionary<string, string> FLAG_LABELS = new Dictionary<string, string> {
             { ADMIN_API, "ENABLE ADMIN API" },
             { CLIENT_API, "ENABLE CLIENT API" },
             { ENTITY_API, "ENABLE ENTITY API" },
             { SERVER_API, "ENABLE SERVER API" },
             { DEBUG_REQUEST_TIMING, "ENABLE REQUEST TIMES" },
-            { DISABLE_IDFA, "DISABLE IDFA" },
+            { ENABLE_BETA_FETURES, "ENABLE UNSTABLE FEATURES" },
         };
-        public static Dictionary<string, bool> FLAG_INVERSION = new Dictionary<string, bool> {
-            { ADMIN_API, false },
-            { CLIENT_API, true },
-            { ENTITY_API, false },
-            { SERVER_API, false },
-            { DEBUG_REQUEST_TIMING, false },
-            { DISABLE_IDFA, false },
+        public static HashSet<string> INVERTED_FLAGS = new HashSet<string> {
+            { CLIENT_API },
         };
 
         public static string DEFAULT_SDK_LOCATION = "Assets/PlayFabSdk";
