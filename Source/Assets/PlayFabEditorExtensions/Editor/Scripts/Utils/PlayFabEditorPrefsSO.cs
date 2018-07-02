@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System;
+using System.IO;
 
 namespace PlayFab.PfEditor
 {
@@ -26,6 +27,8 @@ namespace PlayFab.PfEditor
                     return _instance;
 
                 _instance = CreateInstance<PlayFabEditorPrefsSO>();
+                if (!Directory.Exists(Path.Combine(Application.dataPath, "PlayFabEditorExtensions/Editor/Resources")))
+                    Directory.CreateDirectory(Path.Combine(Application.dataPath, "PlayFabEditorExtensions/Editor/Resources"));
                 AssetDatabase.CreateAsset(_instance, "Assets/PlayFabEditorExtensions/Editor/Resources/PlayFabEditorPrefsSO.asset");
                 AssetDatabase.SaveAssets();
                 Debug.LogWarning("Created missing PlayFabEditorPrefsSO file");
