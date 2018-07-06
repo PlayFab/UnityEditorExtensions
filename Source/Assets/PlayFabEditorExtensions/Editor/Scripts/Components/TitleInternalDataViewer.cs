@@ -114,7 +114,9 @@ namespace PlayFab.PfEditor
                     items.Add(new KvpItem(kvp.Key, kvp.Value));
                 }
 
-                PlayFabEditorDataService.EnvDetails.titleInternalData = result.Data;
+                PlayFabEditorPrefsSO.Instance.InternalTitleDataCache.Clear();
+                foreach (var pair in result.Data)
+                    PlayFabEditorPrefsSO.Instance.InternalTitleDataCache.Add(pair.Key, pair.Value);
                 PlayFabEditorDataService.SaveEnvDetails();
             };
 

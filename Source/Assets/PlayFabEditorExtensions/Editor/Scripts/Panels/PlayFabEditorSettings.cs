@@ -26,7 +26,7 @@ namespace PlayFab.PfEditor
 #endif
         }
 
-        private static float LABEL_WIDTH = 160;
+        private static float LABEL_WIDTH = 180;
 
         private static readonly StringBuilder Sb = new StringBuilder();
 
@@ -56,8 +56,7 @@ namespace PlayFab.PfEditor
                     string flagLabel;
                     if (!PlayFabEditorHelper.FLAG_LABELS.TryGetValue(eachDefine, out flagLabel))
                         flagLabel = eachDefine;
-                    bool flagInverted;
-                    PlayFabEditorHelper.FLAG_INVERSION.TryGetValue(eachDefine, out flagInverted);
+                    bool flagInverted = PlayFabEditorHelper.INVERTED_FLAGS.Contains(eachDefine);
                     DisplayDefineToggle(flagLabel + ": ", flagInverted, eachDefine, ref curDefines, ref changedFlags);
                 }
 
@@ -105,13 +104,10 @@ namespace PlayFab.PfEditor
 
         public static void DrawSettingsPanel()
         {
-            if (!PlayFabEditorDataService.IsDataLoaded)
-                return;
-
             if (_menu != null)
             {
                 _menu.DrawMenu();
-                switch ((SubMenuStates)PlayFabEditorDataService.EditorView.currentSubMenu)
+                switch ((SubMenuStates)PlayFabEditorPrefsSO.Instance.curSubMenuIdx)
                 {
                     case SubMenuStates.StandardSettings:
                         DrawStandardSettingsSubPanel();
@@ -134,10 +130,10 @@ namespace PlayFab.PfEditor
         {
             float labelWidth = 100;
 
-            if (PlayFabEditorDataService.AccountDetails.studios != null && PlayFabEditorDataService.AccountDetails.studios.Count != StudioFoldOutStates.Count + 1)
+            if (PlayFabEditorPrefsSO.Instance.StudioList != null && PlayFabEditorPrefsSO.Instance.StudioList.Count != StudioFoldOutStates.Count + 1)
             {
                 StudioFoldOutStates.Clear();
-                foreach (var studio in PlayFabEditorDataService.AccountDetails.studios)
+                foreach (var studio in PlayFabEditorPrefsSO.Instance.StudioList)
                 {
                     if (string.IsNullOrEmpty(studio.Id))
                         continue;
@@ -209,9 +205,9 @@ namespace PlayFab.PfEditor
 
         private static Studio GetStudioForTitleId(string titleId)
         {
-            if (PlayFabEditorDataService.AccountDetails.studios == null)
+            if (PlayFabEditorPrefsSO.Instance.StudioList == null)
                 return Studio.OVERRIDE;
-            foreach (var eachStudio in PlayFabEditorDataService.AccountDetails.studios)
+            foreach (var eachStudio in PlayFabEditorPrefsSO.Instance.StudioList)
                 if (eachStudio.Titles != null)
                     foreach (var eachTitle in eachStudio.Titles)
                         if (eachTitle.Id == titleId)
@@ -230,7 +226,7 @@ namespace PlayFab.PfEditor
                     using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
                         EditorGUILayout.LabelField("You are using a TitleId to which you are not a member. A title administrator can approve access for your account.", PlayFabEditorHelper.uiStyle.GetStyle("orTxt"));
 
-                PlayFabGuiFieldHelper.SuperFancyDropdown(labelWidth, "STUDIO: ", studio, PlayFabEditorDataService.AccountDetails.studios, eachStudio => eachStudio.Name, OnStudioChange, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
+                PlayFabGuiFieldHelper.SuperFancyDropdown(labelWidth, "STUDIO: ", studio, PlayFabEditorPrefsSO.Instance.StudioList, eachStudio => eachStudio.Name, OnStudioChange, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear"));
                 studio = GetStudioForTitleId(PlayFabEditorDataService.SharedSettings.TitleId); // This might have changed above, so refresh it
 
                 if (string.IsNullOrEmpty(studio.Id))
@@ -346,12 +342,12 @@ namespace PlayFab.PfEditor
         private static void OnTitleIdChange(string newTitleId)
         {
             var studio = GetStudioForTitleId(newTitleId);
-            PlayFabEditorDataService.EnvDetails.selectedStudio = studio.Name;
+            PlayFabEditorPrefsSO.Instance.SelectedStudio = studio.Name;
             PlayFabEditorDataService.SharedSettings.TitleId = newTitleId;
 #if ENABLE_PLAYFABADMIN_API || ENABLE_PLAYFABSERVER_API || UNITY_EDITOR
             PlayFabEditorDataService.SharedSettings.DeveloperSecretKey = studio.GetTitleSecretKey(newTitleId);
 #endif
-            PlayFabEditorDataService.EnvDetails.titleData.Clear();
+            PlayFabEditorPrefsSO.Instance.TitleDataCache.Clear();
             if (PlayFabEditorDataMenu.tdViewer != null)
                 PlayFabEditorDataMenu.tdViewer.items.Clear();
             PlayFabEditorDataService.SaveEnvDetails();

@@ -26,24 +26,24 @@ namespace PlayFab.PfEditor
                     ImportCloudScript();
                 }
                 GUILayout.Space(10);
-                if (File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath))
+                if (File.Exists(PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath))
                 {
                     if (GUILayout.Button("REMOVE", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(30)))
                     {
-                        PlayFabEditorDataService.EnvDetails.localCloudScriptPath = string.Empty;
+                        PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath = string.Empty;
                         PlayFabEditorDataService.SaveEnvDetails();
                     }
                     GUILayout.Space(10);
                     if (GUILayout.Button("EDIT", PlayFabEditorHelper.uiStyle.GetStyle("textButton"), GUILayout.MinHeight(30)))
                     {
-                        EditorUtility.OpenWithDefaultApp(PlayFabEditorDataService.EnvDetails.localCloudScriptPath);
+                        EditorUtility.OpenWithDefaultApp(PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath);
                     }
                 }
             }
 
-            if (File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath))
+            if (File.Exists(PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath))
             {
-                var path = File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath) ? PlayFabEditorDataService.EnvDetails.localCloudScriptPath : PlayFabEditorHelper.CLOUDSCRIPT_PATH;
+                var path = File.Exists(PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath) ? PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath : PlayFabEditorHelper.CLOUDSCRIPT_PATH;
                 var shortPath = "..." + path.Substring(path.LastIndexOf('/'));
 
                 using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
@@ -122,7 +122,7 @@ namespace PlayFab.PfEditor
                         using (var newfile = File.Create(csPath)) { }
                     File.WriteAllText(csPath, result.Files[0].FileContents);
                     Debug.Log("CloudScript uploaded successfully!");
-                    PlayFabEditorDataService.EnvDetails.localCloudScriptPath = csPath;
+                    PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath = csPath;
                     PlayFabEditorDataService.SaveEnvDetails();
                     AssetDatabase.Refresh();
                 }
@@ -137,22 +137,22 @@ namespace PlayFab.PfEditor
 
         private static void SelectLocalFile()
         {
-            var starterPath = File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath) ? Application.dataPath : PlayFabEditorDataService.EnvDetails.localCloudScriptPath;
+            var starterPath = File.Exists(PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath) ? Application.dataPath : PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath;
             var cloudScriptPath = string.Empty;
             cloudScriptPath = EditorUtility.OpenFilePanel("Select your Cloud Script file", starterPath, "js");
 
             if (!string.IsNullOrEmpty(cloudScriptPath))
             {
-                PlayFabEditorDataService.EnvDetails.localCloudScriptPath = cloudScriptPath;
+                PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath = cloudScriptPath;
                 PlayFabEditorDataService.SaveEnvDetails();
             }
         }
 
         private static void BeginCloudScriptUpload()
         {
-            var filePath = File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath) ? PlayFabEditorDataService.EnvDetails.localCloudScriptPath : PlayFabEditorHelper.CLOUDSCRIPT_PATH;
+            var filePath = File.Exists(PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath) ? PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath : PlayFabEditorHelper.CLOUDSCRIPT_PATH;
 
-            if (!File.Exists(PlayFabEditorDataService.EnvDetails.localCloudScriptPath) && !File.Exists(PlayFabEditorHelper.CLOUDSCRIPT_PATH))
+            if (!File.Exists(PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath) && !File.Exists(PlayFabEditorHelper.CLOUDSCRIPT_PATH))
             {
                 PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnError, "Cloud Script Upload Failed: null or corrupt file at path(" + filePath + ").");
                 return;
@@ -173,7 +173,7 @@ namespace PlayFab.PfEditor
 
             PlayFabEditorApi.UpdateCloudScript(request, (UpdateCloudScriptResult result) =>
             {
-                PlayFabEditorDataService.EnvDetails.localCloudScriptPath = filePath;
+                PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath = filePath;
                 PlayFabEditorDataService.SaveEnvDetails();
 
                 Debug.Log("CloudScript uploaded successfully!");
