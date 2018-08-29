@@ -28,7 +28,7 @@ namespace PlayFab.PfEditor
 
         public static string ADMIN_API = "ENABLE_PLAYFABADMIN_API";
         public static string CLIENT_API = "DISABLE_PLAYFABCLIENT_API";
-        public static string ENTITY_API = "ENABLE_PLAYFABENTITY_API";
+        public static string ENTITY_API = "DISABLE_PLAYFABENTITY_API";
         public static string SERVER_API = "ENABLE_PLAYFABSERVER_API";
         public static string DEBUG_REQUEST_TIMING = "PLAYFAB_REQUEST_TIMING";
         public static string ENABLE_BETA_FETURES = "ENABLE_PLAYFAB_BETA";
@@ -41,7 +41,7 @@ namespace PlayFab.PfEditor
             { ENABLE_BETA_FETURES, "ENABLE UNSTABLE FEATURES" },
         };
         public static HashSet<string> INVERTED_FLAGS = new HashSet<string> {
-            { CLIENT_API },
+            CLIENT_API, ENTITY_API,
         };
 
         public static string DEFAULT_SDK_LOCATION = "Assets/PlayFabSdk";
