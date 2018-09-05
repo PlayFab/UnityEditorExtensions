@@ -1,4 +1,5 @@
 using PlayFab.PfEditor.EditorModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
@@ -43,21 +44,26 @@ namespace PlayFab.PfEditor
             {
                 var curDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
                 var changedFlags = false;
-                List<string> allFlags = new List<string>(PlayFabEditorHelper.FLAG_LABELS.Keys);
-                var extraDefines = new List<string>(curDefines.Split(' ', ';'));
-                extraDefines.Sort();
+                var allFlags = new Dictionary<string, PfDefineFlag>(PlayFabEditorHelper.FLAG_LABELS);
+                var extraDefines = new HashSet<string>(curDefines.Split(' ', ';'));
                 foreach (var eachFlag in extraDefines)
-                    if (!allFlags.Contains(eachFlag))
-                        allFlags.Add(eachFlag);
-                foreach (var eachDefine in allFlags)
+                    if (!string.IsNullOrEmpty(eachFlag) && !allFlags.ContainsKey(eachFlag))
+                        allFlags.Add(eachFlag, new PfDefineFlag { Flag = eachFlag, Label = eachFlag, Category = PfDefineFlag.FlagCategory.Other, isInverted = false, isSafe = false });
+                var allowUnsafe = extraDefines.Contains(PlayFabEditorHelper.ENABLE_BETA_FETURES);
+
+                foreach (PfDefineFlag.FlagCategory activeFlagCategory in Enum.GetValues(typeof(PfDefineFlag.FlagCategory)))
                 {
-                    if (string.IsNullOrEmpty(eachDefine))
+                    if (activeFlagCategory == PfDefineFlag.FlagCategory.Other && !allowUnsafe)
                         continue;
-                    string flagLabel;
-                    if (!PlayFabEditorHelper.FLAG_LABELS.TryGetValue(eachDefine, out flagLabel))
-                        flagLabel = eachDefine;
-                    bool flagInverted = PlayFabEditorHelper.INVERTED_FLAGS.Contains(eachDefine);
-                    DisplayDefineToggle(flagLabel + ": ", flagInverted, eachDefine, ref curDefines, ref changedFlags);
+
+                    using (var fwl = new FixedWidthLabel(activeFlagCategory.ToString())) { }
+
+                    foreach (var eachDefinePair in allFlags)
+                    {
+                        PfDefineFlag eachFlag = eachDefinePair.Value;
+                        if (eachFlag.Category == activeFlagCategory && (eachFlag.isSafe || allowUnsafe))
+                            DisplayDefineToggle(eachFlag.Label + ": ", eachFlag.isInverted, eachFlag.Flag, ref curDefines, ref changedFlags);
+                    }
                 }
 
                 if (changedFlags)
