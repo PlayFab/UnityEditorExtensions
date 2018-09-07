@@ -31,17 +31,17 @@ namespace PlayFab.PfEditor
         public static string ENTITY_API = "DISABLE_PLAYFABENTITY_API";
         public static string SERVER_API = "ENABLE_PLAYFABSERVER_API";
         public static string DEBUG_REQUEST_TIMING = "PLAYFAB_REQUEST_TIMING";
+        public static string ENABLE_PLAYFABPLAYSTREAM_API = "ENABLE_PLAYFABPLAYSTREAM_API";
         public static string ENABLE_BETA_FETURES = "ENABLE_PLAYFAB_BETA";
-        public static Dictionary<string, string> FLAG_LABELS = new Dictionary<string, string> {
-            { ADMIN_API, "ENABLE ADMIN API" },
-            { CLIENT_API, "ENABLE CLIENT API" },
-            { ENTITY_API, "ENABLE ENTITY API" },
-            { SERVER_API, "ENABLE SERVER API" },
-            { DEBUG_REQUEST_TIMING, "ENABLE REQUEST TIMES" },
-            { ENABLE_BETA_FETURES, "ENABLE UNSTABLE FEATURES" },
-        };
-        public static HashSet<string> INVERTED_FLAGS = new HashSet<string> {
-            CLIENT_API, ENTITY_API,
+        public static Dictionary<string, PfDefineFlag> FLAG_LABELS = new Dictionary<string, PfDefineFlag> {
+            { ADMIN_API, new PfDefineFlag { Flag = ADMIN_API, Label = "ENABLE ADMIN API", Category = PfDefineFlag.FlagCategory.Api, isInverted = false, isSafe = true } },
+            { CLIENT_API, new PfDefineFlag { Flag = CLIENT_API, Label = "ENABLE CLIENT API", Category = PfDefineFlag.FlagCategory.Api, isInverted = true, isSafe = true } },
+            { ENTITY_API, new PfDefineFlag { Flag = ENTITY_API, Label = "ENABLE ENTITY API", Category = PfDefineFlag.FlagCategory.Api, isInverted = true, isSafe = true } },
+            { SERVER_API, new PfDefineFlag { Flag = SERVER_API, Label = "ENABLE SERVER API", Category = PfDefineFlag.FlagCategory.Api, isInverted = false, isSafe = true } },
+
+            { DEBUG_REQUEST_TIMING, new PfDefineFlag { Flag = DEBUG_REQUEST_TIMING, Label = "ENABLE REQUEST TIMES", Category = PfDefineFlag.FlagCategory.Feature, isInverted = false, isSafe = true } },
+            { ENABLE_BETA_FETURES, new PfDefineFlag { Flag = ENABLE_BETA_FETURES, Label = "ENABLE UNSTABLE FEATURES", Category = PfDefineFlag.FlagCategory.Feature, isInverted = false, isSafe = true } },
+            { ENABLE_PLAYFABPLAYSTREAM_API, new PfDefineFlag { Flag = ENABLE_PLAYFABPLAYSTREAM_API, Label = "ENABLE SIGNALR", Category = PfDefineFlag.FlagCategory.Feature, isInverted = false, isSafe = false } },
         };
 
         public static string DEFAULT_SDK_LOCATION = "Assets/PlayFabSdk";
@@ -202,5 +202,21 @@ namespace PlayFab.PfEditor
             return new Vector3((colorValue / 255f), (colorValue / 255f), (colorValue / 255f));
         }
         #endregion
+    }
+
+    public class PfDefineFlag
+    {
+        public enum FlagCategory
+        {
+            Api,
+            Feature,
+            Other,
+        }
+
+        public string Flag; // Also doubles as the dictionary key
+        public string Label;
+        public FlagCategory Category;
+        public bool isInverted;
+        public bool isSafe;
     }
 }
