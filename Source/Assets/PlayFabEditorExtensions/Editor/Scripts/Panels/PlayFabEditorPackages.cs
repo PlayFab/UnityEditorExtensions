@@ -13,15 +13,16 @@ namespace PlayFab.PfEditor
 
         public static void DrawPackagesMenu()
         {
+#if ENABLE_PLAYFABPUBSUB_API
             var labelStyle = new GUIStyle(PlayFabEditorHelper.uiStyle.GetStyle("label"));
             if (Environment.Version.Major < 4)
             {
-                EditorGUILayout.LabelField("PersistentSockets is only supported with dot Net 4\n\n Please change your Project build settings", labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                EditorGUILayout.LabelField(" PersistentSockets is only supported with dot Net 4\n\n Please change your Project build settings", labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
             }
             else if (!IsPubSubPresent)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("PersistentSockets: ");
+                GUILayout.Label(" PersistentSockets: ");
                 if (GUILayout.Button("Install", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MaxWidth(buttonWidth), GUILayout.MinHeight(32)))
                 {
                     string possibleNewtonsoftPath = "";
@@ -40,8 +41,9 @@ namespace PlayFab.PfEditor
             }
             else
             {
-                EditorGUILayout.LabelField("PersistentSockets is already Installed", labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                EditorGUILayout.LabelField(" PersistentSockets is Installed", labelStyle, GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
             }
+#endif
         }
 
         public static void ImportPubSubSDK()
