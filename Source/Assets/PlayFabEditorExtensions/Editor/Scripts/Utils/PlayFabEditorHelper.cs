@@ -42,7 +42,7 @@ namespace PlayFab.PfEditor
 
             { DEBUG_REQUEST_TIMING, new PfDefineFlag { Flag = DEBUG_REQUEST_TIMING, Label = "ENABLE REQUEST TIMES", Category = PfDefineFlag.FlagCategory.Feature, isInverted = false, isSafe = true } },
             { ENABLE_BETA_FETURES, new PfDefineFlag { Flag = ENABLE_BETA_FETURES, Label = "ENABLE UNSTABLE FEATURES", Category = PfDefineFlag.FlagCategory.Feature, isInverted = false, isSafe = true } },
-            { ENABLE_PLAYFABPUBSUB_API, new PfDefineFlag { Flag = ENABLE_PLAYFABPUBSUB_API, Label = "ENABLE PubSub", Category = PfDefineFlag.FlagCategory.Feature, isInverted = false, isSafe = false } },
+            //{ ENABLE_PLAYFABPUBSUB_API, new PfDefineFlag { Flag = ENABLE_PLAYFABPUBSUB_API, Label = "ENABLE PubSub", Category = PfDefineFlag.FlagCategory.Feature, isInverted = false, isSafe = false } },
         };
 
         public static string DEFAULT_SDK_LOCATION = "Assets/PlayFabSdk";
