@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace PlayFab.PfEditor
 {
-    public class PlayFabEditorPackages : Editor
+    public class PlayFabEditorPackages : UnityEditor.Editor
     {
         private const int buttonWidth = 150;
 
