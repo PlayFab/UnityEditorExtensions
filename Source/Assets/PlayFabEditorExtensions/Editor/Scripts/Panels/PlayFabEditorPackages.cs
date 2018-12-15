@@ -53,7 +53,7 @@ namespace PlayFab.PfEditor
             GUILayout.Label(" PUBSUB IS IN PRIVATE PREVIEW.");
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label(" If you wish to try this feature out, Please contact playfabdt@microsoft.com for access to the private github repo.");
+            GUILayout.Label(" If you wish to try this feature out, Please contact devrel@playfab.com for access to the private github repo.");
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.Label(" User MUST be currently signed into GitHub (with their default browser) to successfully install the unitypackage");
