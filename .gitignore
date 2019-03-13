@@ -1,3 +1,5 @@
+**/*[Tt]estTitleData.json*
+
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -23,8 +25,7 @@ ExportedObj/
 *.svd
 PlayFabUnitySdk.unitypackage
 PlayFabUnitySdk.unitypackage.meta
-PlayFabEditorPrefsSO.asset
-PlayFabEditorPrefsSO.asset.meta
+**/*PlayFabEditorPrefsSO.asset*
 
 
 # Unity3D generated meta files
