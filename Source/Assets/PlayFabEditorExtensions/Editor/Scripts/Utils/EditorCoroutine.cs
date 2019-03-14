@@ -86,6 +86,7 @@ namespace PlayFab.PfEditor
             {
                 if (_www != null)
                 {
+#if UNITY_2018_2_OR_NEWER
                     if (!_sent)
                     {
                         try
@@ -97,8 +98,9 @@ namespace PlayFab.PfEditor
                         {
                         }
                     }
+#endif
 
-                    if (routine.Current != null && _www.isDone && !routine.MoveNext())
+                    if (_www.isDone && !routine.MoveNext())
                     {
                         Stop();
                     }
