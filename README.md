@@ -20,6 +20,7 @@ We will be adding to this platform as PlayFab's features grow.
 ## Setup:
   
   1. Download [this Asset Package](https://api.playfab.com/sdks/download/unity-edex "PlayFabEditorExtensions.unitypackage") and import into a new or existing project.
+    * EditorExtensions is meant to be moved as a whole folder: /PlayFabEditorExtensions/Editor/... if you wish to move the extension to not the root Asset folder, you MUST move the PlayFabEditorExtensions folder not just /Editor/
   2. Open the Editor Extensions via the Unity menu: **Window > PlayFab > Editor Extensions** 
   3. Log in using an existing PlayFab developer account (or create a new account) to continue.
   4. Editor Extensions will automatically detect if you have a PlayFab SDK installed. 
@@ -27,6 +28,7 @@ We will be adding to this platform as PlayFab's features grow.
     * If you are using a Push Plugin released by PlayFab, please delete it, and convert to FCM. See our [Blog Post](https://blog.playfab.com/blog/push-sep-17) for more details.
     * If no SDK was detected, this plugin can download and install the latest SDK version from gitHub.
   5. After a supported SDK is installed, you will need to select a studio and title id.
+    * you may move the PlayFabSdk to a non Asset root folder, but you will have to let the editor extensions know where you have moved the sdk.
   6. After a studio and title ID are selected, you can call APIs and use the Editor Extensions to configure the SDK settings from within the IDE.   
 
 ![EditorExtensions_SKDs](https://github.com/PlayFab/UnityEditorExtensions/raw/master/_repoAssets/img/EdEx_SDKs.png "View the current SDK and upgrade to the latest SDK.")
