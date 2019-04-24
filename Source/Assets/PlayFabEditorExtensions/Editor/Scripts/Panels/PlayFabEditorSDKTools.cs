@@ -220,6 +220,9 @@ namespace PlayFab.PfEditor
                 Debug.Log("PlayFab SDK Install: Complete");
                 AssetDatabase.ImportPackage(fileName, false);
 
+                // attempts to re-import any changed assets (which ImportPackage doesn't implicitly do)
+                AssetDatabase.Refresh();
+
                 PlayFabEditorPrefsSO.Instance.SdkPath = PlayFabEditorHelper.DEFAULT_SDK_LOCATION;
                 PlayFabEditorDataService.SaveEnvDetails();
 
