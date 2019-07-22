@@ -115,21 +115,24 @@ namespace PlayFab.PfEditor
             {
                 foreach (string d in Directory.GetDirectories(sDir))
                 {
-                    foreach (string f in Directory.GetFiles(d))
+                    if (!d.Contains("PlayFab"))
                     {
-                        if (f.EndsWith(".cs"))
+                        foreach (string f in Directory.GetFiles(d))
                         {
-                            string fileText = System.IO.File.ReadAllText(f);
-                            if (fileText.Contains(": MonoBehaviour"))
+                            if (f.EndsWith(".cs"))
                             {
-                                // May be faster to keep a ref to that file itself. 
-                                // right now we are loading all text in, which can be severly slow.
-                                localAssets.Add(f);
+                                string fileText = System.IO.File.ReadAllText(f);
+                                if (fileText.Contains(": MonoBehaviour"))
+                                {
+                                    // May be faster to keep a ref to that file itself. 
+                                    // right now we are loading all text in, which can be severly slow.
+                                    localAssets.Add(f);
+                                }
                             }
+                            Console.WriteLine(f);
                         }
-                        Console.WriteLine(f);
+                        DirSearch(d);
                     }
-                    DirSearch(d);
                 }
             }
             catch (System.Exception excpt)
