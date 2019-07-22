@@ -9,11 +9,37 @@ namespace PlayFab.PfEditor
 {
     public class PlayFabEditorToolsMenu : UnityEditor.Editor
     {
+        public enum ToolSubMenuStates
+        {
+            CloudScript,
+            QuickScript,
+        }
+
+        public static ToolSubMenuStates currentState = ToolSubMenuStates.CloudScript;
+
         public static float buttonWidth = 200;
         public static Vector2 scrollPos = Vector2.zero;
+        private static SubMenuComponent _menu = null;
 
-        public static void DrawToolsPanel()
+        private static void DrawQuickStart()
         {
+            // TODO: split this Tools menu into two sub menus: CloudScript and "other"
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.LabelField("Auto-Tagger: Add telemetry calls to Assets you care about.");
+            if(GUILayout.Button("AutoTag My Assets!", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+            {
+                // TODO:
+                // 1.) navigate to new page (this will be populated by the next thing, so you may need to swtich this to after processing).
+                // 2.) recurisvely look through user's assets folder and find any .cs file that is a MonoBehavior
+
+                GetAssetFiles();
+            }
+            GUILayout.FlexibleSpace();
+        }
+
+        private static void DrawCloudScript()
+        {
+            // TODO: move top part to a new screen
             scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
             buttonWidth = EditorGUIUtility.currentViewWidth > 400 ? EditorGUIUtility.currentViewWidth / 2 : 200;
 
@@ -84,20 +110,34 @@ namespace PlayFab.PfEditor
                     GUILayout.FlexibleSpace();
                 }
             }
+        }
 
-            // TODO: split this Tools menu into two sub menus: CloudScript and "other"
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Auto-Tagger: Add telemetry calls to Assets you care about.");
-            if(GUILayout.Button("AutoTag My Assets!", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+        public static void DrawToolsPanel()
+        {
+            if (_menu == null)
             {
-                // TODO:
-                // 1.) navigate to new page (this will be populated by the next thing, so you may need to swtich this to after processing).
-                // 2.) recurisvely look through user's assets folder and find any .cs file that is a MonoBehavior
-
-                GetAssetFiles();
+                RegisterMenu();
+                return;
             }
-            GUILayout.FlexibleSpace();
 
+            _menu.DrawMenu();
+            switch ((ToolSubMenuStates)PlayFabEditorPrefsSO.Instance.curSubMenuIdx)
+            {
+                case ToolSubMenuStates.CloudScript:
+                    DrawCloudScript();
+                    break;
+
+                case ToolSubMenuStates.QuickScript:
+                    DrawQuickStart();
+                    break;
+
+                default:
+                    using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
+                    {
+                        EditorGUILayout.LabelField("Coming Soon!", PlayFabEditorHelper.uiStyle.GetStyle("titleLabel"), GUILayout.MinWidth(EditorGUIUtility.currentViewWidth));
+                    }
+                    break;
+            }
             GUILayout.EndScrollView();
         }
 
@@ -232,6 +272,24 @@ namespace PlayFab.PfEditor
                 Debug.Log("CloudScript uploaded successfully!");
 
             }, PlayFabEditorHelper.SharedErrorCallback);
+        }
+        public static void RegisterMenu()
+        {
+            if (_menu != null)
+                return;
+
+            _menu = CreateInstance<SubMenuComponent>();
+            _menu.RegisterMenuItem("CloudScript", OnCloudScriptClicked);
+            _menu.RegisterMenuItem("QuickStart", OnQuickStartClicked);
+        }
+        public static void OnCloudScriptClicked()
+        {
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, ToolSubMenuStates.CloudScript.ToString(), "" + (int)ToolSubMenuStates.CloudScript);
+        }
+
+        public static void OnQuickStartClicked()
+        {
+            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, ToolSubMenuStates.QuickScript.ToString(), "" + (int)ToolSubMenuStates.QuickScript);
         }
     }
 }
