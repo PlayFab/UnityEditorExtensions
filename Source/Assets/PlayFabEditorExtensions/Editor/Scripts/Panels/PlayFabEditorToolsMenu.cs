@@ -85,7 +85,57 @@ namespace PlayFab.PfEditor
                 }
             }
 
+            // TODO: split this Tools menu into two sub menus: CloudScript and "other"
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.LabelField("Auto-Tagger: Add telemetry calls to Assets you care about.");
+            if(GUILayout.Button("AutoTag My Assets!", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+            {
+                // TODO:
+                // 1.) navigate to new page (this will be populated by the next thing, so you may need to swtich this to after processing).
+                // 2.) recurisvely look through user's assets folder and find any .cs file that is a MonoBehavior
+
+                GetAssetFiles();
+            }
+            GUILayout.FlexibleSpace();
+
             GUILayout.EndScrollView();
+        }
+
+        private static void GetAssetFiles()
+        {
+            List<string> possibleTag = new List<string>();
+            var projAssetPath = Application.dataPath;
+            DirSearch(projAssetPath);
+        }
+
+        private static List<string> localAssets = new List<string>();
+        static void DirSearch(string sDir)
+        {
+            try
+            {
+                foreach (string d in Directory.GetDirectories(sDir))
+                {
+                    foreach (string f in Directory.GetFiles(d))
+                    {
+                        if (f.EndsWith(".cs"))
+                        {
+                            string fileText = System.IO.File.ReadAllText(f);
+                            if (fileText.Contains(": MonoBehaviour"))
+                            {
+                                // May be faster to keep a ref to that file itself. 
+                                // right now we are loading all text in, which can be severly slow.
+                                localAssets.Add(f);
+                            }
+                        }
+                        Console.WriteLine(f);
+                    }
+                    DirSearch(d);
+                }
+            }
+            catch (System.Exception excpt)
+            {
+                Console.WriteLine(excpt.Message);
+            }
         }
 
         private static void ImportCloudScript()
