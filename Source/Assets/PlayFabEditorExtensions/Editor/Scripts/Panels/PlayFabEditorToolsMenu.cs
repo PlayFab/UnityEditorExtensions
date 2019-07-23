@@ -23,13 +23,13 @@ namespace PlayFab.PfEditor
 
         private static string GetEmitCode(string filename, string lifecyclepoint)
         {
-            return "    PlayFab.PlayFabClientAPI.LoginWithCustomID( new PlayFab.ClientModels.LoginWithCustomIDRequest() { CreateAccount = true, CustomId = SystemInfo.deviceUniqueIdentifier, TitleId=PlayFab.PlayFabSettings.TitleId }, result => { PlayFab.PlayFabClientAPI.WriteTitleEvent( new PlayFab.ClientModels.WriteTitleEventRequest() { EventName = \"" + filename + ":"+lifecyclepoint+"\", AuthenticationContext = result.AuthenticationContext }, null, null);}, null);\n";
+            return "    PlayFab.PlayFabClientAPI.LoginWithCustomID( new PlayFab.ClientModels.LoginWithCustomIDRequest() { CreateAccount = true, CustomId = SystemInfo.deviceUniqueIdentifier, TitleId=PlayFab.PlayFabSettings.TitleId }, result => { PlayFab.PlayFabClientAPI.WriteTitleEvent( new PlayFab.ClientModels.WriteTitleEventRequest() { EventName = \"" + filename + ":" + lifecyclepoint + "\", AuthenticationContext = result.AuthenticationContext }, null, null);}, null);\n";
         }
 
         private static string GetEmitFunction(string filename, string lifecyclepoint)
         {
             //TODO: return a full function instead.
-            return "    PlayFab.PlayFabClientAPI.LoginWithCustomID( new PlayFab.ClientModels.LoginWithCustomIDRequest() { CreateAccount = true, CustomId = SystemInfo.deviceUniqueIdentifier, TitleId=PlayFab.PlayFabSettings.TitleId }, result => { PlayFab.PlayFabClientAPI.WriteTitleEvent( new PlayFab.ClientModels.WriteTitleEventRequest() { EventName = \"" + filename + ":"+lifecyclepoint+"\", AuthenticationContext = result.AuthenticationContext }, null, null);}, null);\n";
+            return "    PlayFab.PlayFabClientAPI.LoginWithCustomID( new PlayFab.ClientModels.LoginWithCustomIDRequest() { CreateAccount = true, CustomId = SystemInfo.deviceUniqueIdentifier, TitleId=PlayFab.PlayFabSettings.TitleId }, result => { PlayFab.PlayFabClientAPI.WriteTitleEvent( new PlayFab.ClientModels.WriteTitleEventRequest() { EventName = \"" + filename + ":" + lifecyclepoint + "\", AuthenticationContext = result.AuthenticationContext }, null, null);}, null);\n";
         }
 
         private static bool quickStartActivated = false;
@@ -46,7 +46,7 @@ namespace PlayFab.PfEditor
         private static string _EnableEnumerableSpaceCode = "IEnumerable OnEnable ()";
         private static bool tagEnable = false;
 
-        //private static List<bool> filesToWriteTo = new List<bool>();
+        private static List<bool> filesToWriteTo = new List<bool>();
 
         private static void DrawQuickStart()
         {
@@ -85,7 +85,7 @@ namespace PlayFab.PfEditor
                     {
                         //filesToWriteTo.Add(true);
                         //EditorGUILayout.LabelField(file);
-                        //filesToWriteTo[filesToWriteTo.Count-1] = GUILayout.Toggle(filesToWriteTo[filesToWriteTo.Count-1], file);
+                        //filesToWriteTo[filesToWriteTo.Count - 1] = GUILayout.Toggle(filesToWriteTo[filesToWriteTo.Count - 1], file);
                         EditorGUILayout.LabelField(file);
                         GUILayout.Toggle(true, file);
                     }
@@ -222,13 +222,13 @@ namespace PlayFab.PfEditor
                         if (!addedLine)
                         {
                             bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _StartVoidSpaceCode);
-                            if(!addedLineWithSpace)
+                            if (!addedLineWithSpace)
                             {
                                 bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _StartEnumerableCode);
-                                if(!addedLineInEnumerator)
+                                if (!addedLineInEnumerator)
                                 {
                                     bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _StartEnumerableSpaceCode);
-                                    if(!addedLineInEnumeratorWithSpace)
+                                    if (!addedLineInEnumeratorWithSpace)
                                     {
                                         // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class file
                                         AddTelemetryFunction(filename, file, text, _StartVoidCode);
@@ -246,13 +246,13 @@ namespace PlayFab.PfEditor
                         if (!addedLine)
                         {
                             bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _EnableVoidSpaceCode);
-                            if(!addedLineWithSpace)
+                            if (!addedLineWithSpace)
                             {
                                 bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _EnableEnumerableCode);
-                                if(!addedLineInEnumerator)
+                                if (!addedLineInEnumerator)
                                 {
                                     bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _EnableEnumerableSpaceCode);
-                                    if(!addedLineInEnumeratorWithSpace)
+                                    if (!addedLineInEnumeratorWithSpace)
                                     {
                                         // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
                                         AddTelemetryFunction(filename, file, text, _EnableVoidCode);
@@ -271,7 +271,7 @@ namespace PlayFab.PfEditor
         {
             // We want to find the BOTTOM of this file. (or at least the end of the class)
             // first, find the START of the class (filename without .cs at the end) + : MonoBehaviour
-            if(filename.EndsWith(".cs"))
+            if (filename.EndsWith(".cs"))
             {
                 filename = filename.Substring(0, filename.Length - 3);
             }
@@ -279,10 +279,10 @@ namespace PlayFab.PfEditor
             // move current index until the first { (class decl)
             var currentIndex = text.LastIndexOf(filename + " : MonoBehaviour");
             int tabs = 0;
-            while(text[currentIndex] != '{')
+            while (text[currentIndex] != '{')
             {
                 currentIndex++;
-                if(text[currentIndex] == ' ' || text[currentIndex] == '\t')
+                if (text[currentIndex] == ' ' || text[currentIndex] == '\t')
                 {
                     tabs++;
                 }
@@ -290,34 +290,34 @@ namespace PlayFab.PfEditor
 
             int currentBracketCount = 1;
             // Keep iterating until we can find a } BUT if we see a { add 1, and subtract for every } that we see
-            while(currentBracketCount > 0)
+            while (currentBracketCount > 0)
             {
                 currentIndex++;
-                if(text[currentIndex] == '{')
+                if (text[currentIndex] == '{')
                 {
                     currentBracketCount++;
                 }
-                else if(text[currentIndex] == '}')
+                else if (text[currentIndex] == '}')
                 {
                     currentBracketCount--;
                 }
             }
 
             // Now we want to back up one line
-            currentIndex -= tabs -1;
+            currentIndex -= tabs - 1;
 
             var beforeText = text.Substring(0, currentIndex);
-            var endText = text.Substring(currentIndex+1);
+            var endText = text.Substring(currentIndex + 1);
 
             string tabbing = "";
-            for(int i = tabs * 2; i != 0; i--)
+            for (int i = tabs * 2; i != 0; i--)
             {
                 tabbing += " ";
             }
 
             var emitCode = GetEmitCode(filename, functionDecl);
             //var functionText = "\n\r"+tabbing+functionDecl +"\n"+tabbing+"{\n" + tabbing + emitCode + tabbing + "}\n\r";
-            var functionText = "\n"+tabbing+functionDecl +"\n"+tabbing+"{\n" + tabbing + emitCode + tabbing + "}\n";
+            var functionText = "\n" + tabbing + functionDecl + "\n" + tabbing + "{\n" + tabbing + emitCode + tabbing + "}\n";
             var fileText = beforeText + functionText + endText;
 
             System.IO.File.WriteAllText(file, fileText);
@@ -334,7 +334,7 @@ namespace PlayFab.PfEditor
                     var currentIndex = originalWhereToStartWriting + lookForCode.Length;
 
                     // we don't know how many spaces they may have...
-                    while (currentIndex < fileText.Length && fileText[currentIndex] != '{') {  tabbing += fileText[currentIndex]; currentIndex++;}
+                    while (currentIndex < fileText.Length && fileText[currentIndex] != '{') { tabbing += fileText[currentIndex]; currentIndex++; }
                     if (currentIndex < fileText.Length)
                     {
                         // NOW we should know the START of the function.
