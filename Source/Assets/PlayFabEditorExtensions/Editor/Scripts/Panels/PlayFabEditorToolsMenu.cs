@@ -13,7 +13,6 @@ namespace PlayFab.PfEditor
         {
             CloudScript,
             QuickScript,
-            Maps,
         }
 
         public static ToolSubMenuStates currentState = ToolSubMenuStates.CloudScript;
@@ -21,23 +20,6 @@ namespace PlayFab.PfEditor
         public static float buttonWidth = 200;
         public static Vector2 scrollPos = Vector2.zero;
         private static SubMenuComponent _menu = null;
-
-        private static void Draw3DMaps()
-        {
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("3D Maps! 200+ possible cities!");
-            if (GUILayout.Button("Add 3D Maps (+Examples)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
-            {
-                var link = "https://github.com/microsoft/MapsSDK-Unity/releases/download/0.2.3/Microsoft.Maps.Unity-Core+Examples-0.2.3.unitypackage";
-                System.Diagnostics.Process.Start(link);
-            }
-            if (GUILayout.Button("Add 3D Maps (Code Only)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
-            {
-                var link = "https://github.com/microsoft/MapsSDK-Unity/releases/download/0.2.3/Microsoft.Maps.Unity-Core-0.2.3.unitypackage";
-                System.Diagnostics.Process.Start(link);
-            }
-            GUILayout.FlexibleSpace();
-        }
 
         private static string GetEmitCode(string filename, string lifecyclepoint)
         {
@@ -210,9 +192,6 @@ namespace PlayFab.PfEditor
                     break;
                 case ToolSubMenuStates.QuickScript:
                     DrawQuickStart();
-                    break;
-                case ToolSubMenuStates.Maps:
-                    Draw3DMaps();
                     break;
 
                 default:
@@ -523,7 +502,6 @@ namespace PlayFab.PfEditor
             _menu = CreateInstance<SubMenuComponent>();
             _menu.RegisterMenuItem("CloudScript", OnCloudScriptClicked);
             _menu.RegisterMenuItem("QuickStart", OnQuickStartClicked);
-            _menu.RegisterMenuItem("MapsSDK", OnMapsSdkClicked);
         }
 
         public static void OnCloudScriptClicked()
@@ -534,11 +512,6 @@ namespace PlayFab.PfEditor
         public static void OnQuickStartClicked()
         {
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, ToolSubMenuStates.QuickScript.ToString(), "" + (int)ToolSubMenuStates.QuickScript);
-        }
-
-        public static void OnMapsSdkClicked()
-        {
-            PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, ToolSubMenuStates.Maps.ToString(), "" + (int)ToolSubMenuStates.Maps);
         }
     }
 }
