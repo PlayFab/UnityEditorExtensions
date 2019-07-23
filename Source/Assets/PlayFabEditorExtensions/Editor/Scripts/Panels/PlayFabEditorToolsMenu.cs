@@ -26,12 +26,12 @@ namespace PlayFab.PfEditor
         {
             GUILayout.FlexibleSpace();
             EditorGUILayout.LabelField("3D Maps! 200+ possible cities!");
-            if (GUILayout.Button("Integrate Bing Maps (With Examples)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+            if (GUILayout.Button("Add 3D Maps (+Examples)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
             {
                 var link = "https://github.com/microsoft/MapsSDK-Unity/releases/download/0.2.3/Microsoft.Maps.Unity-Core+Examples-0.2.3.unitypackage";
                 System.Diagnostics.Process.Start(link);
             }
-            if (GUILayout.Button("Integrate Bing Maps (Code Only)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+            if (GUILayout.Button("Add 3D Maps (Code Only)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
             {
                 var link = "https://github.com/microsoft/MapsSDK-Unity/releases/download/0.2.3/Microsoft.Maps.Unity-Core-0.2.3.unitypackage";
                 System.Diagnostics.Process.Start(link);
@@ -39,24 +39,40 @@ namespace PlayFab.PfEditor
             GUILayout.FlexibleSpace();
         }
 
+        private static bool quickStartActivated = false;
         private static void DrawQuickStart()
         {
             GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Auto-Tagger: Add telemetry calls to Assets you care about.");
-            if (GUILayout.Button("AutoTag My Assets!", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+            if (!quickStartActivated)
             {
-                // TODO:
-                // 1.) navigate to new page (this will be populated by the next thing, so you may need to swtich this to after processing).
-                // 2.) recurisvely look through user's assets folder and find any .cs file that is a MonoBehavior
-
-                GetAssetFiles();
+                EditorGUILayout.LabelField("Auto-Tagger: Add telemetry calls to Assets you care about.");
+                if (GUILayout.Button("AutoTag My Assets!", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+                {
+                    GetAssetFiles();
+                    quickStartActivated = true;
+                }
+            }
+            else
+            {
+                if(localAssets.Count < 1)
+                {
+                    EditorGUILayout.LabelField("No MonoBehaviors were found!");
+                }
+                foreach(var file in localAssets)
+                {
+                    // TODO: add these local assets to a check box list.
+                }
+                if (GUILayout.Button("Add Telemetry", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+                {
+                    WriteAssetFiles();
+                    quickStartActivated = false;
+                }
             }
             GUILayout.FlexibleSpace();
         }
 
         private static void DrawCloudScript()
         {
-            // TODO: move top part to a new screen
             scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
             buttonWidth = EditorGUIUtility.currentViewWidth > 400 ? EditorGUIUtility.currentViewWidth / 2 : 200;
 
@@ -147,6 +163,9 @@ namespace PlayFab.PfEditor
                 case ToolSubMenuStates.QuickScript:
                     DrawQuickStart();
                     break;
+                case ToolSubMenuStates.Maps:
+                    Draw3DMaps();
+                    break;
 
                 default:
                     using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1")))
@@ -156,6 +175,15 @@ namespace PlayFab.PfEditor
                     break;
             }
             GUILayout.EndScrollView();
+        }
+
+        private static void WriteAssetFiles()
+        {
+            // We may want to ask user if they want to add telemetry to Start or Update?
+            foreach(var file in localAssets)
+            {
+                // TODO: finish this write, (ARE WE ALLOWED TO EVEN WRITE TO FILES?)
+            }
         }
 
         private static void GetAssetFiles()
