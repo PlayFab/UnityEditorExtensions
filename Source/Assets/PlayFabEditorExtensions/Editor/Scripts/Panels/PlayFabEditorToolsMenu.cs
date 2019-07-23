@@ -122,7 +122,6 @@ namespace PlayFab.PfEditor
                 {
                     foreach (var file in localAssets)
                     {
-                        // TODO: add these local assets to a check box list.
                         //filesToWriteTo.Add(true);
                         //EditorGUILayout.LabelField(file);
                         //filesToWriteTo[filesToWriteTo.Count-1] = GUILayout.Toggle(filesToWriteTo[filesToWriteTo.Count-1], file);
@@ -131,6 +130,7 @@ namespace PlayFab.PfEditor
                     }
                     if (GUILayout.Button("Add Telemetry", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
                     {
+                        //TODO: Filter out any check boxes that were told to avoid.
                         WriteAssetFiles();
                         localAssets.Clear();
                         quickStartActivated = false;
@@ -250,7 +250,7 @@ namespace PlayFab.PfEditor
         {
             if (localAssets.Count > 0)
             {
-                // We may want to ask user if they want to add telemetry to Start or Update?
+                // We may want to ask user if they want to add telemetry to Start
                 foreach (var file in localAssets)
                 {
                     // TODO: finish this write, (ARE WE ALLOWED TO EVEN WRITE TO FILES?)
@@ -277,6 +277,7 @@ namespace PlayFab.PfEditor
                                     if(!addedLineInEnumeratorWithSpace)
                                     {
                                         // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                        AddTelemetryFunction(filename, file, text, _StartVoidCode);
                                     }
                                 }
                             }
@@ -368,6 +369,23 @@ namespace PlayFab.PfEditor
                     }
                 }
             }
+        }
+
+        private static void AddTelemetryFunction(string filename, string file, string text, string startVoidCode)
+        {
+            // SOOOO we want to find the BOTTOM of this file.
+            // find the start of the class (filename without .cs at the end) + : MonoBehaviour
+            if(filename.EndsWith(".cs"))
+            {
+                filename = filename.Substring(0, filename.Length - 3);
+            }
+            // move current index until {
+            // Keep iterating until we can find a } BUT if we see a { add 1, and subtract for every } that we see
+            // Now we want to back up one line
+            // Add the code declaration on that line
+            // new line, open bracket, new line
+            // THAT LINE
+            // new line, close bracket, new line
         }
 
         private static bool TryAddSingleLineOfCode(string fileName, string filePath, string fileText, string lookForCode)
