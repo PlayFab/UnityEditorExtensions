@@ -64,18 +64,6 @@ namespace PlayFab.PfEditor
         private static string _EnableEnumerableSpaceCode = "IEnumerable OnEnable ()";
         private static bool tagEnable = false;
 
-        private static string _DisableVoidCode = "void OnDisable()";
-        private static string _DisableVoidSpaceCode = "void OnDisable ()";
-        private static string _DisableEnumerableCode = "IEnumerable OnDisable()";
-        private static string _DisableEnumerableSpaceCode = "IEnumerable OnDisable ()";
-        private static bool tagDisable = false;
-
-        private static string _DestroyVoidCode = "void Destroy()";
-        private static string _DestroyVoidSpaceCode = "void Destroy ()";
-        private static string _DestroyEnumerableCode = "IEnumerable Destroy()";
-        private static string _DestroyEnumerableSpaceCode = "IEnumerable Destroy ()";
-        private static bool tagEnd = false;
-
         //private static List<bool> filesToWriteTo = new List<bool>();
 
         private static void DrawQuickStart()
@@ -95,20 +83,11 @@ namespace PlayFab.PfEditor
                 // TODO: v2 possibly have to add each of these 3 to all file options... may not look very good.
                 // Can we pop out a window instead?
 
-                // TODO: add option buttons:
                 EditorGUILayout.LabelField("Start, only emits once per session");
                 tagStart = GUILayout.Toggle(tagStart, "Tag Start");
 
                 EditorGUILayout.LabelField("On Enable, emits anytime this object come back");
                 tagEnable = GUILayout.Toggle(tagEnable, "Tag Enable");
-
-                // STRETCH! may need to add this function if it doesn't already exist.
-                EditorGUILayout.LabelField("On Disable");
-                tagDisable = GUILayout.Toggle(tagDisable, "Tag Disable");
-
-                // STRETCH! may need to add this function if it doesn't already exist.
-                EditorGUILayout.LabelField("On Destroy");
-                tagEnd = GUILayout.Toggle(tagEnd, "Tag Destroy");
 
                 if (localAssets.Count < 1)
                 {
@@ -253,11 +232,7 @@ namespace PlayFab.PfEditor
                 // We may want to ask user if they want to add telemetry to Start
                 foreach (var file in localAssets)
                 {
-                    // TODO: finish this write, (ARE WE ALLOWED TO EVEN WRITE TO FILES?)
                     var text = System.IO.File.ReadAllText(file);
-
-                    // May want to iterate line by line? instead of a whole chunk at once?
-                    var textLines = text.Split('\n');
 
                     var filepath = file.Split('\\');
                     var filename = filepath[filepath.Length - 1];
@@ -302,54 +277,6 @@ namespace PlayFab.PfEditor
                                     {
                                         // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
                                         AddTelemetryFunction(filename, file, text, _EnableVoidCode);
-                                    }
-                                }
-                            }
-                        }
-                        // re-read as we have changed the file and we need those changes back.
-                        text = System.IO.File.ReadAllText(file);
-                    }
-
-                    if (tagDisable)
-                    {
-                        bool addedLine = TryAddSingleLineOfCode(filename, file, text, _DisableVoidCode);
-                        if (!addedLine)
-                        {
-                            bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _DisableVoidSpaceCode);
-                            if(!addedLineWithSpace)
-                            {
-                                bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _DisableEnumerableCode);
-                                if(!addedLineInEnumerator)
-                                {
-                                    bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _DisableEnumerableSpaceCode);
-                                    if(!addedLineInEnumeratorWithSpace)
-                                    {
-                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
-                                        AddTelemetryFunction(filename, file, text, _DisableVoidCode);
-                                    }
-                                }
-                            }
-                        }
-                        // re-read as we have changed the file and we need those changes back.
-                        text = System.IO.File.ReadAllText(file);
-                    }
-
-                    if (tagEnd)
-                    {
-                        bool addedLine = TryAddSingleLineOfCode(filename, file, text, _DestroyVoidCode);
-                        if (!addedLine)
-                        {
-                            bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _DestroyVoidSpaceCode);
-                            if(!addedLineWithSpace)
-                            {
-                                bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _DestroyEnumerableCode);
-                                if(!addedLineInEnumerator)
-                                {
-                                    bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _DestroyEnumerableSpaceCode);
-                                    if(!addedLineInEnumeratorWithSpace)
-                                    {
-                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
-                                        AddTelemetryFunction(filename, file, text, _DestroyVoidCode);
                                     }
                                 }
                             }
