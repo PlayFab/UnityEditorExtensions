@@ -40,6 +40,14 @@ namespace PlayFab.PfEditor
         }
 
         private static bool quickStartActivated = false;
+
+        private static bool tagStart = false;
+        private static bool tagEnable = false;
+        private static bool tagDisable = false;
+        private static bool tagUpdate = false;
+        private static bool tagLateUpdate = false;
+        private static bool tagEnd = false;
+
         private static void DrawQuickStart()
         {
             GUILayout.FlexibleSpace();
@@ -54,18 +62,43 @@ namespace PlayFab.PfEditor
             }
             else
             {
-                if(localAssets.Count < 1)
+                // TODO: v2 possibly have to add each of these 3 to all file options... may not look very good.
+                // Can we pop out a window instead?
+
+                // TODO: add option buttons:
+                EditorGUILayout.LabelField("Start, only emits once per session");
+                tagStart = GUILayout.Toggle(tagStart, "Tag Start");
+                EditorGUILayout.LabelField("On Enable, emits anytime this object come back");
+                tagEnable = GUILayout.Toggle(tagEnable, "Tag Enable");
+
+                EditorGUILayout.LabelField("On Update");
+                tagUpdate = GUILayout.Toggle(tagUpdate, "Tag Update");
+
+                // STRETCH! howabout we try to find Late Update?
+                EditorGUILayout.LabelField("On Late Update");
+                tagLateUpdate = GUILayout.Toggle(tagLateUpdate, "Tag Late Update");
+
+                // STRETCH! may need to add this function if it doesn't already exist.
+                EditorGUILayout.LabelField("On Disable");
+                tagDisable = GUILayout.Toggle(tagDisable, "Tag Disable");
+
+                if (localAssets.Count < 1)
                 {
                     EditorGUILayout.LabelField("No MonoBehaviors were found!");
                 }
-                foreach(var file in localAssets)
+                else
                 {
-                    // TODO: add these local assets to a check box list.
-                }
-                if (GUILayout.Button("Add Telemetry", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
-                {
-                    WriteAssetFiles();
-                    quickStartActivated = false;
+                    foreach (var file in localAssets)
+                    {
+                        // TODO: add these local assets to a check box list.
+                        EditorGUILayout.LabelField(file);
+                        GUILayout.Toggle(false, file);
+                    }
+                    if (GUILayout.Button("Add Telemetry", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+                    {
+                        WriteAssetFiles();
+                        quickStartActivated = false;
+                    }
                 }
             }
             GUILayout.FlexibleSpace();
@@ -159,7 +192,6 @@ namespace PlayFab.PfEditor
                 case ToolSubMenuStates.CloudScript:
                     DrawCloudScript();
                     break;
-
                 case ToolSubMenuStates.QuickScript:
                     DrawQuickStart();
                     break;
@@ -183,6 +215,39 @@ namespace PlayFab.PfEditor
             foreach(var file in localAssets)
             {
                 // TODO: finish this write, (ARE WE ALLOWED TO EVEN WRITE TO FILES?)
+                var text = System.IO.File.ReadAllText(file);
+                // TODO: get correct filename
+                var filename = file.Split('\\');
+
+                if(tagStart)
+                {
+                    // Look for the overload for Start()
+                    if(text.Contains("IEnumerable Start()") || text.Contains("void Start()"))
+                    {
+                        // text.
+                        // Add in the Playstream event
+                    }
+                }
+
+                if(tagEnable)
+                {
+                    // Look for the overload for OnEnable
+                }
+
+                if(tagUpdate)
+                {
+                    
+                }
+
+                if(tagLateUpdate)
+                {
+
+                }
+
+                if(tagDisable)
+                {
+
+                }
             }
         }
 
