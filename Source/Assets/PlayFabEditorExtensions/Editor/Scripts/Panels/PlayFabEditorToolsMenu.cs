@@ -13,6 +13,7 @@ namespace PlayFab.PfEditor
         {
             CloudScript,
             QuickScript,
+            3DMaps,
         }
 
         public static ToolSubMenuStates currentState = ToolSubMenuStates.CloudScript;
@@ -21,9 +22,25 @@ namespace PlayFab.PfEditor
         public static Vector2 scrollPos = Vector2.zero;
         private static SubMenuComponent _menu = null;
 
+        private static void Draw3DMaps()
+        {
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.LabelField("3D Maps! 200+ possible cities!");
+            if(GUILayout.Button("Integrate Bing Maps (With Examples)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+            {
+                var link = "https://github.com/microsoft/MapsSDK-Unity/releases/download/0.2.3/Microsoft.Maps.Unity-Core+Examples-0.2.3.unitypackage";
+                System.Diagnostics.Process.Start(link); 
+            }
+            if(GUILayout.Button("Integrate Bing Maps (Code Only)", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+            {
+                var link = "https://github.com/microsoft/MapsSDK-Unity/releases/download/0.2.3/Microsoft.Maps.Unity-Core-0.2.3.unitypackage";
+                System.Diagnostics.Process.Start(link); 
+            }
+            GUILayout.FlexibleSpace();
+        }
+
         private static void DrawQuickStart()
         {
-            // TODO: split this Tools menu into two sub menus: CloudScript and "other"
             GUILayout.FlexibleSpace();
             EditorGUILayout.LabelField("Auto-Tagger: Add telemetry calls to Assets you care about.");
             if(GUILayout.Button("AutoTag My Assets!", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
