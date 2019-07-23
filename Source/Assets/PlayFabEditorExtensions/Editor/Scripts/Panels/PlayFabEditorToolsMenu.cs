@@ -276,33 +276,14 @@ namespace PlayFab.PfEditor
                                     bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _StartEnumerableSpaceCode);
                                     if(!addedLineInEnumeratorWithSpace)
                                     {
-                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class file
                                         AddTelemetryFunction(filename, file, text, _StartVoidCode);
                                     }
                                 }
                             }
                         }
-
-                        //// Look for the overload for Start()
-                        //if (text.Contains(_StartVoidCode))
-                        //{
-                        //    // THIS IS THE DEFUALT START FUNCTION. What if there's a space inbetween Start and () ? (like we have in our code?)
-                        //    var originalWhereToStartWriting = text.LastIndexOf(_StartVoidCode);
-                        //    if (originalWhereToStartWriting > 0)
-                        //    {
-                        //        var tabbing = "";
-                        //        var currentIndex = originalWhereToStartWriting + _StartVoidCode.Length;
-                        //        // we don't know how many spaces they may have...
-                        //        while (text[currentIndex] != '{') {  tabbing += text[currentIndex]; currentIndex++;}
-                        //        // NOW we should know the START of the function.
-                        //        currentIndex += 4; // for \n\r
-                        //        var emitText = GetEmitCode(filename, "Start");
-                        //        var endText = text.Substring(currentIndex);
-                        //        text = text.Substring(0, currentIndex) + tabbing + emitText + endText;
-                        //        //var testText = text.Split('\n');
-                        //        System.IO.File.WriteAllText(file, text);
-                        //    }
-                        //}
+                        // re-read as we have changed the file and we need those changes back.
+                        text = System.IO.File.ReadAllText(file);
                     }
 
                     if (tagEnable)
@@ -320,10 +301,13 @@ namespace PlayFab.PfEditor
                                     if(!addedLineInEnumeratorWithSpace)
                                     {
                                         // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                        AddTelemetryFunction(filename, file, text, _EnableVoidCode);
                                     }
                                 }
                             }
                         }
+                        // re-read as we have changed the file and we need those changes back.
+                        text = System.IO.File.ReadAllText(file);
                     }
 
                     if (tagDisable)
@@ -341,10 +325,13 @@ namespace PlayFab.PfEditor
                                     if(!addedLineInEnumeratorWithSpace)
                                     {
                                         // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                        AddTelemetryFunction(filename, file, text, _DisableVoidCode);
                                     }
                                 }
                             }
                         }
+                        // re-read as we have changed the file and we need those changes back.
+                        text = System.IO.File.ReadAllText(file);
                     }
 
                     if (tagEnd)
@@ -362,37 +349,78 @@ namespace PlayFab.PfEditor
                                     if(!addedLineInEnumeratorWithSpace)
                                     {
                                         // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                        AddTelemetryFunction(filename, file, text, _DestroyVoidCode);
                                     }
                                 }
                             }
                         }
+                        // re-read as we have changed the file and we need those changes back.
+                        text = System.IO.File.ReadAllText(file);
                     }
                 }
             }
         }
 
-        private static void AddTelemetryFunction(string filename, string file, string text, string startVoidCode)
+        private static void AddTelemetryFunction(string filename, string file, string text, string functionDecl)
         {
-            // SOOOO we want to find the BOTTOM of this file.
-            // find the start of the class (filename without .cs at the end) + : MonoBehaviour
+            // We want to find the BOTTOM of this file. (or at least the end of the class)
+            // first, find the START of the class (filename without .cs at the end) + : MonoBehaviour
             if(filename.EndsWith(".cs"))
             {
                 filename = filename.Substring(0, filename.Length - 3);
             }
-            // move current index until {
+
+            // move current index until the first { (class decl)
+            var currentIndex = text.LastIndexOf(filename + " : MonoBehaviour");
+            int tabs = 0;
+            while(text[currentIndex] != '{')
+            {
+                currentIndex++;
+                if(text[currentIndex] == ' ' || text[currentIndex] == '\t')
+                {
+                    tabs++;
+                }
+            }
+
+            int currentBracketCount = 1;
             // Keep iterating until we can find a } BUT if we see a { add 1, and subtract for every } that we see
+            while(currentBracketCount > 0)
+            {
+                currentIndex++;
+                if(text[currentIndex] == '{')
+                {
+                    currentBracketCount++;
+                }
+                else if(text[currentIndex] == '}')
+                {
+                    currentBracketCount--;
+                }
+            }
+
             // Now we want to back up one line
-            // Add the code declaration on that line
-            // new line, open bracket, new line
-            // THAT LINE
-            // new line, close bracket, new line
+            currentIndex -= tabs -1;
+
+            var beforeText = text.Substring(0, currentIndex);
+            var endText = text.Substring(currentIndex+1);
+
+            string tabbing = "";
+            for(int i = tabs * 2; i != 0; i--)
+            {
+                tabbing += " ";
+            }
+
+            var emitCode = GetEmitCode(filename, functionDecl);
+            //var functionText = "\n\r"+tabbing+functionDecl +"\n"+tabbing+"{\n" + tabbing + emitCode + tabbing + "}\n\r";
+            var functionText = "\n"+tabbing+functionDecl +"\n"+tabbing+"{\n" + tabbing + emitCode + tabbing + "}\n";
+            var fileText = beforeText + functionText + endText;
+
+            System.IO.File.WriteAllText(file, fileText);
         }
 
         private static bool TryAddSingleLineOfCode(string fileName, string filePath, string fileText, string lookForCode)
         {
             if (fileText.Contains(lookForCode))
             {
-                // THIS IS THE DEFUALT START FUNCTION. What if there's a space inbetween Start and () ? (like we have in our code?)
                 var originalWhereToStartWriting = fileText.LastIndexOf(lookForCode);
                 if (originalWhereToStartWriting > 0)
                 {
@@ -400,15 +428,17 @@ namespace PlayFab.PfEditor
                     var currentIndex = originalWhereToStartWriting + lookForCode.Length;
 
                     // we don't know how many spaces they may have...
-                    while (fileText[currentIndex] != '{') {  tabbing += fileText[currentIndex]; currentIndex++;}
-
-                    // NOW we should know the START of the function.
-                    currentIndex += 4; // for \n\r
-                    var emitText = GetEmitCode(fileName, lookForCode);
-                    var endText = fileText.Substring(currentIndex);
-                    fileText = fileText.Substring(0, currentIndex) + tabbing + emitText + endText;
-                    System.IO.File.WriteAllText(filePath, fileText);
-                    return true;
+                    while (currentIndex < fileText.Length && fileText[currentIndex] != '{') {  tabbing += fileText[currentIndex]; currentIndex++;}
+                    if (currentIndex < fileText.Length)
+                    {
+                        // NOW we should know the START of the function.
+                        currentIndex += 4; // for \n\r
+                        var emitText = GetEmitCode(fileName, lookForCode);
+                        var endText = fileText.Substring(currentIndex);
+                        fileText = fileText.Substring(0, currentIndex) + tabbing + emitText + endText;
+                        System.IO.File.WriteAllText(filePath, fileText);
+                        return true;
+                    }
                 }
             }
             return false;
@@ -568,6 +598,7 @@ namespace PlayFab.PfEditor
             _menu.RegisterMenuItem("QuickStart", OnQuickStartClicked);
             _menu.RegisterMenuItem("MapsSDK", OnMapsSdkClicked);
         }
+
         public static void OnCloudScriptClicked()
         {
             PlayFabEditor.RaiseStateUpdate(PlayFabEditor.EdExStates.OnSubmenuItemClicked, ToolSubMenuStates.CloudScript.ToString(), "" + (int)ToolSubMenuStates.CloudScript);
