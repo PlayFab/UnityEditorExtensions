@@ -53,18 +53,27 @@ namespace PlayFab.PfEditor
         private static bool quickStartActivated = false;
 
         private static string _StartVoidCode = "void Start()";
-        private static string _StartEnumeratorCode = "IEnumerable Start()";
-
-
-        private static string _AwakeVoidCode = "void Awake()";
-        private static string _AwakeVoidSpaceCode = "void Awake ()";
+        private static string _StartVoidSpaceCode = "void Start ()";
+        private static string _StartEnumerableCode = "IEnumerable Start()";
+        private static string _StartEnumerableSpaceCode = "IEnumerable Start ()";
         private static bool tagStart = false;
 
         private static string _EnableVoidCode = "void OnEnable()";
+        private static string _EnableVoidSpaceCode = "void OnEnable ()";
+        private static string _EnableEnumerableCode = "IEnumerable OnEnable()";
+        private static string _EnableEnumerableSpaceCode = "IEnumerable OnEnable ()";
         private static bool tagEnable = false;
+
         private static string _DisableVoidCode = "void OnDisable()";
+        private static string _DisableVoidSpaceCode = "void OnDisable ()";
+        private static string _DisableEnumerableCode = "IEnumerable OnDisable()";
+        private static string _DisableEnumerableSpaceCode = "IEnumerable OnDisable ()";
         private static bool tagDisable = false;
+
         private static string _DestroyVoidCode = "void Destroy()";
+        private static string _DestroyVoidSpaceCode = "void Destroy ()";
+        private static string _DestroyEnumerableCode = "IEnumerable Destroy()";
+        private static string _DestroyEnumerableSpaceCode = "IEnumerable Destroy ()";
         private static bool tagEnd = false;
 
         //private static List<bool> filesToWriteTo = new List<bool>();
@@ -89,19 +98,17 @@ namespace PlayFab.PfEditor
                 // TODO: add option buttons:
                 EditorGUILayout.LabelField("Start, only emits once per session");
                 tagStart = GUILayout.Toggle(tagStart, "Tag Start");
+
                 EditorGUILayout.LabelField("On Enable, emits anytime this object come back");
                 tagEnable = GUILayout.Toggle(tagEnable, "Tag Enable");
-
-                EditorGUILayout.LabelField("On Update");
-                tagUpdate = GUILayout.Toggle(tagUpdate, "Tag Update");
-
-                // STRETCH! howabout we try to find Late Update?
-                EditorGUILayout.LabelField("On Late Update");
-                tagLateUpdate = GUILayout.Toggle(tagLateUpdate, "Tag Late Update");
 
                 // STRETCH! may need to add this function if it doesn't already exist.
                 EditorGUILayout.LabelField("On Disable");
                 tagDisable = GUILayout.Toggle(tagDisable, "Tag Disable");
+
+                // STRETCH! may need to add this function if it doesn't already exist.
+                EditorGUILayout.LabelField("On Destroy");
+                tagEnd = GUILayout.Toggle(tagEnd, "Tag Destroy");
 
                 if (localAssets.Count < 1)
                 {
@@ -257,93 +264,136 @@ namespace PlayFab.PfEditor
 
                     if (tagStart)
                     {
-                        //if(text.Contains("void Awake"))
-                        //{
-                        //    // Add in the Playstream event
-                        //    var whereToStartWriting = text.LastIndexOf("void Awake");
-                        //    if (whereToStartWriting > 0)
-                        //    {
-                        //        var tabbing = "";
-                        //        // we don't know how many spaces they may have...
-                        //        while (text[whereToStartWriting] != '{') { whereToStartWriting++; tabbing += text[whereToStartWriting]; }
-                        //        // NOW we should know the START of the function.
-                        //        whereToStartWriting += 2; // for \n
-                        //        var endText = text.Substring(whereToStartWriting);
-                        //        text = text.Substring(0, whereToStartWriting) + _writeEventCode + endText;
-                        //        var testText = text.Split('\n');
-                        //    }
-                        //}
-
-                        // Look for the overload for Start()
-                        if (text.Contains(_StartEnumeratorCode) || text.Contains(_StartVoidCode))
+                        bool addedLine = TryAddSingleLineOfCode(filename, file, text, _StartVoidCode);
+                        if (!addedLine)
                         {
-                            // THIS IS THE DEFUALT START FUNCTION. What if there's a space inbetween Start and () ? (like we have in our code?)
-                            var originalWhereToStartWriting = text.LastIndexOf(_StartVoidCode);
-                            if (originalWhereToStartWriting > 0)
+                            bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _StartVoidSpaceCode);
+                            if(!addedLineWithSpace)
                             {
-                                var tabbing = "";
-                                var currentIndex = originalWhereToStartWriting + _StartVoidCode.Length;
-                                // we don't know how many spaces they may have...
-                                while (text[currentIndex] != '{') {  tabbing += text[currentIndex]; currentIndex++;}
-                                // NOW we should know the START of the function.
-                                currentIndex += 4; // for \n\r
-                                var emitText = GetEmitCode(filename);
-                                var endText = text.Substring(currentIndex);
-                                text = text.Substring(0, currentIndex) + tabbing + emitText + endText;
-                                //var testText = text.Split('\n');
-                                System.IO.File.WriteAllText(file, text);
+                                bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _StartEnumerableCode);
+                                if(!addedLineInEnumerator)
+                                {
+                                    bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _StartEnumerableSpaceCode);
+                                    if(!addedLineInEnumeratorWithSpace)
+                                    {
+                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                    }
+                                }
                             }
                         }
+
+                        //// Look for the overload for Start()
+                        //if (text.Contains(_StartVoidCode))
+                        //{
+                        //    // THIS IS THE DEFUALT START FUNCTION. What if there's a space inbetween Start and () ? (like we have in our code?)
+                        //    var originalWhereToStartWriting = text.LastIndexOf(_StartVoidCode);
+                        //    if (originalWhereToStartWriting > 0)
+                        //    {
+                        //        var tabbing = "";
+                        //        var currentIndex = originalWhereToStartWriting + _StartVoidCode.Length;
+                        //        // we don't know how many spaces they may have...
+                        //        while (text[currentIndex] != '{') {  tabbing += text[currentIndex]; currentIndex++;}
+                        //        // NOW we should know the START of the function.
+                        //        currentIndex += 4; // for \n\r
+                        //        var emitText = GetEmitCode(filename, "Start");
+                        //        var endText = text.Substring(currentIndex);
+                        //        text = text.Substring(0, currentIndex) + tabbing + emitText + endText;
+                        //        //var testText = text.Split('\n');
+                        //        System.IO.File.WriteAllText(file, text);
+                        //    }
+                        //}
                     }
 
                     if (tagEnable)
                     {
-                        // Look for the overload for OnEnable
-                        if (text.Contains(_EnableVoidCode))
+                        bool addedLine = TryAddSingleLineOfCode(filename, file, text, _EnableVoidCode);
+                        if (!addedLine)
                         {
-                            var originalWhereToStartWriting = text.LastIndexOf(_EnableVoidCode);
-                            if (originalWhereToStartWriting > 0)
+                            bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _EnableVoidSpaceCode);
+                            if(!addedLineWithSpace)
                             {
-                                var tabbing = "";
-                                var currentIndex = originalWhereToStartWriting + _EnableVoidCode.Length;
-                                // we don't know how many spaces they may have...
-                                while (text[currentIndex] != '{') { tabbing += text[currentIndex]; currentIndex++; }
-                                // NOW we should know the START of the function.
-                                currentIndex += 4; // for \n\r
-
-                                var emitText = GetEmitCode(filename);
-                                var endText = text.Substring(currentIndex);
-                                text = text.Substring(0, currentIndex) + tabbing + emitText + endText;
-                                System.IO.File.WriteAllText(file, text);
+                                bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _EnableEnumerableCode);
+                                if(!addedLineInEnumerator)
+                                {
+                                    bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _EnableEnumerableSpaceCode);
+                                    if(!addedLineInEnumeratorWithSpace)
+                                    {
+                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                    }
+                                }
                             }
-                        }
-                        else
-                        {
-                            // We should ADD this function to the file.
                         }
                     }
 
                     if (tagDisable)
                     {
-                        if (text.Contains("void OnDisable()"))
+                        bool addedLine = TryAddSingleLineOfCode(filename, file, text, _DisableVoidCode);
+                        if (!addedLine)
                         {
-
+                            bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _DisableVoidSpaceCode);
+                            if(!addedLineWithSpace)
+                            {
+                                bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _DisableEnumerableCode);
+                                if(!addedLineInEnumerator)
+                                {
+                                    bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _DisableEnumerableSpaceCode);
+                                    if(!addedLineInEnumeratorWithSpace)
+                                    {
+                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                    }
+                                }
+                            }
                         }
                     }
 
                     if (tagEnd)
                     {
-                        if (text.Contains("void OnDestroy()"))
+                        bool addedLine = TryAddSingleLineOfCode(filename, file, text, _DestroyVoidCode);
+                        if (!addedLine)
                         {
-
-                        }
-                        else
-                        {
-                            // Find end of MonoBehavior, add OnDestroy()
+                            bool addedLineWithSpace = TryAddSingleLineOfCode(filename, file, text, _DestroyVoidSpaceCode);
+                            if(!addedLineWithSpace)
+                            {
+                                bool addedLineInEnumerator = TryAddSingleLineOfCode(filename, file, text, _DestroyEnumerableCode);
+                                if(!addedLineInEnumerator)
+                                {
+                                    bool addedLineInEnumeratorWithSpace = TryAddSingleLineOfCode(filename, file, text, _DestroyEnumerableSpaceCode);
+                                    if(!addedLineInEnumeratorWithSpace)
+                                    {
+                                        // We didn't find ANY instance of this method. We will ADD our own to the bottom of the class
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
+        }
+
+        private static bool TryAddSingleLineOfCode(string fileName, string filePath, string fileText, string lookForCode)
+        {
+            if (fileText.Contains(lookForCode))
+            {
+                // THIS IS THE DEFUALT START FUNCTION. What if there's a space inbetween Start and () ? (like we have in our code?)
+                var originalWhereToStartWriting = fileText.LastIndexOf(lookForCode);
+                if (originalWhereToStartWriting > 0)
+                {
+                    var tabbing = "";
+                    var currentIndex = originalWhereToStartWriting + lookForCode.Length;
+
+                    // we don't know how many spaces they may have...
+                    while (fileText[currentIndex] != '{') {  tabbing += fileText[currentIndex]; currentIndex++;}
+
+                    // NOW we should know the START of the function.
+                    currentIndex += 4; // for \n\r
+                    var emitText = GetEmitCode(fileName, lookForCode);
+                    var endText = fileText.Substring(currentIndex);
+                    fileText = fileText.Substring(0, currentIndex) + tabbing + emitText + endText;
+                    System.IO.File.WriteAllText(filePath, fileText);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static void GetAssetFiles()
