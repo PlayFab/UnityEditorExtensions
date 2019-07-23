@@ -39,14 +39,35 @@ namespace PlayFab.PfEditor
             GUILayout.FlexibleSpace();
         }
 
+        private static string GetEmitCode(string filename, string lifecyclepoint)
+        {
+            return "    PlayFab.PlayFabClientAPI.LoginWithCustomID( new PlayFab.ClientModels.LoginWithCustomIDRequest() { CreateAccount = true, CustomId = SystemInfo.deviceUniqueIdentifier, TitleId=PlayFab.PlayFabSettings.TitleId }, result => { PlayFab.PlayFabClientAPI.WriteTitleEvent( new PlayFab.ClientModels.WriteTitleEventRequest() { EventName = \"" + filename + ":"+lifecyclepoint+"\", AuthenticationContext = result.AuthenticationContext }, null, null);}, null);\n";
+        }
+
+        private static string GetEmitFunction(string filename, string lifecyclepoint)
+        {
+            //TODO: return a full function instead.
+            return "    PlayFab.PlayFabClientAPI.LoginWithCustomID( new PlayFab.ClientModels.LoginWithCustomIDRequest() { CreateAccount = true, CustomId = SystemInfo.deviceUniqueIdentifier, TitleId=PlayFab.PlayFabSettings.TitleId }, result => { PlayFab.PlayFabClientAPI.WriteTitleEvent( new PlayFab.ClientModels.WriteTitleEventRequest() { EventName = \"" + filename + ":"+lifecyclepoint+"\", AuthenticationContext = result.AuthenticationContext }, null, null);}, null);\n";
+        }
+
         private static bool quickStartActivated = false;
 
+        private static string _StartVoidCode = "void Start()";
+        private static string _StartEnumeratorCode = "IEnumerable Start()";
+
+
+        private static string _AwakeVoidCode = "void Awake()";
+        private static string _AwakeVoidSpaceCode = "void Awake ()";
         private static bool tagStart = false;
+
+        private static string _EnableVoidCode = "void OnEnable()";
         private static bool tagEnable = false;
+        private static string _DisableVoidCode = "void OnDisable()";
         private static bool tagDisable = false;
-        private static bool tagUpdate = false;
-        private static bool tagLateUpdate = false;
+        private static string _DestroyVoidCode = "void Destroy()";
         private static bool tagEnd = false;
+
+        //private static List<bool> filesToWriteTo = new List<bool>();
 
         private static void DrawQuickStart()
         {
@@ -85,18 +106,26 @@ namespace PlayFab.PfEditor
                 if (localAssets.Count < 1)
                 {
                     EditorGUILayout.LabelField("No MonoBehaviors were found!");
+                    if (GUILayout.Button("Back to Add Telemetry", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
+                    {
+                        quickStartActivated = false;
+                    }
                 }
                 else
                 {
                     foreach (var file in localAssets)
                     {
                         // TODO: add these local assets to a check box list.
+                        //filesToWriteTo.Add(true);
+                        //EditorGUILayout.LabelField(file);
+                        //filesToWriteTo[filesToWriteTo.Count-1] = GUILayout.Toggle(filesToWriteTo[filesToWriteTo.Count-1], file);
                         EditorGUILayout.LabelField(file);
-                        GUILayout.Toggle(false, file);
+                        GUILayout.Toggle(true, file);
                     }
                     if (GUILayout.Button("Add Telemetry", PlayFabEditorHelper.uiStyle.GetStyle("Button"), GUILayout.MinHeight(32), GUILayout.Width(buttonWidth)))
                     {
                         WriteAssetFiles();
+                        localAssets.Clear();
                         quickStartActivated = false;
                     }
                 }
@@ -106,7 +135,7 @@ namespace PlayFab.PfEditor
 
         private static void DrawCloudScript()
         {
-            scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
+            //scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
             buttonWidth = EditorGUIUtility.currentViewWidth > 400 ? EditorGUIUtility.currentViewWidth / 2 : 200;
 
             using (new UnityHorizontal(PlayFabEditorHelper.uiStyle.GetStyle("gpStyleClear")))
@@ -185,6 +214,7 @@ namespace PlayFab.PfEditor
                 RegisterMenu();
                 return;
             }
+            scrollPos = GUILayout.BeginScrollView(scrollPos, PlayFabEditorHelper.uiStyle.GetStyle("gpStyleGray1"));
 
             _menu.DrawMenu();
             switch ((ToolSubMenuStates)PlayFabEditorPrefsSO.Instance.curSubMenuIdx)
@@ -211,42 +241,107 @@ namespace PlayFab.PfEditor
 
         private static void WriteAssetFiles()
         {
-            // We may want to ask user if they want to add telemetry to Start or Update?
-            foreach(var file in localAssets)
+            if (localAssets.Count > 0)
             {
-                // TODO: finish this write, (ARE WE ALLOWED TO EVEN WRITE TO FILES?)
-                var text = System.IO.File.ReadAllText(file);
-                // TODO: get correct filename
-                var filename = file.Split('\\');
-
-                if(tagStart)
+                // We may want to ask user if they want to add telemetry to Start or Update?
+                foreach (var file in localAssets)
                 {
-                    // Look for the overload for Start()
-                    if(text.Contains("IEnumerable Start()") || text.Contains("void Start()"))
+                    // TODO: finish this write, (ARE WE ALLOWED TO EVEN WRITE TO FILES?)
+                    var text = System.IO.File.ReadAllText(file);
+
+                    // May want to iterate line by line? instead of a whole chunk at once?
+                    var textLines = text.Split('\n');
+
+                    var filepath = file.Split('\\');
+                    var filename = filepath[filepath.Length - 1];
+
+                    if (tagStart)
                     {
-                        // text.
-                        // Add in the Playstream event
+                        //if(text.Contains("void Awake"))
+                        //{
+                        //    // Add in the Playstream event
+                        //    var whereToStartWriting = text.LastIndexOf("void Awake");
+                        //    if (whereToStartWriting > 0)
+                        //    {
+                        //        var tabbing = "";
+                        //        // we don't know how many spaces they may have...
+                        //        while (text[whereToStartWriting] != '{') { whereToStartWriting++; tabbing += text[whereToStartWriting]; }
+                        //        // NOW we should know the START of the function.
+                        //        whereToStartWriting += 2; // for \n
+                        //        var endText = text.Substring(whereToStartWriting);
+                        //        text = text.Substring(0, whereToStartWriting) + _writeEventCode + endText;
+                        //        var testText = text.Split('\n');
+                        //    }
+                        //}
+
+                        // Look for the overload for Start()
+                        if (text.Contains(_StartEnumeratorCode) || text.Contains(_StartVoidCode))
+                        {
+                            // THIS IS THE DEFUALT START FUNCTION. What if there's a space inbetween Start and () ? (like we have in our code?)
+                            var originalWhereToStartWriting = text.LastIndexOf(_StartVoidCode);
+                            if (originalWhereToStartWriting > 0)
+                            {
+                                var tabbing = "";
+                                var currentIndex = originalWhereToStartWriting + _StartVoidCode.Length;
+                                // we don't know how many spaces they may have...
+                                while (text[currentIndex] != '{') {  tabbing += text[currentIndex]; currentIndex++;}
+                                // NOW we should know the START of the function.
+                                currentIndex += 4; // for \n\r
+                                var emitText = GetEmitCode(filename);
+                                var endText = text.Substring(currentIndex);
+                                text = text.Substring(0, currentIndex) + tabbing + emitText + endText;
+                                //var testText = text.Split('\n');
+                                System.IO.File.WriteAllText(file, text);
+                            }
+                        }
                     }
-                }
 
-                if(tagEnable)
-                {
-                    // Look for the overload for OnEnable
-                }
+                    if (tagEnable)
+                    {
+                        // Look for the overload for OnEnable
+                        if (text.Contains(_EnableVoidCode))
+                        {
+                            var originalWhereToStartWriting = text.LastIndexOf(_EnableVoidCode);
+                            if (originalWhereToStartWriting > 0)
+                            {
+                                var tabbing = "";
+                                var currentIndex = originalWhereToStartWriting + _EnableVoidCode.Length;
+                                // we don't know how many spaces they may have...
+                                while (text[currentIndex] != '{') { tabbing += text[currentIndex]; currentIndex++; }
+                                // NOW we should know the START of the function.
+                                currentIndex += 4; // for \n\r
 
-                if(tagUpdate)
-                {
-                    
-                }
+                                var emitText = GetEmitCode(filename);
+                                var endText = text.Substring(currentIndex);
+                                text = text.Substring(0, currentIndex) + tabbing + emitText + endText;
+                                System.IO.File.WriteAllText(file, text);
+                            }
+                        }
+                        else
+                        {
+                            // We should ADD this function to the file.
+                        }
+                    }
 
-                if(tagLateUpdate)
-                {
+                    if (tagDisable)
+                    {
+                        if (text.Contains("void OnDisable()"))
+                        {
 
-                }
+                        }
+                    }
 
-                if(tagDisable)
-                {
+                    if (tagEnd)
+                    {
+                        if (text.Contains("void OnDestroy()"))
+                        {
 
+                        }
+                        else
+                        {
+                            // Find end of MonoBehavior, add OnDestroy()
+                        }
+                    }
                 }
             }
         }
@@ -263,26 +358,38 @@ namespace PlayFab.PfEditor
         {
             try
             {
+                foreach (string f in Directory.GetFiles(sDir))
+                {
+                    if (f.EndsWith(".cs") && !f.Contains("PlayFab")) // Don't care about our own files
+                    {
+                        string fileText = System.IO.File.ReadAllText(f);
+                        if (fileText.Contains(": MonoBehaviour"))
+                        {
+                            // May be faster to keep a ref to that file itself. 
+                            // right now we are loading all text in, which can be severly slow.
+                            localAssets.Add(f);
+                        }
+                    }
+                    Console.WriteLine(f);
+                }
+
                 foreach (string d in Directory.GetDirectories(sDir))
                 {
-                    if (!d.Contains("PlayFab"))
+                    foreach (string f in Directory.GetFiles(d))
                     {
-                        foreach (string f in Directory.GetFiles(d))
+                        if (f.EndsWith(".cs") && !f.Contains("PlayFab")) // Don't care about our own files
                         {
-                            if (f.EndsWith(".cs"))
+                            string fileText = System.IO.File.ReadAllText(f);
+                            if (fileText.Contains(": MonoBehaviour"))
                             {
-                                string fileText = System.IO.File.ReadAllText(f);
-                                if (fileText.Contains(": MonoBehaviour"))
-                                {
-                                    // May be faster to keep a ref to that file itself. 
-                                    // right now we are loading all text in, which can be severly slow.
-                                    localAssets.Add(f);
-                                }
+                                // May be faster to keep a ref to that file itself. 
+                                // right now we are loading all text in, which can be severly slow.
+                                localAssets.Add(f);
                             }
-                            Console.WriteLine(f);
                         }
-                        DirSearch(d);
+                        Console.WriteLine(f);
                     }
+                    DirSearch(d);
                 }
             }
             catch (System.Exception excpt)
