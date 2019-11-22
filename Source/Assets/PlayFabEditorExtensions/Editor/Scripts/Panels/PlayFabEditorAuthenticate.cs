@@ -22,6 +22,24 @@ namespace PlayFab.PfEditor
         #region draw calls
         public static void DrawAuthPanels()
         {
+            //capture enter input for login
+            var e = Event.current;
+            if (e.type == EventType.KeyUp && e.keyCode == KeyCode.Return)
+            {
+                switch (activeState)
+                {
+                    case PanelDisplayStates.Login:
+                        OnLoginButtonClicked();
+                        break;
+                    case PanelDisplayStates.Register:
+                        OnRegisterClicked();
+                        break;
+                    case PanelDisplayStates.TwoFactorPrompt:
+                        OnContinueButtonClicked();
+                        break;
+                }
+            }
+
             if (PlayFabEditorHelper.uiStyle == null)
                 return;
 
@@ -65,7 +83,6 @@ namespace PlayFab.PfEditor
                 return;
             }
 
-
             if (!string.IsNullOrEmpty(PlayFabEditorPrefsSO.Instance.DevAccountEmail) && !isInitialized)
             {
                 _userEmail = PlayFabEditorPrefsSO.Instance.DevAccountEmail;
@@ -107,24 +124,6 @@ namespace PlayFab.PfEditor
                         Application.OpenURL("https://github.com/PlayFab/UnityEditorExtensions#setup");
                     }
                     GUILayout.FlexibleSpace();
-                }
-            }
-
-            //capture enter input for login
-            var e = Event.current;
-            if (e.type == EventType.KeyUp && e.keyCode == KeyCode.Return)
-            {
-                switch (activeState)
-                {
-                    case PanelDisplayStates.Login:
-                        OnLoginButtonClicked();
-                        break;
-                    case PanelDisplayStates.Register:
-                        OnRegisterClicked();
-                        break;
-                    case PanelDisplayStates.TwoFactorPrompt:
-                        OnContinueButtonClicked();
-                        break;
                 }
             }
         }
