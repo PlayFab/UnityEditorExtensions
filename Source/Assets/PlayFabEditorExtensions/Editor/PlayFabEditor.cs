@@ -79,7 +79,7 @@ namespace PlayFab.PfEditor
         }
 
         [InitializeOnLoad]
-        public class Startup
+        public static class Startup
         {
             static Startup()
             {
