@@ -45,7 +45,10 @@ namespace PlayFab.PfEditor
         public static void Save()
         {
             EditorUtility.SetDirty(_instance);
-            AssetDatabase.SaveAssets();
+            if(!EditorApplication.isPlaying)
+            {
+                AssetDatabase.SaveAssets();
+            }
         }
 
         public string DevAccountEmail;
