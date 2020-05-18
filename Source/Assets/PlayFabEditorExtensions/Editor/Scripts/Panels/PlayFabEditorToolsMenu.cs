@@ -121,7 +121,7 @@ namespace PlayFab.PfEditor
                     if (!File.Exists(csPath))
                         using (var newfile = File.Create(csPath)) { }
                     File.WriteAllText(csPath, result.Files[0].FileContents);
-                    Debug.Log("CloudScript uploaded successfully!");
+                    Debug.Log("CloudScript downloaded successfully!");
                     PlayFabEditorPrefsSO.Instance.LocalCloudScriptPath = csPath;
                     PlayFabEditorDataService.SaveEnvDetails();
                     AssetDatabase.Refresh();
