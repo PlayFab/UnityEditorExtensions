@@ -1,5 +1,11 @@
 # PlayFab Unity Editor Extensions
 
+MOVED! This location is deprecated, and out of date.
+
+This repo has been merged into https://github.com/PlayFab/UnitySDK
+
+The documentation is still relevant, but the source code and packages are out of date.
+
 Welcome to the home of PlayFab's official Unity plugin, the best interface for viewing and configuring our Unity SDK. Our plugin (currently in beta) houses a new custom inspector serving as the remodeled "front door" for our Unity Developers. 
 
 We will be adding to this platform as PlayFab's features grow.
